@@ -1,8 +1,14 @@
-import { BorderInnerOutlined, FileSearchOutlined } from "@ant-design/icons";
+import {
+  BorderInnerOutlined,
+  DownOutlined,
+  FileSearchOutlined,
+  SearchOutlined,
+  UpOutlined,
+} from "@ant-design/icons";
 import { useQuery } from "@apollo/client/react";
 import { useQuery as useReactQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Space, Spin, Table, Typography } from "antd";
+import { Button, Input, Space, Spin, Table, Typography } from "antd";
 import type { TableColumnsType } from "antd";
 import React, { useMemo } from "react";
 import DownloadButton from "@/components/DownloadButton";
@@ -305,6 +311,22 @@ const fetchBytestreamLog = async (
   return new TextDecoder().decode(data);
 };
 
+const countSearchTermMatches = (
+  value: string | undefined,
+  searchTerm: string,
+): number => {
+  const trimmedSearchTerm = searchTerm.trim();
+  if (!value || !trimmedSearchTerm) {
+    return 0;
+  }
+
+  const regex = new RegExp(
+    trimmedSearchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+    "gi",
+  );
+  return value.match(regex)?.length ?? 0;
+};
+
 const resultColumns: TableColumnsType<TestResultNode> = [
   {
     title: "Shard",
@@ -404,6 +426,9 @@ const RunSection: React.FC<{
   runGroup: RunGroup;
 }> = ({ runGroup }) => {
   const { casByteStreamClient } = useGrpcClients();
+  const [logSearchDraft, setLogSearchDraft] = React.useState("");
+  const [logSearchTerm, setLogSearchTerm] = React.useState("");
+  const [activeMatchIndex, setActiveMatchIndex] = React.useState(0);
   const testLogFile = runGroup.results
     .flatMap((result) => result.testResultFiles || [])
     .find((file) => file.name === "test.log" && file.uri);
@@ -413,15 +438,42 @@ const RunSection: React.FC<{
 
   const { data: testLog, error: testLogError, isLoading: testLogLoading } =
     useReactQuery({
-      queryKey: ["testLog", runGroup.run, testLogFile?.uri || ""],
-      queryFn: async () => {
-        if (!testLogFile?.uri) {
-          return undefined;
-        }
-        return fetchBytestreamLog(casByteStreamClient, testLogFile.uri);
-      },
-      enabled: Boolean(testLogFile?.uri),
-    });
+    queryKey: ["testLog", runGroup.run, testLogFile?.uri || ""],
+    queryFn: async () => {
+      if (!testLogFile?.uri) {
+        return undefined;
+      }
+      return fetchBytestreamLog(casByteStreamClient, testLogFile.uri);
+    },
+    enabled: Boolean(testLogFile?.uri),
+  });
+  const matchCount = React.useMemo(
+    () => countSearchTermMatches(testLog, logSearchTerm),
+    [testLog, logSearchTerm],
+  );
+  const handleLogSearch = React.useCallback((value: string) => {
+    const nextValue = value.trim();
+    setActiveMatchIndex(0);
+    setLogSearchTerm(nextValue);
+  }, []);
+  const handlePreviousMatch = React.useCallback(() => {
+    if (matchCount === 0) {
+      return;
+    }
+    setActiveMatchIndex(
+      (currentIndex) => (currentIndex - 1 + matchCount) % matchCount,
+    );
+  }, [matchCount]);
+  const handleNextMatch = React.useCallback(() => {
+    if (matchCount === 0) {
+      return;
+    }
+    setActiveMatchIndex((currentIndex) => (currentIndex + 1) % matchCount);
+  }, [matchCount]);
+
+  React.useEffect(() => {
+    setActiveMatchIndex(0);
+  }, [testLog, logSearchTerm]);
 
   return (
     <section className={styles.runSection}>
@@ -461,28 +513,65 @@ const RunSection: React.FC<{
         ]}
       />
       {testLogFile ? (
-        <PortalCard
-          icon={<FileSearchOutlined />}
-          titleBits={["Log"]}
-          extraBits={
-            testLogDownloadUrl
-              ? [
-                  <DownloadButton
-                    key="download"
-                    enabled={true}
-                    buttonLabel="Download Log"
-                    fileName={testLogFile.name}
-                    url={testLogDownloadUrl}
-                  />,
-                ]
-              : undefined
-          }
-          type="inner"
-        >
+        <PortalCard icon={<FileSearchOutlined />} titleBits={["Log"]} type="inner">
+          <div className={styles.logToolbar}>
+            <div className={styles.logSearchGroup}>
+              <Input.Search
+                allowClear
+                className={styles.logSearch}
+                enterButton={<SearchOutlined />}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setLogSearchDraft(nextValue);
+                  if (!nextValue.trim()) {
+                    setLogSearchTerm("");
+                    setActiveMatchIndex(0);
+                  }
+                }}
+                onSearch={handleLogSearch}
+                placeholder="Search within this run"
+                value={logSearchDraft}
+              />
+              <div className={styles.logSearchNavigation}>
+                <Button
+                  aria-label="Previous match"
+                  disabled={matchCount === 0}
+                  icon={<UpOutlined />}
+                  onClick={handlePreviousMatch}
+                />
+                <Button
+                  aria-label="Next match"
+                  disabled={matchCount === 0}
+                  icon={<DownOutlined />}
+                  onClick={handleNextMatch}
+                />
+              </div>
+              {logSearchTerm ? (
+                <Typography.Text
+                  type="secondary"
+                  className={styles.logMatchCount}
+                >
+                  {matchCount > 0
+                    ? `${activeMatchIndex + 1} / ${matchCount}`
+                    : "0 matches"}
+                </Typography.Text>
+              ) : null}
+            </div>
+            {testLogDownloadUrl ? (
+              <DownloadButton
+                enabled={true}
+                buttonLabel="Download Log"
+                fileName={testLogFile.name}
+                url={testLogDownloadUrl}
+              />
+            ) : null}
+          </div>
           <LogViewer
             loading={testLogLoading}
             error={testLogError instanceof Error ? testLogError : null}
             log={testLog}
+            searchTerm={logSearchTerm}
+            activeMatchIndex={activeMatchIndex}
           />
         </PortalCard>
       ) : null}

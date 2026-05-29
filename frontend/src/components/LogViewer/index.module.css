@@ -5,7 +5,7 @@
 
 .logContainer {
   box-sizing: border-box;
-  max-height: calc(1.5em * 50 + 8px);
+  max-height: calc(1.5em * 25 + 8px);
   padding: 4px 0;
   overflow: auto;
   line-height: 1.5;
@@ -15,4 +15,16 @@
     Liberation Mono, monospace;
   font-size: 0.9em;
   white-space: pre;
+}
+
+.logMatch {
+  background: #fff1b8;
+  color: inherit;
+  border-radius: 2px;
+  padding: 0;
+}
+
+.logActiveMatch {
+  background: #ffd666;
+  outline: 1px solid rgba(0, 0, 0, 0.15);
 }

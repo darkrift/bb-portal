@@ -44,3 +44,39 @@
   line-height: 1.4;
   font-weight: 500;
 }
+
+.logToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.logSearchGroup {
+  display: flex;
+  flex: 1 1 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.logSearch {
+  flex: 1 1 320px;
+  max-width: 520px;
+  min-width: 240px;
+}
+
+.logSearch :global(.ant-input-search-button) {
+  padding-inline: 10px;
+}
+
+.logSearchNavigation {
+  display: flex;
+  gap: 4px;
+}
+
+.logMatchCount {
+  white-space: nowrap;
+}
