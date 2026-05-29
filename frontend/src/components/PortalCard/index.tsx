@@ -86,6 +86,7 @@ interface Props extends Omit<CardProps, "title" | "extra"> {
   icon: React.ReactNode;
   titleBits: React.ReactNode[];
   extraBits?: React.ReactNode[];
+  alwaysShowExtra?: boolean;
   className?: string;
 }
 
@@ -93,6 +94,7 @@ export const PortalCard: React.FC<Props> = ({
   icon,
   titleBits,
   extraBits,
+  alwaysShowExtra,
   className,
   ...cardProps
 }) => {
@@ -135,7 +137,11 @@ export const PortalCard: React.FC<Props> = ({
       className={styles.title}
     />
   );
-  const extra = extraBits?.length && (
+  const extra = extraBits?.length && alwaysShowExtra ? (
+    <div className={styles.extra}>
+      <Header ref={extraRef} headerBits={extraBits ?? []} />
+    </div>
+  ) : extraBits?.length && (
     <div className={styles.extra}>
       <span className={isExtraMenuDisplayed ? styles.hidden : styles.visible}>
         <Header ref={extraRef} headerBits={extraBits ?? []} />

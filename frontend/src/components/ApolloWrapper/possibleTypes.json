@@ -94,6 +94,7 @@
     "Target",
     "TargetMetrics",
     "TestResult",
+    "TestResultFile",
     "TestSummary",
     "TestTarget",
     "TimingMetrics"
@@ -116,6 +117,8 @@
   "TargetMetricsWhereInput": [],
   "TargetWhereInput": [],
   "TestResult": [],
+  "TestResultFile": [],
+  "TestResultFileWhereInput": [],
   "TestResultWhereInput": [],
   "TestSummary": [],
   "TestSummaryConnection": [],

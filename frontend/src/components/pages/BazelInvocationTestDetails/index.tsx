@@ -1,17 +1,20 @@
 import {
-  BorderInnerOutlined,
+  BranchesOutlined,
   DownOutlined,
+  FileOutlined,
   FileSearchOutlined,
+  InfoCircleOutlined,
   SearchOutlined,
   UpOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@apollo/client/react";
 import { useQuery as useReactQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Button, Input, Space, Spin, Table, Typography } from "antd";
-import type { TableColumnsType } from "antd";
+import { Button, Input, Space, Spin, Tabs, Tooltip, Typography } from "antd";
+import type { TabsProps } from "antd";
 import React, { useMemo } from "react";
 import DownloadButton from "@/components/DownloadButton";
+import PortalDuration from "@/components/PortalDuration";
 import { useGrpcClients } from "@/context/GrpcClientsContext";
 import type {
   GetBazelInvocationTestDetailsQuery,
@@ -28,7 +31,6 @@ import Content from "../../Content";
 import LogViewer from "../../LogViewer";
 import PortalAlert from "../../PortalAlert";
 import PortalCard from "../../PortalCard";
-import NullBooleanTag from "../../NullableBooleanTag";
 import TestStatusTag, { type TestStatusEnum } from "../../TestStatusTag";
 import styles from "./index.module.css";
 
@@ -121,9 +123,6 @@ type TestSummaryNode = NonNullable<
 >;
 
 type TestResultNode = NonNullable<NonNullable<TestSummaryNode["testResults"]>[number]>;
-type TestResultFileNode = NonNullable<
-  NonNullable<TestResultNode["testResultFiles"]>[number]
->;
 
 interface RunGroup {
   run: number;
@@ -155,6 +154,29 @@ interface StatItem {
   title: string;
   value: React.ReactNode;
 }
+
+interface TimingBreakdownNode {
+  name?: string;
+  durationMillis?: number;
+  children?: TimingBreakdownNode[];
+  Name?: string;
+  DurationMillis?: number;
+  Children?: TimingBreakdownNode[];
+}
+
+const getTimingBreakdownName = (node: TimingBreakdownNode): string => {
+  return node.name || node.Name || "-";
+};
+
+const getTimingBreakdownDuration = (node: TimingBreakdownNode): number => {
+  return node.durationMillis ?? node.DurationMillis ?? 0;
+};
+
+const getTimingBreakdownChildren = (
+  node: TimingBreakdownNode,
+): TimingBreakdownNode[] => {
+  return node.children || node.Children || [];
+};
 
 const parseTime = (value: unknown): Date | null => {
   if (value === null || value === undefined || value === "") {
@@ -244,55 +266,6 @@ const InfoStats: React.FC<{ items: StatItem[] }> = ({ items }) => {
   );
 };
 
-const RunStats: React.FC<{ items: StatItem[] }> = ({ items }) => {
-  return (
-    <div className={styles.runStats}>
-      {items.map((item) => (
-        <div key={item.title}>
-          <Typography.Text
-            type="secondary"
-            className={styles.runStatLabel}
-          >
-            {item.title}
-          </Typography.Text>
-          <div className={styles.runStatValue}>{item.value ?? "-"}</div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const ResultFileLinks: React.FC<{ files: TestResultFileNode[] | null | undefined }> = ({
-  files,
-}) => {
-  const visibleFiles = useMemo(
-    () =>
-      [...(files || [])]
-        .filter((file) => file.name && file.uri)
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    [files],
-  );
-
-  if (visibleFiles.length === 0) {
-    return <Typography.Text type="secondary">-</Typography.Text>;
-  }
-
-  return (
-    <Space direction="vertical" size={0}>
-      {visibleFiles.map((file) => (
-        <Typography.Link
-          key={file.name}
-          href={generateFileUrlFromBytestreamUri(file.uri, file.name) || file.uri}
-          rel="noreferrer"
-          target="_blank"
-        >
-          {file.name}
-        </Typography.Link>
-      ))}
-    </Space>
-  );
-};
-
 const fetchBytestreamLog = async (
   casByteStreamClient: ByteStreamClient,
   uri: string,
@@ -327,68 +300,6 @@ const countSearchTermMatches = (
   return value.match(regex)?.length ?? 0;
 };
 
-const resultColumns: TableColumnsType<TestResultNode> = [
-  {
-    title: "Shard",
-    dataIndex: "shard",
-  },
-  {
-    title: "Attempt",
-    dataIndex: "attempt",
-  },
-  {
-    title: "Status",
-    dataIndex: "status",
-    render: (status) => (
-      <TestStatusTag
-        displayText={true}
-        status={status as TestStatusEnum}
-      />
-    ),
-  },
-  {
-    title: "Cached Locally",
-    dataIndex: "cachedLocally",
-    render: (value) => <NullBooleanTag status={value as boolean | null} />,
-  },
-  {
-    title: "Cached Remotely",
-    dataIndex: "cachedRemotely",
-    render: (value) => <NullBooleanTag status={value as boolean | null} />,
-  },
-  {
-    title: "Start",
-    dataIndex: "testAttemptStart",
-    render: (value) => formatTime(value),
-  },
-  {
-    title: "Duration",
-    dataIndex: "testAttemptDurationInMs",
-    render: (value) => readableDurationFromMilliseconds(value, { smallestUnit: "ms" }),
-    align: "right",
-  },
-  {
-    title: "Strategy",
-    dataIndex: "strategy",
-    render: (value) => value || "-",
-  },
-  {
-    title: "Exit Code",
-    dataIndex: "exitCode",
-    render: (value) => value ?? "-",
-  },
-  {
-    title: "Hostname",
-    dataIndex: "hostname",
-    render: (value) => value || "-",
-  },
-  {
-    title: "Files",
-    dataIndex: "testResultFiles",
-    render: (value) => <ResultFileLinks files={value as TestResultFileNode[] | null | undefined} />,
-  },
-];
-
 const ResultDetails: React.FC<{ result: TestResultNode }> = ({ result }) => {
   return (
     <Space direction="vertical" style={{ width: "100%" }} size="middle">
@@ -408,45 +319,145 @@ const ResultDetails: React.FC<{ result: TestResultNode }> = ({ result }) => {
           </Typography.Paragraph>
         </div>
       ) : null}
-      {result.timingBreakdown ? (
-        <div>
-          <Typography.Text strong>Timing Breakdown</Typography.Text>
-          <Typography.Paragraph
-            style={{ whiteSpace: "pre-wrap", marginBottom: 0 }}
-          >
-            {JSON.stringify(result.timingBreakdown, null, 2)}
-          </Typography.Paragraph>
-        </div>
-      ) : null}
     </Space>
   );
 };
 
-const RunSection: React.FC<{
-  runGroup: RunGroup;
-}> = ({ runGroup }) => {
+const TimingPhaseRow: React.FC<{
+  node: TimingBreakdownNode;
+  index: number;
+}> = ({ node, index }) => {
+  const duration = getTimingBreakdownDuration(node);
+  const name = getTimingBreakdownName(node);
+  const label = `${name} - ${readableDurationFromMilliseconds(duration, {
+    smallestUnit: "ms",
+  })}`;
+  const colors = [
+    "#1677ff",
+    "#52c41a",
+    "#faad14",
+    "#ff4d4f",
+    "#722ed1",
+    "#13c2c2",
+  ];
+  const accent = colors[index % colors.length];
+
+  return (
+    <Tooltip title={label}>
+      <div className={styles.phaseChip}>
+        <span className={styles.phaseBullet} style={{ backgroundColor: accent }} />
+        <Typography.Text className={styles.phaseName}>{name}</Typography.Text>
+        <Typography.Text type="secondary" className={styles.phaseDuration}>
+          {readableDurationFromMilliseconds(duration, { smallestUnit: "ms" })}
+        </Typography.Text>
+      </div>
+    </Tooltip>
+  );
+};
+
+const TimingPhases: React.FC<{ breakdown: TimingBreakdownNode | null | undefined }> = ({
+  breakdown,
+}) => {
+  if (!breakdown) {
+    return null;
+  }
+
+  const breakdownJson = JSON.stringify(breakdown, null, 2);
+
+  return (
+    <div>
+      <Tooltip
+        title={
+          <div className={styles.timingTooltipContent}>
+            <Typography.Text strong>Nested timing information reported by Bazel for this test attempt.</Typography.Text>
+            <pre className={styles.timingTooltipJson}>{breakdownJson}</pre>
+          </div>
+        }
+      >
+        <Typography.Text strong>
+          Phase Breakdown: {readableDurationFromMilliseconds(getTimingBreakdownDuration(breakdown), { smallestUnit: "ms" })}
+        </Typography.Text>
+      </Tooltip>
+      <div className={styles.phaseList}>
+        {getTimingBreakdownChildren(breakdown).length ? (
+          getTimingBreakdownChildren(breakdown).map((child, index) => (
+            <TimingPhaseRow key={`${getTimingBreakdownName(child)}-${index}`} node={child} index={index} />
+          ))
+        ) : (
+          <TimingPhaseRow node={breakdown} index={0} />
+        )}
+      </div>
+    </div>
+  );
+};
+
+const SummaryField: React.FC<StatItem> = ({ title, value }) => {
+  return (
+    <div>
+      <Typography.Text type="secondary" className={styles.summaryFieldTitle}>
+        {title}
+      </Typography.Text>
+      <div className={styles.summaryFieldValue}>{value ?? "-"}</div>
+    </div>
+  );
+};
+
+const AttemptSummary: React.FC<{ result: TestResultNode }> = ({ result }) => {
+  return (
+    <div className={styles.attemptSummary}>
+      <SummaryField title="Shard" value={result.shard} />
+      <SummaryField title="Attempt" value={result.attempt} />
+      <SummaryField
+        title="Status"
+        value={<TestStatusTag displayText={true} status={result.status as TestStatusEnum} />}
+      />
+      <SummaryField
+        title="Cached Locally"
+        value={result.cachedLocally === true ? "yes" : result.cachedLocally === false ? "no" : "-"}
+      />
+      <SummaryField
+        title="Cached Remotely"
+        value={result.cachedRemotely === true ? "yes" : result.cachedRemotely === false ? "no" : "-"}
+      />
+      <SummaryField title="Start" value={formatTime(result.testAttemptStart)} />
+      <SummaryField
+        title="Duration"
+        value={readableDurationFromMilliseconds(result.testAttemptDurationInMs, {
+          smallestUnit: "ms",
+        })}
+      />
+      <SummaryField title="Strategy" value={result.strategy || "-"} />
+      <SummaryField title="Exit Code" value={result.exitCode ?? "-"} />
+      <SummaryField title="Hostname" value={result.hostname || "-"} />
+    </div>
+  );
+};
+
+const AttemptLogSection: React.FC<{
+  result: TestResultNode;
+}> = ({ result }) => {
   const { casByteStreamClient } = useGrpcClients();
   const [logSearchDraft, setLogSearchDraft] = React.useState("");
   const [logSearchTerm, setLogSearchTerm] = React.useState("");
   const [activeMatchIndex, setActiveMatchIndex] = React.useState(0);
-  const testLogFile = runGroup.results
-    .flatMap((result) => result.testResultFiles || [])
-    .find((file) => file.name === "test.log" && file.uri);
+  const testLogFile = (result.testResultFiles || []).find(
+    (file) => file.name === "test.log" && file.uri,
+  );
   const testLogDownloadUrl = testLogFile
     ? generateFileUrlFromBytestreamUri(testLogFile.uri, testLogFile.name)
     : null;
 
   const { data: testLog, error: testLogError, isLoading: testLogLoading } =
     useReactQuery({
-    queryKey: ["testLog", runGroup.run, testLogFile?.uri || ""],
-    queryFn: async () => {
-      if (!testLogFile?.uri) {
-        return undefined;
-      }
-      return fetchBytestreamLog(casByteStreamClient, testLogFile.uri);
-    },
-    enabled: Boolean(testLogFile?.uri),
-  });
+      queryKey: ["testLog", result.id, testLogFile?.uri || ""],
+      queryFn: async () => {
+        if (!testLogFile?.uri) {
+          return undefined;
+        }
+        return fetchBytestreamLog(casByteStreamClient, testLogFile.uri);
+      },
+      enabled: Boolean(testLogFile?.uri),
+    });
   const matchCount = React.useMemo(
     () => countSearchTermMatches(testLog, logSearchTerm),
     [testLog, logSearchTerm],
@@ -476,122 +487,240 @@ const RunSection: React.FC<{
   }, [testLog, logSearchTerm]);
 
   return (
-    <section className={styles.runSection}>
-      <div className={styles.runHeader}>
-        <Typography.Title level={5} className={styles.runTitle}>
-          Run {runGroup.run}
-        </Typography.Title>
-        <Typography.Text type="secondary">
-          {runGroup.resultCount} results
-        </Typography.Text>
-      </div>
-      <RunStats
-        items={[
-          { title: "Run Number", value: runGroup.run },
-          { title: "Results", value: runGroup.resultCount },
-          { title: "Shards", value: runGroup.shardCount },
-          { title: "Attempts", value: runGroup.attemptCount },
-          {
-            title: "First Start",
-            value: runGroup.firstAttemptStart
-              ? runGroup.firstAttemptStart.toLocaleString()
-              : "-",
-          },
-          {
-            title: "Last End",
-            value: runGroup.lastAttemptEnd
-              ? runGroup.lastAttemptEnd.toLocaleString()
-              : "-",
-          },
-          {
-            title: "Attempt Time",
-            value: readableDurationFromMilliseconds(
-              runGroup.totalAttemptDurationInMs,
-              { smallestUnit: "ms" },
-            ),
-          },
-        ]}
-      />
-      {testLogFile ? (
-        <PortalCard icon={<FileSearchOutlined />} titleBits={["Log"]} type="inner">
-          <div className={styles.logToolbar}>
-            <div className={styles.logSearchGroup}>
-              <Input.Search
-                allowClear
-                className={styles.logSearch}
-                enterButton={<SearchOutlined />}
-                onChange={(event) => {
-                  const nextValue = event.target.value;
-                  setLogSearchDraft(nextValue);
-                  if (!nextValue.trim()) {
-                    setLogSearchTerm("");
-                    setActiveMatchIndex(0);
-                  }
-                }}
-                onSearch={handleLogSearch}
-                placeholder="Search within this run"
-                value={logSearchDraft}
-              />
-              <div className={styles.logSearchNavigation}>
-                <Button
-                  aria-label="Previous match"
-                  disabled={matchCount === 0}
-                  icon={<UpOutlined />}
-                  onClick={handlePreviousMatch}
-                />
-                <Button
-                  aria-label="Next match"
-                  disabled={matchCount === 0}
-                  icon={<DownOutlined />}
-                  onClick={handleNextMatch}
-                />
-              </div>
-              {logSearchTerm ? (
-                <Typography.Text
-                  type="secondary"
-                  className={styles.logMatchCount}
-                >
-                  {matchCount > 0
-                    ? `${activeMatchIndex + 1} / ${matchCount}`
-                    : "0 matches"}
-                </Typography.Text>
-              ) : null}
-            </div>
-            {testLogDownloadUrl ? (
-              <DownloadButton
-                enabled={true}
-                buttonLabel="Download Log"
-                fileName={testLogFile.name}
-                url={testLogDownloadUrl}
-              />
-            ) : null}
-          </div>
-          <LogViewer
-            loading={testLogLoading}
-            error={testLogError instanceof Error ? testLogError : null}
-            log={testLog}
-            searchTerm={logSearchTerm}
-            activeMatchIndex={activeMatchIndex}
+    <Space direction="vertical" style={{ width: "100%" }} size="middle">
+      <div className={styles.logToolbar}>
+        <div className={styles.logSearchGroup}>
+          <Input.Search
+            allowClear
+            className={styles.logSearch}
+            enterButton={<SearchOutlined />}
+            onChange={(event) => {
+              const nextValue = event.target.value;
+              setLogSearchDraft(nextValue);
+              if (!nextValue.trim()) {
+                setLogSearchTerm("");
+                setActiveMatchIndex(0);
+              }
+            }}
+            onSearch={handleLogSearch}
+            placeholder="Search within this attempt"
+            value={logSearchDraft}
           />
-        </PortalCard>
-      ) : null}
-      <Table<TestResultNode>
-        rowKey="id"
-        size="small"
-        pagination={false}
-        columns={resultColumns}
-        dataSource={runGroup.results}
-        expandable={{
-          rowExpandable: (record) =>
-            Boolean(
-              record.statusDetails ||
-                (record.warning && record.warning.length > 0) ||
-                record.timingBreakdown,
-            ),
-          expandedRowRender: (record) => <ResultDetails result={record} />,
-        }}
+          <div className={styles.logSearchNavigation}>
+            <Button
+              aria-label="Previous match"
+              disabled={matchCount === 0}
+              icon={<UpOutlined />}
+              onClick={handlePreviousMatch}
+            />
+            <Button
+              aria-label="Next match"
+              disabled={matchCount === 0}
+              icon={<DownOutlined />}
+              onClick={handleNextMatch}
+            />
+          </div>
+          {logSearchTerm ? (
+            <Typography.Text type="secondary" className={styles.logMatchCount}>
+              {matchCount > 0
+                ? `${activeMatchIndex + 1} / ${matchCount}`
+                : "0 matches"}
+            </Typography.Text>
+          ) : null}
+        </div>
+        {testLogFile && testLogDownloadUrl ? (
+          <DownloadButton
+            enabled={true}
+            buttonLabel="Download Log"
+            fileName={testLogFile.name}
+            url={testLogDownloadUrl}
+          />
+        ) : null}
+      </div>
+      <LogViewer
+        loading={testLogLoading}
+        error={testLogError instanceof Error ? testLogError : null}
+        log={testLog}
+        searchTerm={logSearchTerm}
+        activeMatchIndex={activeMatchIndex}
       />
-    </section>
+    </Space>
+  );
+};
+
+const AttemptFilesSection: React.FC<{
+  result: TestResultNode;
+}> = ({ result }) => {
+  const files = React.useMemo(
+    () =>
+      [...(result.testResultFiles || [])]
+        .sort((left, right) => left.name.localeCompare(right.name))
+        .map((file) => ({
+          ...file,
+          url: file.uri ? generateFileUrlFromBytestreamUri(file.uri, file.name) : null,
+        })),
+    [result.testResultFiles],
+  );
+
+  if (files.length === 0) {
+    return (
+      <Typography.Text type="secondary">
+        No attached files were reported for this attempt.
+      </Typography.Text>
+    );
+  }
+
+  return (
+    <Space direction="vertical" size="small" style={{ width: "100%" }}>
+      {files.map((file) => (
+        <div key={`${file.name}-${file.uri}`}>
+          {file.url ? (
+            <a href={file.url} target="_blank" rel="noreferrer">
+              {file.name}
+            </a>
+          ) : (
+            <Typography.Text>{file.name}</Typography.Text>
+          )}
+        </div>
+      ))}
+    </Space>
+  );
+};
+
+const AttemptDetails: React.FC<{
+  result: TestResultNode;
+}> = ({ result }) => {
+  const [activeTab, setActiveTab] = React.useState<string>("overview");
+
+  const items = React.useMemo<TabsProps["items"]>(
+    () => [
+      {
+        key: "overview",
+        label: (
+          <Space size={4}>
+            <InfoCircleOutlined />
+            <span>Overview</span>
+          </Space>
+        ),
+        children: (
+          <Space direction="vertical" style={{ width: "100%" }} size="middle">
+            <AttemptSummary result={result} />
+            <ResultDetails result={result} />
+          </Space>
+        ),
+      },
+      {
+        key: "log",
+        label: (
+          <Space size={4}>
+            <FileSearchOutlined />
+            <span>Logs</span>
+          </Space>
+        ),
+        children: <AttemptLogSection result={result} />,
+      },
+      {
+        key: "phase",
+        label: (
+          <Space size={4}>
+            <BranchesOutlined />
+            <span>Phases</span>
+          </Space>
+        ),
+        children: (
+          <TimingPhases
+            breakdown={
+              result.timingBreakdown as TimingBreakdownNode | null | undefined
+            }
+          />
+        ),
+      },
+      {
+        key: "files",
+        label: (
+          <Space size={4}>
+            <FileOutlined />
+            <span>Files</span>
+          </Space>
+        ),
+        children: <AttemptFilesSection result={result} />,
+      },
+    ],
+    [result],
+  );
+
+  return (
+    <Tabs
+      activeKey={activeTab}
+      items={items}
+      onChange={setActiveTab}
+      destroyInactiveTabPane={true}
+      size="small"
+      className={styles.attemptTabs}
+    />
+  );
+};
+
+const RunSection: React.FC<{
+  runGroup: RunGroup;
+}> = ({ runGroup }) => {
+  const primaryResult =
+    runGroup.results.find((result) => result.status) ?? runGroup.results[0];
+  const runStatus =
+    primaryResult?.status ??
+    runGroup.results.find((result) => result.status)?.status ??
+    "NO_STATUS";
+  const titleBits = [
+    <span key="run">
+      Run:{" "}
+      <Typography.Text type="secondary" className={styles.normalWeight}>
+        {runGroup.run}
+      </Typography.Text>
+    </span>,
+    <span key="shard">
+      Shard:{" "}
+      <Typography.Text type="secondary" className={styles.normalWeight}>
+        {primaryResult?.shard ?? "-"}
+      </Typography.Text>
+    </span>,
+    <span key="attempt">
+      Attempt:{" "}
+      <Typography.Text type="secondary" className={styles.normalWeight}>
+        {primaryResult?.attempt ?? "-"}
+      </Typography.Text>
+    </span>,
+    <span key="status">
+      Status:{" "}
+      <Typography.Text type="secondary" className={styles.normalWeight}>
+        <TestStatusTag
+          displayText={true}
+          status={runStatus as TestStatusEnum}
+        />
+      </Typography.Text>
+    </span>,
+  ];
+  return (
+    <PortalCard
+      icon={null}
+      titleBits={titleBits}
+      extraBits={[
+        runGroup.firstAttemptStart && runGroup.lastAttemptEnd ? (
+          <PortalDuration
+            key="run-duration"
+            from={runGroup.firstAttemptStart.toISOString()}
+            to={runGroup.lastAttemptEnd.toISOString()}
+            includeIcon
+            includePopover
+            formatConfig={{ smallestUnit: "ms" }}
+          />
+        ) : null,
+      ].filter(Boolean) as React.ReactNode[]}
+      alwaysShowExtra={true}
+      type="inner"
+      className={styles.runCard}
+    >
+      {primaryResult ? <AttemptDetails result={primaryResult} /> : null}
+    </PortalCard>
   );
 };
 
@@ -654,35 +783,46 @@ export const BazelInvocationTestDetails: React.FC<Props> = ({
     throw new TestNotFoundError();
   }
 
+  const targetTitleBits = [
+    <span key="target">
+      Target:{" "}
+      <Typography.Text type="secondary" className={styles.normalWeight}>
+        {target.id ? (
+          <Link to="/targets/$targetID/tests" params={{ targetID: target.id }}>
+            {target.label || "-"}
+          </Link>
+        ) : (
+          target.label || "-"
+        )}
+      </Typography.Text>
+    </span>,
+  ];
+
   return (
     <Space direction="vertical" size="middle" style={{ display: "flex" }}>
       <PortalCard
-        icon={<BorderInnerOutlined />}
-        titleBits={["Target", "Summary"]}
+        icon={null}
+        titleBits={targetTitleBits}
+        extraBits={[
+          testSummary?.firstStartTime && testSummary?.lastStopTime ? (
+            <PortalDuration
+              key="target-duration"
+              from={testSummary.firstStartTime}
+              to={testSummary.lastStopTime}
+              includeIcon
+              includePopover
+              formatConfig={{ smallestUnit: "ms" }}
+            />
+          ) : null,
+        ].filter(Boolean) as React.ReactNode[]}
+        alwaysShowExtra={true}
         type="inner"
       >
         <InfoStats
           items={[
             { title: "Instance Name", value: target.instanceName.name || "-" },
             { title: "Target Kind", value: target.targetKind || "-" },
-            {
-              title: "Target Label",
-              value: target.id ? (
-                <Space size={4}>
-                  <Link to="/targets/$targetID/tests" params={{ targetID: target.id }}>
-                    {target.label || "-"}
-                  </Link>
-                  <Typography.Text copyable={{ text: target.label || "-" }} />
-                </Space>
-              ) : (
-                <Typography.Text copyable>{target.label || "-"}</Typography.Text>
-              ),
-            },
             { title: "Target Aspect", value: target.aspect || "-" },
-            {
-              title: "Invocation ID",
-              value: <Typography.Text copyable>{invocationID}</Typography.Text>,
-            },
             {
               title: "Overall Status",
               value: testSummary?.overallStatus ? (
@@ -700,19 +840,6 @@ export const BazelInvocationTestDetails: React.FC<Props> = ({
             { title: "Shard Count", value: testSummary?.shardCount ?? "-" },
             { title: "Total Runs", value: testSummary?.totalRunCount ?? "-" },
             { title: "Cached Results", value: testSummary?.totalNumCached ?? "-" },
-            {
-              title: "Total Duration",
-              value:
-                testSummary?.totalRunDurationInMs !== undefined &&
-                testSummary?.totalRunDurationInMs !== null
-                  ? readableDurationFromMilliseconds(
-                      testSummary.totalRunDurationInMs,
-                      {
-                        smallestUnit: "ms",
-                      },
-                    )
-                  : "-",
-            },
             {
               title: "First Start",
               value: testSummary?.firstStartTime
