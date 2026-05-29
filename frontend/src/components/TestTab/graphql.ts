@@ -42,6 +42,9 @@ export const GET_TESTS_FOR_INVOCATION = gql(/* GraphQl */ `
               aspect
               targetKind
             }
+            bazelInvocation {
+              invocationID
+            }
           }
         }
       }

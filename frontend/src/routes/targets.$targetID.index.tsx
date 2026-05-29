@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { apolloClient } from "@/components/ApolloWrapper";
 import { TargetDetailsPage } from "@/components/pages/TargetDetails";
 import { gql } from "@/graphql/__generated__";
-import { TargetNotFoundError } from "@/main";
 import { env } from "@/utils/env";
 import { requireFeature } from "@/utils/featureGuard";
 import { generatePageTitle } from "@/utils/generatePageTitle";
+import { TargetNotFoundError } from "@/utils/notFound";
 
 export const TARGET_METADATA_QUERY = gql(`
   query getTargetMetadata($id: ID!) {

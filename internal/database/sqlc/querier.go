@@ -38,7 +38,7 @@ type Querier interface {
 	// order than what's used during the test.
 	CreateTargets(ctx context.Context, arg CreateTargetsParams) ([]CreateTargetsRow, error)
 	// STAGE 2: Join the rest using the specific Target IDs we found
-	CreateTestResultsBulk(ctx context.Context, arg CreateTestResultsBulkParams) (int64, error)
+	CreateTestResultsBulk(ctx context.Context, arg CreateTestResultsBulkParams) ([]CreateTestResultsBulkRow, error)
 	// STAGE 2: Join the rest using the specific Target IDs we found
 	CreateTestSummariesBulk(ctx context.Context, arg CreateTestSummariesBulkParams) (int64, error)
 	CreateTestTargetsBulk(ctx context.Context, targetIds []int64) error

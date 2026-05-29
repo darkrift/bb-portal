@@ -1,42 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { apolloClient } from "@/components/ApolloWrapper";
-import { TestDetailsPage } from "@/components/pages/TestDetails";
-import { gql } from "@/graphql/__generated__";
+import {
+  BazelInvocationTestDetailsPage,
+  TEST_TARGET_METADATA_QUERY,
+} from "@/components/pages/BazelInvocationTestDetails";
+import { TargetNotFoundError } from "@/utils/notFound";
 import { env } from "@/utils/env";
 import { requireFeature } from "@/utils/featureGuard";
 import { generatePageTitle } from "@/utils/generatePageTitle";
-import { TestNotFoundError } from "@/utils/notFound";
 
-export const TARGET_METADATA_QUERY = gql(`
-  query getTargetMetadata($id: ID!) {
-    findTargets(where: { id: $id }) {
-      edges {
-        node {
-          id
-          aspect
-          instanceName {
-            name
-          }
-          label
-          targetKind
-        }
-      }
-    }
-  }
-`);
-
-export const Route = createFileRoute("/targets/$targetID/tests")({
+export const Route = createFileRoute("/bazel-invocations/$invocationID/tests/$targetID")({
   component: RouteComponent,
   beforeLoad: requireFeature(env.featureFlags?.bes?.pageTests),
   loader: async ({ params }) => {
     const { data } = await apolloClient.query({
-      query: TARGET_METADATA_QUERY,
+      query: TEST_TARGET_METADATA_QUERY,
       variables: { id: params.targetID },
       fetchPolicy: "cache-first",
     });
     const target = data?.findTargets?.edges?.[0]?.node;
     if (!target) {
-      throw new TestNotFoundError();
+      throw new TargetNotFoundError();
     }
     return { target };
   },
@@ -50,14 +34,12 @@ export const Route = createFileRoute("/targets/$targetID/tests")({
 });
 
 function RouteComponent() {
+  const { invocationID } = Route.useParams();
   const { target } = Route.useLoaderData();
   return (
-    <TestDetailsPage
-      targetID={target.id}
-      aspect={target.aspect}
-      instanceName={target.instanceName.name}
-      kind={target.targetKind}
-      label={target.label}
+    <BazelInvocationTestDetailsPage
+      invocationID={invocationID}
+      target={target}
     />
   );
 }

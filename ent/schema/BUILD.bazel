@@ -34,6 +34,7 @@ go_library(
         "target.go",
         "targetkindmapping.go",
         "targetmetrics.go",
+        "testresultfile.go",
         "testresult.go",
         "testsummary.go",
         "testtarget.go",

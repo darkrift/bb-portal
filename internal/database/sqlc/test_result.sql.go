@@ -12,7 +12,7 @@ import (
 	"github.com/lib/pq"
 )
 
-const createTestResultsBulk = `-- name: CreateTestResultsBulk :execrows
+const createTestResultsBulk = `-- name: CreateTestResultsBulk :many
 INSERT INTO test_results (
     test_summary_test_results,
     run,
@@ -102,6 +102,8 @@ JOIN invocation_targets it
     AND it.bazel_invocation_invocation_targets = $18
 JOIN test_summaries ts
     ON ts.invocation_target_test_summary = it.id
+RETURNING
+    test_results.id
 `
 
 type CreateTestResultsBulkParams struct {
@@ -125,9 +127,13 @@ type CreateTestResultsBulkParams struct {
 	BazelInvocationID    int64
 }
 
+type CreateTestResultsBulkRow struct {
+	ID int64
+}
+
 // STAGE 2: Join the rest using the specific Target IDs we found
-func (q *Queries) CreateTestResultsBulk(ctx context.Context, arg CreateTestResultsBulkParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, createTestResultsBulk,
+func (q *Queries) CreateTestResultsBulk(ctx context.Context, arg CreateTestResultsBulkParams) ([]CreateTestResultsBulkRow, error) {
+	rows, err := q.db.QueryContext(ctx, createTestResultsBulk,
 		arg.InstanceNameID,
 		pq.Array(arg.Labels),
 		pq.Array(arg.ConfigIds),
@@ -148,7 +154,20 @@ func (q *Queries) CreateTestResultsBulk(ctx context.Context, arg CreateTestResul
 		arg.BazelInvocationID,
 	)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return result.RowsAffected()
+	defer rows.Close()
+
+	items := make([]CreateTestResultsBulkRow, 0)
+	for rows.Next() {
+		var item CreateTestResultsBulkRow
+		if err := rows.Scan(&item.ID); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

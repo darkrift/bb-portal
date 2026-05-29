@@ -1,0 +1,46 @@
+.runList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.runSection {
+  border: 1px solid rgba(5, 5, 5, 0.06);
+  border-left: 4px solid var(--ant-color-primary);
+  border-radius: 8px;
+  background: rgba(5, 5, 5, 0.015);
+  padding: 16px 18px 18px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.runHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+
+.runTitle {
+  margin: 0;
+}
+
+.runStats {
+  display: grid;
+  gap: 8px 20px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin-bottom: 14px;
+}
+
+.runStatLabel {
+  display: block;
+}
+
+.runStatValue {
+  margin-top: 2px;
+  line-height: 1.4;
+  font-weight: 500;
+}

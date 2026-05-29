@@ -1,4 +1,4 @@
--- name: CreateTestResultsBulk :execrows
+-- name: CreateTestResultsBulk :many
 INSERT INTO test_results (
     test_summary_test_results,
     run,
@@ -88,4 +88,6 @@ JOIN invocation_targets it
     AND it.invocation_target_configuration = c.id
     AND it.bazel_invocation_invocation_targets = sqlc.arg(bazel_invocation_id)
 JOIN test_summaries ts
-    ON ts.invocation_target_test_summary = it.id;
+    ON ts.invocation_target_test_summary = it.id
+RETURNING
+    test_results.id;

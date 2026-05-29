@@ -58,11 +58,15 @@ type TestResult struct {
 type TestResultEdges struct {
 	// TestSummary holds the value of the test_summary edge.
 	TestSummary *TestSummary `json:"test_summary,omitempty"`
+	// TestResultFiles holds the value of the test_result_files edge.
+	TestResultFiles []*TestResultFile `json:"test_result_files,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
+
+	namedTestResultFiles map[string][]*TestResultFile
 }
 
 // TestSummaryOrErr returns the TestSummary value or an error if the edge
@@ -74,6 +78,15 @@ func (e TestResultEdges) TestSummaryOrErr() (*TestSummary, error) {
 		return nil, &NotFoundError{label: testsummary.Label}
 	}
 	return nil, &NotLoadedError{edge: "test_summary"}
+}
+
+// TestResultFilesOrErr returns the TestResultFiles value or an error if the edge
+// was not loaded in eager-loading.
+func (e TestResultEdges) TestResultFilesOrErr() ([]*TestResultFile, error) {
+	if e.loadedTypes[1] {
+		return e.TestResultFiles, nil
+	}
+	return nil, &NotLoadedError{edge: "test_result_files"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -227,6 +240,11 @@ func (tr *TestResult) QueryTestSummary() *TestSummaryQuery {
 	return NewTestResultClient(tr.config).QueryTestSummary(tr)
 }
 
+// QueryTestResultFiles queries the "test_result_files" edge of the TestResult entity.
+func (tr *TestResult) QueryTestResultFiles() *TestResultFileQuery {
+	return NewTestResultClient(tr.config).QueryTestResultFiles(tr)
+}
+
 // Update returns a builder for updating this TestResult.
 // Note that you need to call TestResult.Unwrap() before calling this method if this TestResult
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -293,6 +311,30 @@ func (tr *TestResult) String() string {
 	builder.WriteString(fmt.Sprintf("%v", tr.TimingBreakdown))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// NamedTestResultFiles returns the TestResultFiles named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (tr *TestResult) NamedTestResultFiles(name string) ([]*TestResultFile, error) {
+	if tr.Edges.namedTestResultFiles == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := tr.Edges.namedTestResultFiles[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (tr *TestResult) appendNamedTestResultFiles(name string, edges ...*TestResultFile) {
+	if tr.Edges.namedTestResultFiles == nil {
+		tr.Edges.namedTestResultFiles = make(map[string][]*TestResultFile)
+	}
+	if len(edges) == 0 {
+		tr.Edges.namedTestResultFiles[name] = []*TestResultFile{}
+	} else {
+		tr.Edges.namedTestResultFiles[name] = append(tr.Edges.namedTestResultFiles[name], edges...)
+	}
 }
 
 // TestResults is a parsable slice of TestResult.

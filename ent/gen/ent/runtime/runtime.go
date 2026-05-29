@@ -11,6 +11,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/build"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/target"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/testresultfile"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testsummary"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testtarget"
 
@@ -81,6 +82,15 @@ func init() {
 	target.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
 			if err := target.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	testresultfile.Policy = privacy.NewPolicies(authschema.TestResultFile{})
+	testresultfile.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := testresultfile.Policy.EvalMutation(ctx, m); err != nil {
 				return nil, err
 			}
 			return next.Mutate(ctx, m)

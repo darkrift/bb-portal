@@ -35,6 +35,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/targetkindmapping"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/targetmetrics"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testresult"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/testresultfile"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testsummary"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/timingmetrics"
@@ -47,7 +48,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 34)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 35)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   action.Table,
@@ -612,6 +613,21 @@ var schemaGraph = func() *sqlgraph.Schema {
 	}
 	graph.Nodes[31] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
+			Table:   testresultfile.Table,
+			Columns: testresultfile.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt64,
+				Column: testresultfile.FieldID,
+			},
+		},
+		Type: "TestResultFile",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			testresultfile.FieldName: {Type: field.TypeString, Column: testresultfile.FieldName},
+			testresultfile.FieldURI:  {Type: field.TypeString, Column: testresultfile.FieldURI},
+		},
+	}
+	graph.Nodes[32] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
 			Table:   testsummary.Table,
 			Columns: testsummary.Columns,
 			ID: &sqlgraph.FieldSpec{
@@ -632,7 +648,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			testsummary.FieldTotalRunDurationInMs: {Type: field.TypeInt64, Column: testsummary.FieldTotalRunDurationInMs},
 		},
 	}
-	graph.Nodes[32] = &sqlgraph.Node{
+	graph.Nodes[33] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   testtarget.Table,
 			Columns: testtarget.Columns,
@@ -646,7 +662,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			testtarget.FieldTargetID: {Type: field.TypeInt64, Column: testtarget.FieldTargetID},
 		},
 	}
-	graph.Nodes[33] = &sqlgraph.Node{
+	graph.Nodes[34] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   timingmetrics.Table,
 			Columns: timingmetrics.Columns,
@@ -1527,6 +1543,30 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"TestResult",
 		"TestSummary",
+	)
+	graph.MustAddE(
+		"test_result_files",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   testresult.TestResultFilesTable,
+			Columns: []string{testresult.TestResultFilesColumn},
+			Bidi:    false,
+		},
+		"TestResult",
+		"TestResultFile",
+	)
+	graph.MustAddE(
+		"test_result",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   testresultfile.TestResultTable,
+			Columns: []string{testresultfile.TestResultColumn},
+			Bidi:    false,
+		},
+		"TestResultFile",
+		"TestResult",
 	)
 	graph.MustAddE(
 		"invocation_target",
@@ -4638,6 +4678,84 @@ func (f *TestResultFilter) WhereHasTestSummaryWith(preds ...predicate.TestSummar
 	})))
 }
 
+// WhereHasTestResultFiles applies a predicate to check if query has an edge test_result_files.
+func (f *TestResultFilter) WhereHasTestResultFiles() {
+	f.Where(entql.HasEdge("test_result_files"))
+}
+
+// WhereHasTestResultFilesWith applies a predicate to check if query has an edge test_result_files with a given conditions (other predicates).
+func (f *TestResultFilter) WhereHasTestResultFilesWith(preds ...predicate.TestResultFile) {
+	f.Where(entql.HasEdgeWith("test_result_files", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (trfq *TestResultFileQuery) addPredicate(pred func(s *sql.Selector)) {
+	trfq.predicates = append(trfq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the TestResultFileQuery builder.
+func (trfq *TestResultFileQuery) Filter() *TestResultFileFilter {
+	return &TestResultFileFilter{config: trfq.config, predicateAdder: trfq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *TestResultFileMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the TestResultFileMutation builder.
+func (m *TestResultFileMutation) Filter() *TestResultFileFilter {
+	return &TestResultFileFilter{config: m.config, predicateAdder: m}
+}
+
+// TestResultFileFilter provides a generic filtering capability at runtime for TestResultFileQuery.
+type TestResultFileFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *TestResultFileFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[31].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int64 predicate on the id field.
+func (f *TestResultFileFilter) WhereID(p entql.Int64P) {
+	f.Where(p.Field(testresultfile.FieldID))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *TestResultFileFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(testresultfile.FieldName))
+}
+
+// WhereURI applies the entql string predicate on the uri field.
+func (f *TestResultFileFilter) WhereURI(p entql.StringP) {
+	f.Where(p.Field(testresultfile.FieldURI))
+}
+
+// WhereHasTestResult applies a predicate to check if query has an edge test_result.
+func (f *TestResultFileFilter) WhereHasTestResult() {
+	f.Where(entql.HasEdge("test_result"))
+}
+
+// WhereHasTestResultWith applies a predicate to check if query has an edge test_result with a given conditions (other predicates).
+func (f *TestResultFileFilter) WhereHasTestResultWith(preds ...predicate.TestResult) {
+	f.Where(entql.HasEdgeWith("test_result", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
 // addPredicate implements the predicateAdder interface.
 func (tsq *TestSummaryQuery) addPredicate(pred func(s *sql.Selector)) {
 	tsq.predicates = append(tsq.predicates, pred)
@@ -4667,7 +4785,7 @@ type TestSummaryFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TestSummaryFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[31].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[32].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -4780,7 +4898,7 @@ type TestTargetFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TestTargetFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[32].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[33].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -4839,7 +4957,7 @@ type TimingMetricsFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TimingMetricsFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[33].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[34].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

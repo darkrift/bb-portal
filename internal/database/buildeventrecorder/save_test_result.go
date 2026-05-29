@@ -158,12 +158,35 @@ func createTestResultsBulk(ctx context.Context, invocationDbID, instanceNameDbID
 		}
 	}
 
-	affectedRows, err := tx.Sqlc().CreateTestResultsBulk(ctx, params)
+	insertedRows, err := tx.Sqlc().CreateTestResultsBulk(ctx, params)
 	if err != nil {
 		return util.StatusWrap(err, "Failed to bulk insert test results")
 	}
-	if int(affectedRows) != len(batch) {
-		return status.Errorf(codes.Internal, "Expected to insert %d test results, but only %d were inserted", len(batch), affectedRows)
+	if len(insertedRows) != len(batch) {
+		return status.Errorf(codes.Internal, "Expected to insert %d test results, but only %d were inserted", len(batch), len(insertedRows))
+	}
+
+	for i, x := range batch {
+		testResult := x.Event.GetTestResult()
+		if testResult == nil {
+			return status.Error(codes.InvalidArgument, "Test result event does not have test result set.")
+		}
+
+		for _, output := range testResult.GetTestActionOutput() {
+			name := output.GetName()
+			uri := output.GetUri()
+			if name == "" || !shouldPersistTestResultFileURI(uri) {
+				continue
+			}
+
+			file := tx.Ent().TestResultFile.Create().
+				SetName(name).
+				SetURI(uri).
+				SetTestResultID(insertedRows[i].ID)
+			if _, err := file.Save(ctx); err != nil {
+				return util.StatusWrap(err, "Failed to save test result file")
+			}
+		}
 	}
 
 	return nil

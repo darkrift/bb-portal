@@ -27,6 +27,7 @@ go_library(
         "save_target_configured.go",
         "save_test_result.go",
         "save_test_summary.go",
+        "test_result_file.go",
     ],
     importpath = "github.com/buildbarn/bb-portal/internal/database/buildeventrecorder",
     visibility = ["//:__subpackages__"],

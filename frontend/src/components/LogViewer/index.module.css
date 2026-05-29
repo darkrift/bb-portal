@@ -3,10 +3,16 @@
   box-shadow: var(--ant-card-box-shadow);
 }
 
-/* Fixes sideways scrolling in the WindowVirtualizer */
-.logContainer > div {
-  width: max-content !important;
-}
-.logContainer > div > div {
-  width: max-content !important;
+.logContainer {
+  box-sizing: border-box;
+  max-height: calc(1.5em * 50 + 8px);
+  padding: 4px 0;
+  overflow: auto;
+  line-height: 1.5;
+  margin: 0;
+  font-family:
+    ui-monospace, SFMono-Regular, SF Mono, Menlo, Monaco, Consolas,
+    Liberation Mono, monospace;
+  font-size: 0.9em;
+  white-space: pre;
 }

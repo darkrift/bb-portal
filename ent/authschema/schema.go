@@ -67,6 +67,8 @@ type (
 	TargetMetrics struct{ schema.TargetMetrics }
 	// TestTarget reexport with auth policy added
 	TestTarget struct{ schema.TestTarget }
+	// TestResultFile reexport with auth policy added
+	TestResultFile struct{ schema.TestResultFile }
 	// TestResult reexport with auth policy added
 	TestResult struct{ schema.TestResult }
 	// TestSummary reexport with auth policy added

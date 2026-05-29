@@ -65,6 +65,8 @@ func (TestResult) Edges() []ent.Edge {
 			Ref("test_results").
 			Required().
 			Unique(),
+		// Files produced by the test result, such as test.log and test.xml.
+		edge.To("test_result_files", TestResultFile.Type),
 	}
 }
 

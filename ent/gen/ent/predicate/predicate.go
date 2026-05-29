@@ -99,6 +99,9 @@ type TargetMetrics func(*sql.Selector)
 // TestResult is the predicate function for testresult builders.
 type TestResult func(*sql.Selector)
 
+// TestResultFile is the predicate function for testresultfile builders.
+type TestResultFile func(*sql.Selector)
+
 // TestSummary is the predicate function for testsummary builders.
 type TestSummary func(*sql.Selector)
 

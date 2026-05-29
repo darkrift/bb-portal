@@ -2,23 +2,12 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { NotFoundPage } from "@/components/pages/NotFound";
+import { TargetNotFoundError, TestNotFoundError } from "@/utils/notFound";
 import { routeTree } from "./routeTree.gen";
 import "./globals.css";
 import { DisabledPage } from "./components/pages/DisabledPage";
 import { ErrorPage } from "./components/pages/ErrorPage";
 import { FeatureDisabledError } from "./utils/featureGuard";
-
-export class TargetNotFoundError extends Error {
-  constructor() {
-    super("TARGET_NOT_FOUND");
-  }
-}
-
-export class TestNotFoundError extends Error {
-  constructor() {
-    super("TEST_NOT_FOUND");
-  }
-}
 
 const router = createRouter({
   routeTree,

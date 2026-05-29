@@ -855,6 +855,30 @@ func (f TestResultMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Muta
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.TestResultMutation", m)
 }
 
+// The TestResultFileQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type TestResultFileQueryRuleFunc func(context.Context, *ent.TestResultFileQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f TestResultFileQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.TestResultFileQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.TestResultFileQuery", q)
+}
+
+// The TestResultFileMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type TestResultFileMutationRuleFunc func(context.Context, *ent.TestResultFileMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f TestResultFileMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.TestResultFileMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.TestResultFileMutation", m)
+}
+
 // The TestSummaryQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type TestSummaryQueryRuleFunc func(context.Context, *ent.TestSummaryQuery) error
@@ -1024,6 +1048,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.TestResultQuery:
 		return q.Filter(), nil
+	case *ent.TestResultFileQuery:
+		return q.Filter(), nil
 	case *ent.TestSummaryQuery:
 		return q.Filter(), nil
 	case *ent.TestTargetQuery:
@@ -1098,6 +1124,8 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	case *ent.TargetMetricsMutation:
 		return m.Filter(), nil
 	case *ent.TestResultMutation:
+		return m.Filter(), nil
+	case *ent.TestResultFileMutation:
 		return m.Filter(), nil
 	case *ent.TestSummaryMutation:
 		return m.Filter(), nil

@@ -34,6 +34,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/target"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/targetmetrics"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testresult"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/testresultfile"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testsummary"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/timingmetrics"
@@ -9732,6 +9733,10 @@ type TestResultWhereInput struct {
 	// "test_summary" edge predicates.
 	HasTestSummary     *bool                    `json:"hasTestSummary,omitempty"`
 	HasTestSummaryWith []*TestSummaryWhereInput `json:"hasTestSummaryWith,omitempty"`
+
+	// "test_result_files" edge predicates.
+	HasTestResultFiles     *bool                       `json:"hasTestResultFiles,omitempty"`
+	HasTestResultFilesWith []*TestResultFileWhereInput `json:"hasTestResultFilesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -10214,6 +10219,24 @@ func (i *TestResultWhereInput) P() (predicate.TestResult, error) {
 		}
 		predicates = append(predicates, testresult.HasTestSummaryWith(with...))
 	}
+	if i.HasTestResultFiles != nil {
+		p := testresult.HasTestResultFiles()
+		if !*i.HasTestResultFiles {
+			p = testresult.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasTestResultFilesWith) > 0 {
+		with := make([]predicate.TestResultFile, 0, len(i.HasTestResultFilesWith))
+		for _, w := range i.HasTestResultFilesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasTestResultFilesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, testresult.HasTestResultFilesWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyTestResultWhereInput
@@ -10221,6 +10244,260 @@ func (i *TestResultWhereInput) P() (predicate.TestResult, error) {
 		return predicates[0], nil
 	default:
 		return testresult.And(predicates...), nil
+	}
+}
+
+// TestResultFileWhereInput represents a where input for filtering TestResultFile queries.
+type TestResultFileWhereInput struct {
+	Predicates []predicate.TestResultFile  `json:"-"`
+	Not        *TestResultFileWhereInput   `json:"not,omitempty"`
+	Or         []*TestResultFileWhereInput `json:"or,omitempty"`
+	And        []*TestResultFileWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int64  `json:"id,omitempty"`
+	IDNEQ   *int64  `json:"idNEQ,omitempty"`
+	IDIn    []int64 `json:"idIn,omitempty"`
+	IDNotIn []int64 `json:"idNotIn,omitempty"`
+	IDGT    *int64  `json:"idGT,omitempty"`
+	IDGTE   *int64  `json:"idGTE,omitempty"`
+	IDLT    *int64  `json:"idLT,omitempty"`
+	IDLTE   *int64  `json:"idLTE,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "uri" field predicates.
+	URI             *string  `json:"uri,omitempty"`
+	URINEQ          *string  `json:"uriNEQ,omitempty"`
+	URIIn           []string `json:"uriIn,omitempty"`
+	URINotIn        []string `json:"uriNotIn,omitempty"`
+	URIGT           *string  `json:"uriGT,omitempty"`
+	URIGTE          *string  `json:"uriGTE,omitempty"`
+	URILT           *string  `json:"uriLT,omitempty"`
+	URILTE          *string  `json:"uriLTE,omitempty"`
+	URIContains     *string  `json:"uriContains,omitempty"`
+	URIHasPrefix    *string  `json:"uriHasPrefix,omitempty"`
+	URIHasSuffix    *string  `json:"uriHasSuffix,omitempty"`
+	URIEqualFold    *string  `json:"uriEqualFold,omitempty"`
+	URIContainsFold *string  `json:"uriContainsFold,omitempty"`
+
+	// "test_result" edge predicates.
+	HasTestResult     *bool                   `json:"hasTestResult,omitempty"`
+	HasTestResultWith []*TestResultWhereInput `json:"hasTestResultWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *TestResultFileWhereInput) AddPredicates(predicates ...predicate.TestResultFile) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the TestResultFileWhereInput filter on the TestResultFileQuery builder.
+func (i *TestResultFileWhereInput) Filter(q *TestResultFileQuery) (*TestResultFileQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyTestResultFileWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyTestResultFileWhereInput is returned in case the TestResultFileWhereInput is empty.
+var ErrEmptyTestResultFileWhereInput = errors.New("ent: empty predicate TestResultFileWhereInput")
+
+// P returns a predicate for filtering testresultfiles.
+// An error is returned if the input is empty or invalid.
+func (i *TestResultFileWhereInput) P() (predicate.TestResultFile, error) {
+	var predicates []predicate.TestResultFile
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, testresultfile.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.TestResultFile, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, testresultfile.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.TestResultFile, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, testresultfile.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, testresultfile.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, testresultfile.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, testresultfile.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, testresultfile.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, testresultfile.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, testresultfile.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, testresultfile.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, testresultfile.IDLTE(*i.IDLTE))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, testresultfile.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, testresultfile.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, testresultfile.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, testresultfile.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, testresultfile.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, testresultfile.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, testresultfile.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, testresultfile.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, testresultfile.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, testresultfile.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, testresultfile.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, testresultfile.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, testresultfile.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.URI != nil {
+		predicates = append(predicates, testresultfile.URIEQ(*i.URI))
+	}
+	if i.URINEQ != nil {
+		predicates = append(predicates, testresultfile.URINEQ(*i.URINEQ))
+	}
+	if len(i.URIIn) > 0 {
+		predicates = append(predicates, testresultfile.URIIn(i.URIIn...))
+	}
+	if len(i.URINotIn) > 0 {
+		predicates = append(predicates, testresultfile.URINotIn(i.URINotIn...))
+	}
+	if i.URIGT != nil {
+		predicates = append(predicates, testresultfile.URIGT(*i.URIGT))
+	}
+	if i.URIGTE != nil {
+		predicates = append(predicates, testresultfile.URIGTE(*i.URIGTE))
+	}
+	if i.URILT != nil {
+		predicates = append(predicates, testresultfile.URILT(*i.URILT))
+	}
+	if i.URILTE != nil {
+		predicates = append(predicates, testresultfile.URILTE(*i.URILTE))
+	}
+	if i.URIContains != nil {
+		predicates = append(predicates, testresultfile.URIContains(*i.URIContains))
+	}
+	if i.URIHasPrefix != nil {
+		predicates = append(predicates, testresultfile.URIHasPrefix(*i.URIHasPrefix))
+	}
+	if i.URIHasSuffix != nil {
+		predicates = append(predicates, testresultfile.URIHasSuffix(*i.URIHasSuffix))
+	}
+	if i.URIEqualFold != nil {
+		predicates = append(predicates, testresultfile.URIEqualFold(*i.URIEqualFold))
+	}
+	if i.URIContainsFold != nil {
+		predicates = append(predicates, testresultfile.URIContainsFold(*i.URIContainsFold))
+	}
+
+	if i.HasTestResult != nil {
+		p := testresultfile.HasTestResult()
+		if !*i.HasTestResult {
+			p = testresultfile.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasTestResultWith) > 0 {
+		with := make([]predicate.TestResult, 0, len(i.HasTestResultWith))
+		for _, w := range i.HasTestResultWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasTestResultWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, testresultfile.HasTestResultWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyTestResultFileWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return testresultfile.And(predicates...), nil
 	}
 }
 

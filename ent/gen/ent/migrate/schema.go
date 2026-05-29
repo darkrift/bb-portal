@@ -1103,6 +1103,39 @@ var (
 			},
 		},
 	}
+	// TestResultFilesColumns holds the columns for the "test_result_files" table.
+	TestResultFilesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "uri", Type: field.TypeString},
+		{Name: "test_result_test_result_files", Type: field.TypeInt64, Nullable: true},
+	}
+	// TestResultFilesTable holds the schema information for the "test_result_files" table.
+	TestResultFilesTable = &schema.Table{
+		Name:       "test_result_files",
+		Columns:    TestResultFilesColumns,
+		PrimaryKey: []*schema.Column{TestResultFilesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "test_result_files_test_results_test_result_files",
+				Columns:    []*schema.Column{TestResultFilesColumns[3]},
+				RefColumns: []*schema.Column{TestResultsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "testresultfile_test_result_test_result_files",
+				Unique:  false,
+				Columns: []*schema.Column{TestResultFilesColumns[3]},
+			},
+			{
+				Name:    "testresultfile_name_test_result_test_result_files",
+				Unique:  true,
+				Columns: []*schema.Column{TestResultFilesColumns[1], TestResultFilesColumns[3]},
+			},
+		},
+	}
 	// TestSummariesColumns holds the columns for the "test_summaries" table.
 	TestSummariesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -1221,6 +1254,7 @@ var (
 		TargetKindMappingsTable,
 		TargetMetricsTable,
 		TestResultsTable,
+		TestResultFilesTable,
 		TestSummariesTable,
 		TestTargetsTable,
 		TimingMetricsTable,
@@ -1263,6 +1297,7 @@ func init() {
 	TargetKindMappingsTable.ForeignKeys[1].RefTable = TargetsTable
 	TargetMetricsTable.ForeignKeys[0].RefTable = MetricsTable
 	TestResultsTable.ForeignKeys[0].RefTable = TestSummariesTable
+	TestResultFilesTable.ForeignKeys[0].RefTable = TestResultsTable
 	TestSummariesTable.ForeignKeys[0].RefTable = InvocationTargetsTable
 	TestTargetsTable.ForeignKeys[0].RefTable = TargetsTable
 	TimingMetricsTable.ForeignKeys[0].RefTable = MetricsTable

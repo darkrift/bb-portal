@@ -1,17 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { BazelInvocationDetailsPage } from "@/components/pages/BazelInvocationDetails";
-import { generatePageTitle } from "@/utils/generatePageTitle";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/bazel-invocations/$invocationID")({
-  component: RouteComponent,
-  head: (_ctx) => ({
-    meta: [
-      { title: generatePageTitle(["Invocation", _ctx.params.invocationID]) },
-    ],
-  }),
+  component: Outlet,
 });
-
-function RouteComponent() {
-  const { invocationID } = Route.useParams();
-  return <BazelInvocationDetailsPage invocationID={invocationID} />;
-}

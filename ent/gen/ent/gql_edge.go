@@ -618,6 +618,26 @@ func (tr *TestResult) TestSummary(ctx context.Context) (*TestSummary, error) {
 	return result, err
 }
 
+func (tr *TestResult) TestResultFiles(ctx context.Context) (result []*TestResultFile, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = tr.NamedTestResultFiles(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = tr.Edges.TestResultFilesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = tr.QueryTestResultFiles().All(ctx)
+	}
+	return result, err
+}
+
+func (trf *TestResultFile) TestResult(ctx context.Context) (*TestResult, error) {
+	result, err := trf.Edges.TestResultOrErr()
+	if IsNotLoaded(err) {
+		result, err = trf.QueryTestResult().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (ts *TestSummary) InvocationTarget(ctx context.Context) (*InvocationTarget, error) {
 	result, err := ts.Edges.InvocationTargetOrErr()
 	if IsNotLoaded(err) {
