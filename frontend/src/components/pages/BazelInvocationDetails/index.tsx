@@ -123,12 +123,12 @@ export const BazelInvocationDetailsPage: React.FC<Props> = ({ invocation }) => {
   if (
     pathname.match(
       new RegExp(
-        `^/bazel-invocations/${invocation.invocationID}/tests/[^/]+$`,
+        `^/bazel-invocations/${invocation.invocationID}/tests/[^/]+(?:/.*)?$`,
       ),
     )
     || pathname.match(
       new RegExp(
-        `^/bazel-invocations/${invocation.invocationID}/targets/[^/]+$`,
+        `^/bazel-invocations/${invocation.invocationID}/targets/[^/]+(?:/.*)?$`,
       ),
     )
   ) {

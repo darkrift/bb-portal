@@ -58,6 +58,37 @@ const GET_BAZEL_INVOCATION_TARGET_DETAILS = gql(/* GraphQL */ `
               totalRunDurationInMs
               firstStartTime
               lastStopTime
+              invocationTarget {
+                target {
+                  id
+                  label
+                  aspect
+                  targetKind
+                  instanceName {
+                    name
+                  }
+                }
+              }
+              testResults {
+                run
+                shard
+                attempt
+                status
+                statusDetails
+                cachedLocally
+                testAttemptStart
+                testAttemptDurationInMs
+                warning
+                strategy
+                cachedRemotely
+                exitCode
+                hostname
+                timingBreakdown
+                testResultFiles {
+                  name
+                  uri
+                }
+              }
             }
           }
         }
@@ -144,11 +175,10 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const { invocationID, instanceName, target, actions } = Route.useLoaderData();
+  const { invocationID, target, actions } = Route.useLoaderData();
   return (
     <BazelInvocationTargetDetailsPage
       invocationID={invocationID}
-      instanceName={instanceName}
       target={target}
       actions={actions}
     />

@@ -72,7 +72,7 @@ function RouteComponent() {
   if (
     pathname.match(
       new RegExp(
-        `^/bazel-invocations/${invocationID}/targets/[^/]+$`,
+        `^/bazel-invocations/${invocationID}/targets/[^/]+(?:/.*)?$`,
       ),
     )
   ) {

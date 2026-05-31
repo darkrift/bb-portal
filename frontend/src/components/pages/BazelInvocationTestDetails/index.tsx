@@ -174,7 +174,10 @@ const renderOverview = (testResult: any) => {
         ? dayjs(testResult.testAttemptStart).format("YYYY-MM-DD HH:mm:ss")
         : "-",
     ],
-    ["Duration", formatDuration(testResult.testAttemptDurationInMs)],
+    [
+      "Total test duration",
+      formatDuration(testResult.testAttemptDurationInMs),
+    ],
   ];
 
   return (
@@ -341,7 +344,7 @@ const getSummaryTitleBits = (summary: any): React.ReactNode[] => [
     Target:{" "}
     <Typography.Text className={styles.normalWeight}>
       <Link
-        to="/targets/$targetID/tests"
+        to="/targets/$targetID"
         params={{ targetID: summary.invocationTarget.target.id }}
       >
         <Typography.Text
@@ -372,6 +375,126 @@ const getSummaryExtraBits = (summary: any) => {
   ];
 };
 
+export const BazelInvocationTestSummaryPanel: React.FC<Props> = ({ summary }) => (
+  <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+    <div className={styles.summaryGrid}>
+      <div className={styles.detailItem}>
+        <div className={styles.summaryLabel}>Status</div>
+        <div className={styles.summaryValue}>
+          <TestStatusTag
+            displayText
+            status={summary.overallStatus as TestStatusEnum}
+          />
+        </div>
+      </div>
+      <div className={styles.detailItem}>
+        <div className={styles.summaryLabel}>Run count</div>
+        <div className={styles.summaryValue}>{summary.runCount ?? "-"}</div>
+      </div>
+      <div className={styles.detailItem}>
+        <div className={styles.summaryLabel}>Attempt count</div>
+        <div className={styles.summaryValue}>{summary.attemptCount ?? "-"}</div>
+      </div>
+      <div className={styles.detailItem}>
+        <div className={styles.summaryLabel}>Shard count</div>
+        <div className={styles.summaryValue}>{summary.shardCount ?? "-"}</div>
+      </div>
+      <div className={styles.detailItem}>
+        <div className={styles.summaryLabel}>Total cached</div>
+        <div className={styles.summaryValue}>
+          {summary.totalNumCached ?? "-"}
+        </div>
+      </div>
+      <div className={styles.detailItem}>
+        <div className={styles.summaryLabel}>Total test duration</div>
+        <div className={styles.summaryValue}>
+          <PortalDuration
+            from={summary.firstStartTime}
+            to={
+              summary.firstStartTime && summary.totalRunDurationInMs
+                ? dayjs(summary.firstStartTime)
+                    .add(summary.totalRunDurationInMs, "millisecond")
+                    .toISOString()
+                : undefined
+            }
+            includeIcon
+            formatConfig={{ smallestUnit: "ms" }}
+          />
+        </div>
+      </div>
+      <div className={styles.detailItem}>
+        <div className={styles.summaryLabel}>First started</div>
+        <div className={styles.summaryValue}>
+          {summary.firstStartTime
+            ? dayjs(summary.firstStartTime).format("YYYY-MM-DD HH:mm:ss")
+            : "-"}
+        </div>
+      </div>
+      <div className={styles.detailItem}>
+        <div className={styles.summaryLabel}>Last completed</div>
+        <div className={styles.summaryValue}>
+          {summary.lastStopTime
+            ? dayjs(summary.lastStopTime).format("YYYY-MM-DD HH:mm:ss")
+            : "-"}
+        </div>
+      </div>
+    </div>
+  </Space>
+);
+
+export const BazelInvocationTestRunsPanel: React.FC<Props> = ({ summary }) => (
+  <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+    {(summary.testResults || [])
+      .slice()
+      .sort((left: any, right: any) => {
+        const runDiff = left.run - right.run;
+        if (runDiff !== 0) {
+          return runDiff;
+        }
+        const shardDiff = left.shard - right.shard;
+        if (shardDiff !== 0) {
+          return shardDiff;
+        }
+        return left.attempt - right.attempt;
+      })
+      .map((testResult: any) => (
+        <PortalCard
+          key={`${testResult.run}-${testResult.shard}-${testResult.attempt}`}
+          type="inner"
+          icon={<OrderedListOutlined />}
+          titleBits={getRunTitleBits(testResult)}
+          extraBits={getRunExtraBits(testResult)}
+          className={styles.runCard}
+        >
+          <Tabs
+            items={[
+              {
+                key: "overview",
+                label: "Overview",
+                children: renderOverview(testResult),
+              },
+              {
+                key: "logs",
+                label: "Logs",
+                children: renderLogs(summary, testResult),
+              },
+              {
+                key: "phases",
+                label: "Phases",
+                children: renderPhases(testResult),
+              },
+              {
+                key: "files",
+                label: "Files",
+                children: renderFiles(testResult),
+              },
+            ]}
+          />
+        </PortalCard>
+      ))}
+  </Space>
+);
+
 export const BazelInvocationTestDetailsPage: React.FC<Props> = ({ summary }) => {
   return (
     <Space direction="vertical" size="middle" className={styles.page}>
@@ -381,108 +504,8 @@ export const BazelInvocationTestDetailsPage: React.FC<Props> = ({ summary }) => 
         extraBits={getSummaryExtraBits(summary)}
       >
         <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-          <div className={styles.summaryGrid}>
-            <div className={styles.detailItem}>
-              <div className={styles.summaryLabel}>Status</div>
-              <div className={styles.summaryValue}>
-                <TestStatusTag
-                  displayText
-                  status={summary.overallStatus as TestStatusEnum}
-                />
-              </div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.summaryLabel}>Run count</div>
-              <div className={styles.summaryValue}>
-                {summary.runCount ?? "-"}
-              </div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.summaryLabel}>Attempt count</div>
-              <div className={styles.summaryValue}>
-                {summary.attemptCount ?? "-"}
-              </div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.summaryLabel}>Shard count</div>
-              <div className={styles.summaryValue}>
-                {summary.shardCount ?? "-"}
-              </div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.summaryLabel}>Total cached</div>
-              <div className={styles.summaryValue}>
-                {summary.totalNumCached ?? "-"}
-              </div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.summaryLabel}>Instance name</div>
-              <div className={styles.summaryValue}>
-                {summary.invocationTarget.target.instanceName.name}
-              </div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.summaryLabel}>Target kind</div>
-              <div className={styles.summaryValue}>
-                {summary.invocationTarget.target.targetKind}
-              </div>
-            </div>
-            <div className={styles.detailItem}>
-              <div className={styles.summaryLabel}>Target aspect</div>
-              <div className={styles.summaryValue}>
-                {summary.invocationTarget.target.aspect || "-"}
-              </div>
-            </div>
-          </div>
-
-          {(summary.testResults || [])
-            .slice()
-            .sort((left: any, right: any) => {
-              const runDiff = left.run - right.run;
-              if (runDiff !== 0) {
-                return runDiff;
-              }
-              const shardDiff = left.shard - right.shard;
-              if (shardDiff !== 0) {
-                return shardDiff;
-              }
-              return left.attempt - right.attempt;
-            })
-            .map((testResult: any) => (
-              <PortalCard
-                key={`${testResult.run}-${testResult.shard}-${testResult.attempt}`}
-                type="inner"
-                icon={<OrderedListOutlined />}
-                titleBits={getRunTitleBits(testResult)}
-                extraBits={getRunExtraBits(testResult)}
-                className={styles.runCard}
-              >
-                <Tabs
-                  items={[
-                    {
-                      key: "overview",
-                      label: "Overview",
-                      children: renderOverview(testResult),
-                    },
-                    {
-                      key: "logs",
-                      label: "Logs",
-                      children: renderLogs(summary, testResult),
-                    },
-                    {
-                      key: "phases",
-                      label: "Phases",
-                      children: renderPhases(testResult),
-                    },
-                    {
-                      key: "files",
-                      label: "Files",
-                      children: renderFiles(testResult),
-                    },
-                  ]}
-                />
-              </PortalCard>
-            ))}
+          <BazelInvocationTestSummaryPanel summary={summary} />
+          <BazelInvocationTestRunsPanel summary={summary} />
         </Space>
       </PortalCard>
     </Space>

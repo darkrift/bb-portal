@@ -27,7 +27,7 @@
 }
 
 .detailLabel {
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--text-tertiary);
   font-size: 12px;
   line-height: 1.2;
   margin-bottom: 4px;
@@ -37,11 +37,12 @@
   min-width: 0;
   font-size: 14px;
   line-height: 1.35;
+  color: var(--text-primary);
   word-break: break-word;
 }
 
 .summaryLabel {
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--text-tertiary);
   font-size: 12px;
   line-height: 1.2;
   margin-bottom: 4px;
@@ -51,6 +52,7 @@
   min-width: 0;
   font-size: 14px;
   line-height: 1.35;
+  color: var(--text-primary);
   word-break: break-word;
 }
 
@@ -61,7 +63,7 @@
 }
 
 .runSummaryLabel {
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--text-tertiary);
   font-size: 12px;
   line-height: 1.2;
   margin-bottom: 4px;
@@ -71,6 +73,7 @@
   min-width: 0;
   font-size: 14px;
   line-height: 1.35;
+  color: var(--text-primary);
   word-break: break-word;
 }
 
@@ -140,7 +143,7 @@
   margin-left: 4px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  color: rgba(0, 0, 0, 0.65);
+  color: var(--text-secondary);
 }
 
 .fileRow {

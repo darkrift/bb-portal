@@ -1,8 +1,8 @@
 import { ExperimentFilled } from "@ant-design/icons";
 import { useQuery } from "@apollo/client/react";
 import type { FilterValue, SorterResult } from "antd/es/table/interface";
+import { Space, Statistic, theme } from "antd";
 import React, { useMemo } from "react";
-import { Row, Space, Statistic } from "antd";
 import PortalCard from "../PortalCard";
 import {
   GetTestsForInvocationDocument,
@@ -24,6 +24,7 @@ interface Props {
 }
 
 export const TestTab: React.FC<Props> = ({ invocationId }) => {
+  const { token } = theme.useToken();
   const [paginationVariables, setPaginationVariables] =
     React.useState<PaginationVariables>(getNewPaginationVariables());
   const [filterVariables, setFilterVariables] = React.useState<
@@ -193,19 +194,37 @@ export const TestTab: React.FC<Props> = ({ invocationId }) => {
       icon={<ExperimentFilled />}
       titleBits={[<span key="title">Tests Overview</span>]}
     >
-      <Row>
-        <Space size="large" wrap>
-          <Statistic title="Tests" value={summaryStats.tests} />
-          <Statistic title="Passed" value={summaryStats.passed} />
-          <Statistic title="Flaky" value={summaryStats.flaky} />
-          <Statistic title="Failed" value={summaryStats.failed} />
-          <Statistic title="Incomplete" value={summaryStats.incomplete} />
-          <Statistic title="No status" value={summaryStats.noStatus} />
-          <Statistic title="Runs" value={summaryStats.runs} />
-          <Statistic title="Attempts" value={summaryStats.attempts} />
-          <Statistic title="Cached" value={summaryStats.cached} />
-        </Space>
-      </Row>
+      <Space size="large" wrap>
+        <Statistic title="Tests" value={summaryStats.tests} />
+        <Statistic
+          title="Passed"
+          value={summaryStats.passed}
+          valueStyle={{ color: token.colorSuccess }}
+        />
+        <Statistic
+          title="Flaky"
+          value={summaryStats.flaky}
+          valueStyle={{ color: token.colorWarning }}
+        />
+        <Statistic
+          title="Failed"
+          value={summaryStats.failed}
+          valueStyle={{ color: token.colorError }}
+        />
+        <Statistic
+          title="Incomplete"
+          value={summaryStats.incomplete}
+          valueStyle={{ color: token.colorInfo }}
+        />
+        <Statistic
+          title="No status"
+          value={summaryStats.noStatus}
+          valueStyle={{ color: token.colorTextQuaternary }}
+        />
+        <Statistic title="Runs" value={summaryStats.runs} />
+        <Statistic title="Attempts" value={summaryStats.attempts} />
+        <Statistic title="Cached" value={summaryStats.cached} />
+      </Space>
       <CursorTable
         size="small"
         columns={columns}

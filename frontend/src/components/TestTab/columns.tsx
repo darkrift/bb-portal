@@ -84,7 +84,7 @@ export const columns: TableColumnsType<TestTabRowType> = [
     dataIndex: "label",
     render: (_, record) => (
       <Link
-        to="/bazel-invocations/$invocationID/tests/$targetID"
+        to="/bazel-invocations/$invocationID/targets/$targetID/test-summary"
         params={{
           invocationID: String(
             record.invocationTarget.bazelInvocation.invocationID,
