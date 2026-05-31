@@ -8,6 +8,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/buildbarn/bb-portal/pkg/proto/configuration/bb_portal"
 	"github.com/buildbarn/bb-portal/pkg/proto/configuration/frontend"
@@ -83,6 +84,10 @@ func setupProxyHandler(router *mux.Router, sourceConfig *bb_portal.FrontendServi
 	}
 
 	proxy := &httputil.ReverseProxy{
+		Transport: &http.Transport{
+			Proxy:                 http.ProxyFromEnvironment,
+			ResponseHeaderTimeout: 30 * time.Second,
+		},
 		Rewrite: func(request *httputil.ProxyRequest) {
 			request.SetURL(remote)
 			request.Out.Host = remote.Host
@@ -108,6 +113,9 @@ func setupProxyHandler(router *mux.Router, sourceConfig *bb_portal.FrontendServi
 			r.Body = io.NopCloser(bytes.NewReader(newIndexContent))
 			r.Header.Set("Content-Length", strconv.Itoa(len(newIndexContent)))
 			return nil
+		},
+		ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
+			http.Error(w, fmt.Sprintf("frontend proxy request to %s failed: %v", remote, err), http.StatusBadGateway)
 		},
 	}
 

@@ -15,7 +15,7 @@ export const columns: TableColumnsType<TestGridRowDataType> = [
     title: "Target",
     dataIndex: "target",
     render: (_, record) => (
-      <Link to="/targets/$targetID/tests" params={{ targetID: record.id }}>
+      <Link to="/tests/$targetID" params={{ targetID: record.id }}>
         {record.label}
       </Link>
     ),

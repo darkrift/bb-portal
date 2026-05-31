@@ -26,12 +26,14 @@ import { Route as BuildsIndexRouteImport } from './routes/builds.index'
 import { Route as BrowserIndexRouteImport } from './routes/browser.index'
 import { Route as BazelInvocationsIndexRouteImport } from './routes/bazel-invocations.index'
 import { Route as UsersUserUUIDRouteImport } from './routes/users.$userUUID'
+import { Route as TestsTargetIDRouteImport } from './routes/tests.$targetID'
 import { Route as TargetsTargetIDRouteImport } from './routes/targets.$targetID'
 import { Route as SchedulerWorkerRouteImport } from './routes/scheduler.worker'
 import { Route as OperationsOperationIDRouteImport } from './routes/operations.$operationID'
 import { Route as BuildsBuildUUIDRouteImport } from './routes/builds.$buildUUID'
 import { Route as BrowserSplatRouteImport } from './routes/browser.$'
 import { Route as BazelInvocationsInvocationIDRouteImport } from './routes/bazel-invocations.$invocationID'
+import { Route as TestsTargetIDIndexRouteImport } from './routes/tests.$targetID.index'
 import { Route as TargetsTargetIDIndexRouteImport } from './routes/targets.$targetID.index'
 import { Route as BazelInvocationsInvocationIDIndexRouteImport } from './routes/bazel-invocations.$invocationID/index'
 import { Route as TargetsTargetIDTestsRouteImport } from './routes/targets.$targetID.tests'
@@ -137,6 +139,11 @@ const UsersUserUUIDRoute = UsersUserUUIDRouteImport.update({
   path: '/users/$userUUID',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TestsTargetIDRoute = TestsTargetIDRouteImport.update({
+  id: '/$targetID',
+  path: '/$targetID',
+  getParentRoute: () => TestsRoute,
+} as any)
 const TargetsTargetIDRoute = TargetsTargetIDRouteImport.update({
   id: '/$targetID',
   path: '/$targetID',
@@ -168,6 +175,11 @@ const BazelInvocationsInvocationIDRoute =
     path: '/$invocationID',
     getParentRoute: () => BazelInvocationsRoute,
   } as any)
+const TestsTargetIDIndexRoute = TestsTargetIDIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TestsTargetIDRoute,
+} as any)
 const TargetsTargetIDIndexRoute = TargetsTargetIDIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -297,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/operations/$operationID': typeof OperationsOperationIDRoute
   '/scheduler/worker': typeof SchedulerWorkerRoute
   '/targets/$targetID': typeof TargetsTargetIDRouteWithChildren
+  '/tests/$targetID': typeof TestsTargetIDRouteWithChildren
   '/users/$userUUID': typeof UsersUserUUIDRoute
   '/bazel-invocations/': typeof BazelInvocationsIndexRoute
   '/browser/': typeof BrowserIndexRoute
@@ -316,6 +329,7 @@ export interface FileRoutesByFullPath {
   '/targets/$targetID/tests': typeof TargetsTargetIDTestsRoute
   '/bazel-invocations/$invocationID/': typeof BazelInvocationsInvocationIDIndexRoute
   '/targets/$targetID/': typeof TargetsTargetIDIndexRoute
+  '/tests/$targetID/': typeof TestsTargetIDIndexRoute
   '/bazel-invocations/$invocationID/targets/$targetID': typeof BazelInvocationsInvocationIDTargetsTargetIDRouteWithChildren
   '/bazel-invocations/$invocationID/tests/$targetID': typeof BazelInvocationsInvocationIDTestsTargetIDRoute
   '/bazel-invocations/$invocationID/tests/': typeof BazelInvocationsInvocationIDTestsIndexRoute
@@ -350,6 +364,7 @@ export interface FileRoutesByTo {
   '/targets/$targetID/tests': typeof TargetsTargetIDTestsRoute
   '/bazel-invocations/$invocationID': typeof BazelInvocationsInvocationIDIndexRoute
   '/targets/$targetID': typeof TargetsTargetIDIndexRoute
+  '/tests/$targetID': typeof TestsTargetIDIndexRoute
   '/bazel-invocations/$invocationID/tests/$targetID': typeof BazelInvocationsInvocationIDTestsTargetIDRoute
   '/bazel-invocations/$invocationID/tests': typeof BazelInvocationsInvocationIDTestsIndexRoute
   '/bazel-invocations/$invocationID/targets/$targetID/actions': typeof BazelInvocationsInvocationIDTargetsTargetIDActionsRoute
@@ -375,6 +390,7 @@ export interface FileRoutesById {
   '/operations/$operationID': typeof OperationsOperationIDRoute
   '/scheduler/worker': typeof SchedulerWorkerRoute
   '/targets/$targetID': typeof TargetsTargetIDRouteWithChildren
+  '/tests/$targetID': typeof TestsTargetIDRouteWithChildren
   '/users/$userUUID': typeof UsersUserUUIDRoute
   '/bazel-invocations/': typeof BazelInvocationsIndexRoute
   '/browser/': typeof BrowserIndexRoute
@@ -394,6 +410,7 @@ export interface FileRoutesById {
   '/targets/$targetID/tests': typeof TargetsTargetIDTestsRoute
   '/bazel-invocations/$invocationID/': typeof BazelInvocationsInvocationIDIndexRoute
   '/targets/$targetID/': typeof TargetsTargetIDIndexRoute
+  '/tests/$targetID/': typeof TestsTargetIDIndexRoute
   '/bazel-invocations/$invocationID/targets/$targetID': typeof BazelInvocationsInvocationIDTargetsTargetIDRouteWithChildren
   '/bazel-invocations/$invocationID/tests/$targetID': typeof BazelInvocationsInvocationIDTestsTargetIDRoute
   '/bazel-invocations/$invocationID/tests/': typeof BazelInvocationsInvocationIDTestsIndexRoute
@@ -421,6 +438,7 @@ export interface FileRouteTypes {
     | '/operations/$operationID'
     | '/scheduler/worker'
     | '/targets/$targetID'
+    | '/tests/$targetID'
     | '/users/$userUUID'
     | '/bazel-invocations/'
     | '/browser/'
@@ -440,6 +458,7 @@ export interface FileRouteTypes {
     | '/targets/$targetID/tests'
     | '/bazel-invocations/$invocationID/'
     | '/targets/$targetID/'
+    | '/tests/$targetID/'
     | '/bazel-invocations/$invocationID/targets/$targetID'
     | '/bazel-invocations/$invocationID/tests/$targetID'
     | '/bazel-invocations/$invocationID/tests/'
@@ -474,6 +493,7 @@ export interface FileRouteTypes {
     | '/targets/$targetID/tests'
     | '/bazel-invocations/$invocationID'
     | '/targets/$targetID'
+    | '/tests/$targetID'
     | '/bazel-invocations/$invocationID/tests/$targetID'
     | '/bazel-invocations/$invocationID/tests'
     | '/bazel-invocations/$invocationID/targets/$targetID/actions'
@@ -498,6 +518,7 @@ export interface FileRouteTypes {
     | '/operations/$operationID'
     | '/scheduler/worker'
     | '/targets/$targetID'
+    | '/tests/$targetID'
     | '/users/$userUUID'
     | '/bazel-invocations/'
     | '/browser/'
@@ -517,6 +538,7 @@ export interface FileRouteTypes {
     | '/targets/$targetID/tests'
     | '/bazel-invocations/$invocationID/'
     | '/targets/$targetID/'
+    | '/tests/$targetID/'
     | '/bazel-invocations/$invocationID/targets/$targetID'
     | '/bazel-invocations/$invocationID/tests/$targetID'
     | '/bazel-invocations/$invocationID/tests/'
@@ -661,6 +683,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersUserUUIDRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tests/$targetID': {
+      id: '/tests/$targetID'
+      path: '/$targetID'
+      fullPath: '/tests/$targetID'
+      preLoaderRoute: typeof TestsTargetIDRouteImport
+      parentRoute: typeof TestsRoute
+    }
     '/targets/$targetID': {
       id: '/targets/$targetID'
       path: '/$targetID'
@@ -702,6 +731,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/bazel-invocations/$invocationID'
       preLoaderRoute: typeof BazelInvocationsInvocationIDRouteImport
       parentRoute: typeof BazelInvocationsRoute
+    }
+    '/tests/$targetID/': {
+      id: '/tests/$targetID/'
+      path: '/'
+      fullPath: '/tests/$targetID/'
+      preLoaderRoute: typeof TestsTargetIDIndexRouteImport
+      parentRoute: typeof TestsTargetIDRoute
     }
     '/targets/$targetID/': {
       id: '/targets/$targetID/'
@@ -1032,11 +1068,25 @@ const TargetsRouteChildren: TargetsRouteChildren = {
 const TargetsRouteWithChildren =
   TargetsRoute._addFileChildren(TargetsRouteChildren)
 
+interface TestsTargetIDRouteChildren {
+  TestsTargetIDIndexRoute: typeof TestsTargetIDIndexRoute
+}
+
+const TestsTargetIDRouteChildren: TestsTargetIDRouteChildren = {
+  TestsTargetIDIndexRoute: TestsTargetIDIndexRoute,
+}
+
+const TestsTargetIDRouteWithChildren = TestsTargetIDRoute._addFileChildren(
+  TestsTargetIDRouteChildren,
+)
+
 interface TestsRouteChildren {
+  TestsTargetIDRoute: typeof TestsTargetIDRouteWithChildren
   TestsIndexRoute: typeof TestsIndexRoute
 }
 
 const TestsRouteChildren: TestsRouteChildren = {
+  TestsTargetIDRoute: TestsTargetIDRouteWithChildren,
   TestsIndexRoute: TestsIndexRoute,
 }
 

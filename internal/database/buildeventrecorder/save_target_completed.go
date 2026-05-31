@@ -9,7 +9,11 @@ import (
 	"time"
 
 	bes "github.com/bazelbuild/bazel/src/main/java/com/google/devtools/build/lib/buildeventstream/proto"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/target"
 	"github.com/buildbarn/bb-portal/internal/database"
 	"github.com/buildbarn/bb-portal/internal/database/sqlc"
 	"github.com/buildbarn/bb-portal/pkg/proto/configuration/bb_portal"
@@ -72,7 +76,7 @@ func (r *buildEventRecorder) saveTargetCompletedBatch(ctx context.Context, batch
 		return util.StatusWrap(err, "Failed to bulk insert invocation targets")
 	}
 
-	if err := saveInvocationTargetFiles(ctx, tx, batch, targetInfoMap); err != nil {
+	if err := saveInvocationTargetFiles(ctx, r.InvocationDbID, tx, batch, targetInfoMap); err != nil {
 		return util.StatusWrap(err, "Failed to bulk insert invocation target files")
 	}
 
@@ -91,7 +95,13 @@ func (r *buildEventRecorder) saveTargetCompletedBatch(ctx context.Context, batch
 	return nil
 }
 
-func saveInvocationTargetFiles(ctx context.Context, tx database.Handle, batch []BuildEventWithInfo, targetInfoMap map[invocationTargetKey]completedTargetInfo) error {
+func saveInvocationTargetFiles(ctx context.Context, invocationDbID int64, tx database.Handle, batch []BuildEventWithInfo, targetInfoMap map[invocationTargetKey]completedTargetInfo) error {
+	type fileKey struct {
+		invocationTargetID int64
+		name               string
+	}
+	seen := make(map[fileKey]struct{})
+
 	for _, x := range batch {
 		be := x.Event
 		targetCompletedID := be.GetId().GetTargetCompleted()
@@ -109,7 +119,21 @@ func saveInvocationTargetFiles(ctx context.Context, tx database.Handle, batch []
 			continue
 		}
 
-		seen := make(map[string]struct{})
+		invocationTargetID, err := tx.Ent().InvocationTarget.Query().Where(
+			invocationtarget.HasBazelInvocationWith(
+				bazelinvocation.ID(invocationDbID),
+			),
+			invocationtarget.HasTargetWith(
+				target.ID(int64(targetInfo.targetID)),
+			),
+			invocationtarget.HasConfigurationWith(
+				configuration.ConfigurationIDEQ(targetCompletedID.GetConfiguration().GetId()),
+			),
+		).OnlyID(ctx)
+		if err != nil {
+			return util.StatusWrap(err, "Failed to resolve inserted invocation target")
+		}
+
 		addFile := func(file *bes.File) error {
 			if !shouldPersistBesFile(file) {
 				return nil
@@ -118,15 +142,22 @@ func saveInvocationTargetFiles(ctx context.Context, tx database.Handle, batch []
 			if name == "" {
 				return nil
 			}
-			if _, exists := seen[name]; exists {
+			key := fileKey{
+				invocationTargetID: invocationTargetID,
+				name:               name,
+			}
+			if _, exists := seen[key]; exists {
 				return nil
 			}
-			seen[name] = struct{}{}
+			seen[key] = struct{}{}
 
 			create := tx.Ent().InvocationFiles.Create().
-				SetInvocationTargetID(int64(targetInfo.targetID))
+				SetInvocationTargetID(invocationTargetID)
 			applyBesFileFields(create, file)
-			if _, err := create.Save(ctx); err != nil {
+			if err := create.
+				OnConflictColumns(invocationfiles.FieldName, invocationfiles.InvocationTargetColumn).
+				Ignore().
+				Exec(ctx); err != nil {
 				return util.StatusWrap(err, "Failed to insert invocation target file")
 			}
 			return nil
@@ -317,8 +348,8 @@ func (r *buildEventRecorder) resolveTargetInfo(ctx context.Context, tx database.
 
 	params := sqlc.FindMappedTargetsParams{
 		BazelInvocationID: int64(r.InvocationDbID),
-		Aspects:           make([]string, len(batch)),
-		Labels:            make([]string, len(batch)),
+		Aspects:           make([]string, len(keys)),
+		Labels:            make([]string, len(keys)),
 	}
 	for i, k := range keys {
 		params.Aspects[i] = k.aspect

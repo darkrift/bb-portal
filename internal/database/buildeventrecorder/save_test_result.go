@@ -9,6 +9,7 @@ import (
 
 	bes "github.com/bazelbuild/bazel/src/main/java/com/google/devtools/build/lib/buildeventstream/proto"
 	"github.com/buildbarn/bb-portal/ent/gen/ent"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/target"
@@ -78,7 +79,7 @@ func (r *buildEventRecorder) saveTestResultBatch(ctx context.Context, batch []Bu
 		return util.StatusWrap(err, "Failed to bulk insert test results")
 	}
 
-	if err := saveTestResultFiles(ctx, tx, filteredBatch); err != nil {
+	if err := saveTestResultFiles(ctx, r.InvocationDbID, tx, filteredBatch); err != nil {
 		return util.StatusWrap(err, "Failed to bulk insert test result files")
 	}
 
@@ -180,7 +181,7 @@ func createTestResultsBulk(ctx context.Context, invocationDbID, instanceNameDbID
 	return nil
 }
 
-func saveTestResultFiles(ctx context.Context, tx database.Handle, batch []BuildEventWithInfo) error {
+func saveTestResultFiles(ctx context.Context, invocationDbID int64, tx database.Handle, batch []BuildEventWithInfo) error {
 	for _, x := range batch {
 		be := x.Event
 		testResultID := be.GetId().GetTestResult()
@@ -196,6 +197,9 @@ func saveTestResultFiles(ctx context.Context, tx database.Handle, batch []BuildE
 			testresult.AttemptEQ(testResultID.Attempt),
 			testresult.HasTestSummaryWith(
 				testsummary.HasInvocationTargetWith(
+					invocationtarget.HasBazelInvocationWith(
+						bazelinvocation.ID(invocationDbID),
+					),
 					invocationtarget.HasTargetWith(
 						target.LabelEQ(testResultID.Label),
 						target.AspectEQ(""),

@@ -2,6 +2,7 @@ import {
   DatabaseOutlined,
   DeploymentUnitOutlined,
   ExperimentOutlined,
+  LinkOutlined,
   FileSearchOutlined,
   FolderOutlined,
   InfoCircleOutlined,
@@ -239,6 +240,16 @@ export const BazelInvocationTargetTestSummaryPanel: React.FC<{
   summary: any;
 }> = ({ summary }) => (
   <Space direction="vertical" size="large" style={{ width: "100%" }}>
+    <div style={{ display: "flex", justifyContent: "flex-start" }}>
+      <Link
+        to="/tests/$targetID"
+        params={{ targetID: summary.invocationTarget.target.id }}
+        style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+      >
+        <LinkOutlined />
+        Open Tests Page
+      </Link>
+    </div>
     <BazelInvocationTestSummaryPanel summary={summary} />
     <BazelInvocationTestRunsPanel summary={summary} />
   </Space>

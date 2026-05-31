@@ -38,3 +38,34 @@
   background-attachment: local, local, scroll, scroll;
   padding: 6px 0.6em;
 }
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.18);
+}
+
+.searchControls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.searchInput {
+  width: 240px;
+}
+
+.logLine {
+  display: block;
+}
+
+.matchLine {
+  background-color: rgba(250, 173, 20, 0.15);
+}
+
+.activeMatchLine {
+  background-color: rgba(22, 119, 255, 0.18);
+}

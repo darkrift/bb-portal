@@ -1,6 +1,7 @@
 import { DownloadOutlined, FileSearchOutlined } from "@ant-design/icons";
-import { Button, Spin } from "antd";
+import { Button, Input, Space, Spin, Typography } from "antd";
 import type React from "react";
+import { useEffect, useMemo, useState } from "react";
 import PortalAlert from "@/components/PortalAlert";
 import { useBbPortalMessage } from "@/context/MessageContext";
 import PortalCard from "../PortalCard";
@@ -25,6 +26,32 @@ const LogViewerCard: React.FC<Props> = ({
   fileName,
 }) => {
   const { copyToClipboard } = useBbPortalMessage();
+  const [searchDraft, setSearchDraft] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
+  const [activeMatchIndex, setActiveMatchIndex] = useState(0);
+
+  const logLines = useMemo(() => log?.split(/\r?\n/) ?? [], [log]);
+  const normalizedSearchTerm = activeSearchTerm.trim().toLowerCase();
+  const matchingLineIndexes = useMemo(() => {
+    if (!normalizedSearchTerm) {
+      return [];
+    }
+    return logLines
+      .map((line, index) =>
+        line.toLowerCase().includes(normalizedSearchTerm) ? index : null,
+      )
+      .filter((index): index is number => index !== null);
+  }, [logLines, normalizedSearchTerm]);
+
+  useEffect(() => {
+    setActiveMatchIndex(0);
+  }, [activeSearchTerm, log]);
+
+  useEffect(() => {
+    if (activeMatchIndex >= matchingLineIndexes.length) {
+      setActiveMatchIndex(0);
+    }
+  }, [activeMatchIndex, matchingLineIndexes.length]);
 
   if (loading === true)
     return (
@@ -66,7 +93,7 @@ const LogViewerCard: React.FC<Props> = ({
       titleBits={[title]}
       extraBits={[
         logDownloadUrl && (
-          <Button icon={<DownloadOutlined />} type="primary">
+          <Button key="download" icon={<DownloadOutlined />} type="primary">
             <a
               href={logDownloadUrl}
               download={fileName || "log.txt"}
@@ -77,13 +104,68 @@ const LogViewerCard: React.FC<Props> = ({
           </Button>
         ),
         log && (
-          <Button type="primary" onClick={() => copyToClipboard(log)}>
+          <Button key="copy" type="primary" onClick={() => copyToClipboard(log)}>
             Copy to clipboard
           </Button>
         ),
       ]}
     >
-      <AnsiScrollingWindow log={log} />
+      <div className={styles.toolbar}>
+        <Space size="small" className={styles.searchControls} wrap>
+          <Input.Search
+            allowClear
+            placeholder="Search log"
+            size="small"
+            className={styles.searchInput}
+            value={searchDraft}
+            onChange={(event) => setSearchDraft(event.target.value)}
+            onSearch={() => setActiveSearchTerm(searchDraft)}
+          />
+          <Button
+            size="small"
+            disabled={matchingLineIndexes.length === 0}
+            onClick={() =>
+              setActiveMatchIndex((current) =>
+                matchingLineIndexes.length === 0
+                  ? 0
+                  : (current - 1 + matchingLineIndexes.length) %
+                    matchingLineIndexes.length,
+              )
+            }
+          >
+            Previous
+          </Button>
+          <Button
+            size="small"
+            disabled={matchingLineIndexes.length === 0}
+            onClick={() =>
+              setActiveMatchIndex((current) =>
+                matchingLineIndexes.length === 0
+                  ? 0
+                  : (current + 1) % matchingLineIndexes.length,
+              )
+            }
+          >
+            Next
+          </Button>
+          {activeSearchTerm && (
+            <Typography.Text type="secondary">
+              {matchingLineIndexes.length > 0
+                ? `${activeMatchIndex + 1}/${matchingLineIndexes.length}`
+                : "0/0"}
+            </Typography.Text>
+          )}
+        </Space>
+      </div>
+      <AnsiScrollingWindow
+        log={log}
+        activeLineIndex={
+          matchingLineIndexes.length > 0
+            ? matchingLineIndexes[activeMatchIndex]
+            : undefined
+        }
+        matchedLineIndexes={matchingLineIndexes}
+      />
     </PortalCard>
   );
 };

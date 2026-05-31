@@ -8,10 +8,16 @@ const ansi = new AnsiUp();
 
 interface Props {
   log: string;
+  activeLineIndex?: number;
+  matchedLineIndexes?: number[];
 }
 
 // Takes a log in ansi style, formats it to HTML, and displays it in a scrollable window with virtualization
-const AnsiScrollingWindow: React.FC<Props> = ({ log }) => {
+const AnsiScrollingWindow: React.FC<Props> = ({
+  log,
+  activeLineIndex,
+  matchedLineIndexes,
+}) => {
   const lines = React.useMemo(() => {
     if (!log) return [];
     return ansi.ansi_to_html(log).split("\n");
@@ -20,10 +26,15 @@ const AnsiScrollingWindow: React.FC<Props> = ({ log }) => {
   const vListRef = useRef<VGridHandle>(null);
 
   useEffect(() => {
-    if (vListRef.current) {
-      vListRef.current.scrollToIndex(lines.length - 1);
+    if (!vListRef.current) {
+      return;
     }
-  }, [lines]);
+    if (typeof activeLineIndex === "number") {
+      vListRef.current.scrollToIndex(activeLineIndex);
+      return;
+    }
+    vListRef.current.scrollToIndex(lines.length - 1);
+  }, [activeLineIndex, lines]);
 
   if (!log) {
     return (
@@ -38,18 +49,31 @@ const AnsiScrollingWindow: React.FC<Props> = ({ log }) => {
   const LINE_HEIGHT = 16.66; // 14px base font size * 0.85 font-size * 1.4 line-height
   const PADDING_HEIGHT = 14; // (Vertical padding + border) * 2
   const MAX_VISIBLE_LINES = 27.3; // Make the top line only partially visible to convey that the view screen is scrollable
+  const renderLine = (html: string, rowIndex: number) => {
+    const isMatch = matchedLineIndexes?.includes(rowIndex) ?? false;
+    const isActive = activeLineIndex === rowIndex;
+    const className = [
+      styles.logLine,
+      isMatch ? styles.matchLine : "",
+      isActive ? styles.activeMatchLine : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    return (
+      <div
+        // biome-ignore lint/suspicious/noArrayIndexKey: We have nothing better to use
+        key={rowIndex}
+        className={className}
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Should be reworked
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    );
+  };
   if (lines.length < MAX_VISIBLE_LINES) {
     return (
       <pre className={styles.scrollWindow}>
-        {lines.map((v, i) => (
-          <div
-            // biome-ignore lint/suspicious/noArrayIndexKey: We have nothing better to use
-            key={i}
-            // TODO: Remove the danger
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: Should be reworked
-            dangerouslySetInnerHTML={{ __html: v }}
-          />
-        ))}
+        {lines.map((v, i) => renderLine(v, i))}
       </pre>
     );
   }
@@ -65,15 +89,7 @@ const AnsiScrollingWindow: React.FC<Props> = ({ log }) => {
         col={1}
         cellHeight={LINE_HEIGHT}
       >
-        {({ rowIndex }) => (
-          <span
-            // This is also using an index as key, but biome dosn't notice.
-            key={rowIndex}
-            // TODO: Remove the danger
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: Should be reworked
-            dangerouslySetInnerHTML={{ __html: lines[rowIndex] }}
-          />
-        )}
+        {({ rowIndex }) => renderLine(lines[rowIndex], rowIndex)}
       </VGrid>
     </pre>
   );
