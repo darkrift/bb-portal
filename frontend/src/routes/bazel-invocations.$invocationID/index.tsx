@@ -4,16 +4,16 @@ import { InvocationOverviewDisplay } from "@/components/InvocationOverviewDispla
 import { getFragmentData, gql } from "@/graphql/__generated__";
 import { generatePageTitle } from "@/utils/generatePageTitle";
 
-const GET_BAZEL_INVOCATION_OVERVIEW = gql(/* GraphQL */ `
-  query GetBazelInvocationOverview($invocationID: UUID!) {
+const GET_BAZEL_INVOCATION_SUMMARY = gql(/* GraphQL */ `
+  query GetBazelInvocationSummary($invocationID: UUID!) {
     getBazelInvocation(invocationID: $invocationID) {
-      ...BazelInvocationOverview
+      ...BazelInvocationSummary
     }
   }
 `);
 
-const BAZEL_INVOCATION_OVERVIEW_FRAGMENT = gql(/* GraphQL */ `
-  fragment BazelInvocationOverview on BazelInvocation {
+const BAZEL_INVOCATION_SUMMARY_FRAGMENT = gql(/* GraphQL */ `
+  fragment BazelInvocationSummary on BazelInvocation {
     id
     invocationID
     startedAt
@@ -44,7 +44,7 @@ export const Route = createFileRoute("/bazel-invocations/$invocationID/")({
   component: RouteComponent,
   loader: async ({ params }) => {
     const { data } = await apolloClient.query({
-      query: GET_BAZEL_INVOCATION_OVERVIEW,
+      query: GET_BAZEL_INVOCATION_SUMMARY,
       variables: { invocationID: params.invocationID },
       fetchPolicy: "network-only",
     });
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/bazel-invocations/$invocationID/")({
 
     return {
       invocation: getFragmentData(
-        BAZEL_INVOCATION_OVERVIEW_FRAGMENT,
+        BAZEL_INVOCATION_SUMMARY_FRAGMENT,
         data.getBazelInvocation,
       ),
     };

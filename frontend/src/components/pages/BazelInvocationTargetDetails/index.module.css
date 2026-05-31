@@ -1,0 +1,31 @@
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 16px;
+}
+
+.detailItem {
+  min-width: 0;
+}
+
+.detailLabel {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.detailValue {
+  min-width: 0;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.failureMessage {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.fileRow {
+  padding-left: 0;
+  padding-right: 0;
+}

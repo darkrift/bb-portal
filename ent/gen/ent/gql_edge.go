@@ -24,6 +24,18 @@ func (a *Action) Configuration(ctx context.Context) (*Configuration, error) {
 	return result, err
 }
 
+func (a *Action) ActionFiles(ctx context.Context) (result []*InvocationFiles, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = a.NamedActionFiles(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = a.Edges.ActionFilesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = a.QueryActionFiles().All(ctx)
+	}
+	return result, err
+}
+
 func (acs *ActionCacheStatistics) ActionSummary(ctx context.Context) (*ActionSummary, error) {
 	result, err := acs.Edges.ActionSummaryOrErr()
 	if IsNotLoaded(err) {
@@ -206,6 +218,18 @@ func (bi *BazelInvocation) Metrics(ctx context.Context) (*Metrics, error) {
 	return result, MaskNotFound(err)
 }
 
+func (bi *BazelInvocation) InvocationFiles(ctx context.Context) (result []*InvocationFiles, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = bi.NamedInvocationFiles(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = bi.Edges.InvocationFilesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = bi.QueryInvocationFiles().All(ctx)
+	}
+	return result, err
+}
+
 func (bi *BazelInvocation) InvocationTargets(
 	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *InvocationTargetOrder, where *InvocationTargetWhereInput,
 ) (*InvocationTargetConnection, error) {
@@ -214,7 +238,7 @@ func (bi *BazelInvocation) InvocationTargets(
 		WithInvocationTargetFilter(where.Filter),
 	}
 	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := bi.Edges.totalCount[8][alias]
+	totalCount, hasTotalCount := bi.Edges.totalCount[9][alias]
 	if nodes, err := bi.NamedInvocationTargets(alias); err == nil || hasTotalCount {
 		pager, err := newInvocationTargetPager(opts, last != nil)
 		if err != nil {
@@ -389,6 +413,30 @@ func (in *InstanceName) Targets(ctx context.Context) (result []*Target, err erro
 	return result, err
 }
 
+func (_if *InvocationFiles) BazelInvocation(ctx context.Context) (*BazelInvocation, error) {
+	result, err := _if.Edges.BazelInvocationOrErr()
+	if IsNotLoaded(err) {
+		result, err = _if.QueryBazelInvocation().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_if *InvocationFiles) Action(ctx context.Context) (*Action, error) {
+	result, err := _if.Edges.ActionOrErr()
+	if IsNotLoaded(err) {
+		result, err = _if.QueryAction().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (_if *InvocationFiles) InvocationTarget(ctx context.Context) (*InvocationTarget, error) {
+	result, err := _if.Edges.InvocationTargetOrErr()
+	if IsNotLoaded(err) {
+		result, err = _if.QueryInvocationTarget().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (it *InvocationTag) BazelInvocation(ctx context.Context) (*BazelInvocation, error) {
 	result, err := it.Edges.BazelInvocationOrErr()
 	if IsNotLoaded(err) {
@@ -429,6 +477,18 @@ func (it *InvocationTarget) TestSummary(ctx context.Context) (result []*TestSumm
 	}
 	if IsNotLoaded(err) {
 		result, err = it.QueryTestSummary().All(ctx)
+	}
+	return result, err
+}
+
+func (it *InvocationTarget) TargetFiles(ctx context.Context) (result []*InvocationFiles, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = it.NamedTargetFiles(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = it.Edges.TargetFilesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = it.QueryTargetFiles().All(ctx)
 	}
 	return result, err
 }
@@ -614,6 +674,18 @@ func (tr *TestResult) TestSummary(ctx context.Context) (*TestSummary, error) {
 	result, err := tr.Edges.TestSummaryOrErr()
 	if IsNotLoaded(err) {
 		result, err = tr.QueryTestSummary().Only(ctx)
+	}
+	return result, err
+}
+
+func (tr *TestResult) TestResultFiles(ctx context.Context) (result []*TestResultFile, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = tr.NamedTestResultFiles(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = tr.Edges.TestResultFilesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = tr.QueryTestResultFiles().All(ctx)
 	}
 	return result, err
 }

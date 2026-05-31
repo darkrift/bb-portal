@@ -381,6 +381,18 @@ func (f TestResultFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestResultMutation", m)
 }
 
+// The TestResultFileFunc type is an adapter to allow the use of ordinary
+// function as TestResultFile mutator.
+type TestResultFileFunc func(context.Context, *ent.TestResultFileMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TestResultFileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TestResultFileMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestResultFileMutation", m)
+}
+
 // The TestSummaryFunc type is an adapter to allow the use of ordinary
 // function as TestSummary mutator.
 type TestSummaryFunc func(context.Context, *ent.TestSummaryMutation) (ent.Value, error)

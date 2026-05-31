@@ -25,6 +25,8 @@ import type {
   InvocationTargetAbortReason,
   InvocationTargetWhereInput,
 } from "@/graphql/__generated__/graphql";
+import { parseBytestreamUri } from "@/utils/bytestreamUri";
+import { generateFileUrl } from "@/utils/urlGenerator";
 import { parseGraphqlEdgeList } from "@/utils/parseGraphqlEdgeList";
 import { readableDurationFromMilliseconds } from "@/utils/time";
 import PortalAlert from "../../PortalAlert";
@@ -109,6 +111,42 @@ const TargetDetails: React.FC<Props> = ({
     data?.getTarget?.invocationTargets,
   );
 
+  const renderFileLink = (file: { name: string; uri?: string | null }) => {
+    if (!file.uri) {
+      return (
+        <Typography.Text type="secondary" key={file.name}>
+          {file.name}
+        </Typography.Text>
+      );
+    }
+
+    const parsed = parseBytestreamUri(file.uri);
+    if (!parsed) {
+      return (
+        <Typography.Text type="secondary" key={file.name}>
+          {file.name}
+        </Typography.Text>
+      );
+    }
+
+    return (
+      <a
+        key={file.name}
+        href={generateFileUrl(
+          parsed.instanceName,
+          parsed.digestFunction,
+          parsed.digest,
+          file.name,
+        )}
+        download={file.name}
+        target="_self"
+        rel="noreferrer"
+      >
+        {file.name}
+      </a>
+    );
+  };
+
   return (
     <Space direction="vertical" size="middle" style={{ display: "flex" }}>
       <Descriptions column={1}>
@@ -186,17 +224,36 @@ const TargetDetails: React.FC<Props> = ({
           size="small"
           expandable={{
             rowExpandable: (record) =>
-              record.failureMessage !== null &&
-              record.failureMessage !== undefined &&
-              record.failureMessage !== "",
+              (record.failureMessage !== null &&
+                record.failureMessage !== undefined &&
+                record.failureMessage !== "") ||
+              (Array.isArray(record.targetFiles) && record.targetFiles.length > 0),
             expandedRowRender: (record) => (
               <Space direction="vertical" style={{ paddingLeft: "48px" }}>
-                <strong>Failure Message:</strong>
-                <pre
-                  style={{ whiteSpace: "pre-wrap", overflowWrap: "break-word" }}
-                >
-                  {record.failureMessage}
-                </pre>
+                {record.failureMessage && (
+                  <>
+                    <strong>Failure Message:</strong>
+                    <pre
+                      style={{
+                        whiteSpace: "pre-wrap",
+                        overflowWrap: "break-word",
+                      }}
+                    >
+                      {record.failureMessage}
+                    </pre>
+                  </>
+                )}
+                {Array.isArray(record.targetFiles) &&
+                  record.targetFiles.length > 0 && (
+                    <Space direction="vertical" size="small">
+                      <strong>Files</strong>
+                      <Space direction="vertical" size={2}>
+                        {[...record.targetFiles]
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map((file) => renderFileLink(file))}
+                      </Space>
+                    </Space>
+                  )}
               </Space>
             ),
           }}

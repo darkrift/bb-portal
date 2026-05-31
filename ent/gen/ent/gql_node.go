@@ -27,6 +27,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/connectionmetadata"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/garbagemetrics"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/instancename"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtag"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/memorymetrics"
@@ -39,6 +40,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/target"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/targetmetrics"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testresult"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/testresultfile"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testsummary"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/timingmetrics"
@@ -121,6 +123,11 @@ var instancenameImplementors = []string{"InstanceName", "Node"}
 // IsNode implements the Node interface check for GQLGen.
 func (*InstanceName) IsNode() {}
 
+var invocationfilesImplementors = []string{"InvocationFiles", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*InvocationFiles) IsNode() {}
+
 var invocationtagImplementors = []string{"InvocationTag", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
@@ -180,6 +187,11 @@ var testresultImplementors = []string{"TestResult", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*TestResult) IsNode() {}
+
+var testresultfileImplementors = []string{"TestResultFile", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*TestResultFile) IsNode() {}
 
 var testsummaryImplementors = []string{"TestSummary", "Node"}
 
@@ -380,6 +392,15 @@ func (c *Client) noder(ctx context.Context, table string, id int64) (Noder, erro
 			}
 		}
 		return query.Only(ctx)
+	case invocationfiles.Table:
+		query := c.InvocationFiles.Query().
+			Where(invocationfiles.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, invocationfilesImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
 	case invocationtag.Table:
 		query := c.InvocationTag.Query().
 			Where(invocationtag.ID(id))
@@ -484,6 +505,15 @@ func (c *Client) noder(ctx context.Context, table string, id int64) (Noder, erro
 			Where(testresult.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
 			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, testresultImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case testresultfile.Table:
+		query := c.TestResultFile.Query().
+			Where(testresultfile.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, testresultfileImplementors...); err != nil {
 				return nil, err
 			}
 		}
@@ -812,6 +842,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int64) ([]Noder
 				*noder = node
 			}
 		}
+	case invocationfiles.Table:
+		query := c.InvocationFiles.Query().
+			Where(invocationfiles.IDIn(ids...))
+		query, err := query.CollectFields(ctx, invocationfilesImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case invocationtag.Table:
 		query := c.InvocationTag.Query().
 			Where(invocationtag.IDIn(ids...))
@@ -992,6 +1038,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int64) ([]Noder
 		query := c.TestResult.Query().
 			Where(testresult.IDIn(ids...))
 		query, err := query.CollectFields(ctx, testresultImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case testresultfile.Table:
+		query := c.TestResultFile.Query().
+			Where(testresultfile.IDIn(ids...))
+		query, err := query.CollectFields(ctx, testresultfileImplementors...)
 		if err != nil {
 			return nil, err
 		}

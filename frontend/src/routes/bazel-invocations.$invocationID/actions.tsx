@@ -37,6 +37,10 @@ const BAZEL_INVOCATION_ACTIONS_FRAGMENT = gql(/* GraphQL */ `
     stderrHash
     stderrSizeBytes
     stderrHashFunction
+    actionFiles {
+      name
+      uri
+    }
     configuration {
       id
       configurationID

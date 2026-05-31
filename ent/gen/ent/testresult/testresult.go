@@ -3,6 +3,7 @@
 package testresult
 
 import (
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -42,6 +43,8 @@ const (
 	FieldTimingBreakdown = "timing_breakdown"
 	// EdgeTestSummary holds the string denoting the test_summary edge name in mutations.
 	EdgeTestSummary = "test_summary"
+	// EdgeTestResultFiles holds the string denoting the test_result_files edge name in mutations.
+	EdgeTestResultFiles = "test_result_files"
 	// Table holds the table name of the testresult in the database.
 	Table = "test_results"
 	// TestSummaryTable is the table that holds the test_summary relation/edge.
@@ -51,6 +54,13 @@ const (
 	TestSummaryInverseTable = "test_summaries"
 	// TestSummaryColumn is the table column denoting the test_summary relation/edge.
 	TestSummaryColumn = "test_summary_test_results"
+	// TestResultFilesTable is the table that holds the test_result_files relation/edge.
+	TestResultFilesTable = "test_result_files"
+	// TestResultFilesInverseTable is the table name for the TestResultFile entity.
+	// It exists in this package in order to avoid circular dependency with the "testresultfile" package.
+	TestResultFilesInverseTable = "test_result_files"
+	// TestResultFilesColumn is the table column denoting the test_result_files relation/edge.
+	TestResultFilesColumn = "test_result_test_result_files"
 )
 
 // Columns holds all SQL columns for testresult fields.
@@ -92,6 +102,16 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+// Note that the variables below are initialized by the runtime
+// package on the initialization of the application. Therefore,
+// it should be imported in the main as follows:
+//
+//	import _ "github.com/buildbarn/bb-portal/ent/gen/ent/runtime"
+var (
+	Hooks  [1]ent.Hook
+	Policy ent.Policy
+)
 
 // OrderOption defines the ordering options for the TestResult queries.
 type OrderOption func(*sql.Selector)
@@ -167,10 +187,31 @@ func ByTestSummaryField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newTestSummaryStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByTestResultFilesCount orders the results by test_result_files count.
+func ByTestResultFilesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTestResultFilesStep(), opts...)
+	}
+}
+
+// ByTestResultFiles orders the results by test_result_files terms.
+func ByTestResultFiles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTestResultFilesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newTestSummaryStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TestSummaryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, TestSummaryTable, TestSummaryColumn),
+	)
+}
+func newTestResultFilesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TestResultFilesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, TestResultFilesTable, TestResultFilesColumn),
 	)
 }

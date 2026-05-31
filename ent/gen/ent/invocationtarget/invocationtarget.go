@@ -38,6 +38,8 @@ const (
 	EdgeConfiguration = "configuration"
 	// EdgeTestSummary holds the string denoting the test_summary edge name in mutations.
 	EdgeTestSummary = "test_summary"
+	// EdgeTargetFiles holds the string denoting the target_files edge name in mutations.
+	EdgeTargetFiles = "target_files"
 	// Table holds the table name of the invocationtarget in the database.
 	Table = "invocation_targets"
 	// BazelInvocationTable is the table that holds the bazel_invocation relation/edge.
@@ -68,6 +70,13 @@ const (
 	TestSummaryInverseTable = "test_summaries"
 	// TestSummaryColumn is the table column denoting the test_summary relation/edge.
 	TestSummaryColumn = "invocation_target_test_summary"
+	// TargetFilesTable is the table that holds the target_files relation/edge.
+	TargetFilesTable = "invocation_files"
+	// TargetFilesInverseTable is the table name for the InvocationFiles entity.
+	// It exists in this package in order to avoid circular dependency with the "invocationfiles" package.
+	TargetFilesInverseTable = "invocation_files"
+	// TargetFilesColumn is the table column denoting the target_files relation/edge.
+	TargetFilesColumn = "invocation_target_target_files"
 )
 
 // Columns holds all SQL columns for invocationtarget fields.
@@ -216,6 +225,20 @@ func ByTestSummary(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newTestSummaryStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByTargetFilesCount orders the results by target_files count.
+func ByTargetFilesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTargetFilesStep(), opts...)
+	}
+}
+
+// ByTargetFiles orders the results by target_files terms.
+func ByTargetFiles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTargetFilesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newBazelInvocationStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -242,6 +265,13 @@ func newTestSummaryStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TestSummaryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, TestSummaryTable, TestSummaryColumn),
+	)
+}
+func newTargetFilesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TargetFilesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, TargetFilesTable, TargetFilesColumn),
 	)
 }
 

@@ -5,8 +5,48 @@ import (
 	"strings"
 
 	bes "github.com/bazelbuild/bazel/src/main/java/com/google/devtools/build/lib/buildeventstream/proto"
+	"github.com/buildbarn/bb-portal/ent/gen/ent"
 	remoteexecution "github.com/bazelbuild/remote-apis/build/bazel/remote/execution/v2"
 )
+
+func shouldPersistBesFile(file *bes.File) bool {
+	if file == nil {
+		return false
+	}
+	uri := file.GetUri()
+	if uri == "" {
+		// Some BES file messages can inline contents instead of referencing a URI.
+		return file.GetContents() != nil && len(file.GetContents()) > 0
+	}
+	if strings.HasPrefix(uri, "file://") {
+		return false
+	}
+	return true
+}
+
+func applyBesFileFields(create *ent.InvocationFilesCreate, file *bes.File) *ent.InvocationFilesCreate {
+	if create == nil || file == nil {
+		return create
+	}
+
+	create.SetName(file.GetName())
+	if uri := file.GetUri(); uri != "" {
+		create.SetURI(uri)
+	}
+	if contents := file.GetContents(); len(contents) > 0 {
+		create.SetContent(string(contents))
+	}
+	if digest := getFileDigestFromBesFile(file); digest != nil {
+		create.SetDigest(*digest)
+	}
+	if sizeBytes := getFileSizeBytesFromBesFile(file); sizeBytes != nil {
+		create.SetSizeBytes(*sizeBytes)
+	}
+	if digestFunction := getFileDigestFunctionFromBesFile(file); digestFunction != nil {
+		create.SetDigestFunction(*digestFunction)
+	}
+	return create
+}
 
 func getFileDigestFromBesFile(file *bes.File) *string {
 	var digest string

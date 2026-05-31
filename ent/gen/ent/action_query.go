@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -14,20 +15,23 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/predicate"
 )
 
 // ActionQuery is the builder for querying Action entities.
 type ActionQuery struct {
 	config
-	ctx                 *QueryContext
-	order               []action.OrderOption
-	inters              []Interceptor
-	predicates          []predicate.Action
-	withBazelInvocation *BazelInvocationQuery
-	withConfiguration   *ConfigurationQuery
-	modifiers           []func(*sql.Selector)
-	loadTotal           []func(context.Context, []*Action) error
+	ctx                  *QueryContext
+	order                []action.OrderOption
+	inters               []Interceptor
+	predicates           []predicate.Action
+	withBazelInvocation  *BazelInvocationQuery
+	withConfiguration    *ConfigurationQuery
+	withActionFiles      *InvocationFilesQuery
+	modifiers            []func(*sql.Selector)
+	loadTotal            []func(context.Context, []*Action) error
+	withNamedActionFiles map[string]*InvocationFilesQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -101,6 +105,28 @@ func (aq *ActionQuery) QueryConfiguration() *ConfigurationQuery {
 			sqlgraph.From(action.Table, action.FieldID, selector),
 			sqlgraph.To(configuration.Table, configuration.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, action.ConfigurationTable, action.ConfigurationColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryActionFiles chains the current query on the "action_files" edge.
+func (aq *ActionQuery) QueryActionFiles() *InvocationFilesQuery {
+	query := (&InvocationFilesClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(action.Table, action.FieldID, selector),
+			sqlgraph.To(invocationfiles.Table, invocationfiles.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, action.ActionFilesTable, action.ActionFilesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -302,6 +328,7 @@ func (aq *ActionQuery) Clone() *ActionQuery {
 		predicates:          append([]predicate.Action{}, aq.predicates...),
 		withBazelInvocation: aq.withBazelInvocation.Clone(),
 		withConfiguration:   aq.withConfiguration.Clone(),
+		withActionFiles:     aq.withActionFiles.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -327,6 +354,17 @@ func (aq *ActionQuery) WithConfiguration(opts ...func(*ConfigurationQuery)) *Act
 		opt(query)
 	}
 	aq.withConfiguration = query
+	return aq
+}
+
+// WithActionFiles tells the query-builder to eager-load the nodes that are connected to
+// the "action_files" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *ActionQuery) WithActionFiles(opts ...func(*InvocationFilesQuery)) *ActionQuery {
+	query := (&InvocationFilesClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withActionFiles = query
 	return aq
 }
 
@@ -408,9 +446,10 @@ func (aq *ActionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Actio
 	var (
 		nodes       = []*Action{}
 		_spec       = aq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			aq.withBazelInvocation != nil,
 			aq.withConfiguration != nil,
+			aq.withActionFiles != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -443,6 +482,20 @@ func (aq *ActionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Actio
 	if query := aq.withConfiguration; query != nil {
 		if err := aq.loadConfiguration(ctx, query, nodes, nil,
 			func(n *Action, e *Configuration) { n.Edges.Configuration = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withActionFiles; query != nil {
+		if err := aq.loadActionFiles(ctx, query, nodes,
+			func(n *Action) { n.Edges.ActionFiles = []*InvocationFiles{} },
+			func(n *Action, e *InvocationFiles) { n.Edges.ActionFiles = append(n.Edges.ActionFiles, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range aq.withNamedActionFiles {
+		if err := aq.loadActionFiles(ctx, query, nodes,
+			func(n *Action) { n.appendNamedActionFiles(name) },
+			func(n *Action, e *InvocationFiles) { n.appendNamedActionFiles(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -509,6 +562,37 @@ func (aq *ActionQuery) loadConfiguration(ctx context.Context, query *Configurati
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (aq *ActionQuery) loadActionFiles(ctx context.Context, query *InvocationFilesQuery, nodes []*Action, init func(*Action), assign func(*Action, *InvocationFiles)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*Action)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.InvocationFiles(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(action.ActionFilesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.action_action_files
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "action_action_files" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "action_action_files" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }
@@ -601,6 +685,20 @@ func (aq *ActionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedActionFiles tells the query-builder to eager-load the nodes that are connected to the "action_files"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (aq *ActionQuery) WithNamedActionFiles(name string, opts ...func(*InvocationFilesQuery)) *ActionQuery {
+	query := (&InvocationFilesClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if aq.withNamedActionFiles == nil {
+		aq.withNamedActionFiles = make(map[string]*InvocationFilesQuery)
+	}
+	aq.withNamedActionFiles[name] = query
+	return aq
 }
 
 // ActionGroupBy is the group-by builder for Action entities.

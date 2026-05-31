@@ -8,13 +8,16 @@ export type TagVariables = {
 };
 
 interface Props {
-  tagVars: TagVariables;
+  tagVars?: TagVariables;
 }
 
 const { useToken } = theme;
 
 const ResultTag: React.FC<Props> = ({ tagVars }) => {
   const { token } = useToken();
+  if (!tagVars) {
+    return null;
+  }
   const backgroundColorKey = `${tagVars.color}-1` as keyof GlobalToken;
   const textColorKey = `${tagVars.color}-7` as keyof GlobalToken;
   const backgroundColor = token[backgroundColorKey];

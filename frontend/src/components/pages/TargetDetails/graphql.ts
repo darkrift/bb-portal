@@ -32,6 +32,10 @@ export const GET_TARGET_DETAILS = gql(/* GraphQl */ `
             abortReason
             failureMessage
             tags
+            targetFiles {
+              name
+              uri
+            }
             bazelInvocation {
               invocationID
             }

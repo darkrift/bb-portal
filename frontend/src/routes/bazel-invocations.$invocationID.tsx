@@ -2,50 +2,27 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { apolloClient } from "@/components/ApolloWrapper";
 import { BazelInvocationDetailsPage } from "@/components/pages/BazelInvocationDetails";
 import { getFragmentData, gql } from "@/graphql/__generated__";
+import { env } from "@/utils/env";
+import { requireFeature } from "@/utils/featureGuard";
+import { generatePageTitle } from "@/utils/generatePageTitle";
 
-const GET_BAZEL_INVOCATION_COMMON = gql(/* GraphQL */ `
-  query GetBazelInvocationCommon($invocationID: UUID!) {
+const GET_BAZEL_INVOCATION_OVERVIEW = gql(/* GraphQL */ `
+  query GetBazelInvocationOverview($invocationID: UUID!) {
     getBazelInvocation(invocationID: $invocationID) {
-      ...BazelInvocationCommon
+      ...BazelInvocationOverview
     }
   }
 `);
 
-const BAZEL_INVOCATION_COMMON_FRAGMENT = gql(/* GraphQL */ `
-  fragment BazelInvocationCommon on BazelInvocation {
+const BAZEL_INVOCATION_OVERVIEW_FRAGMENT = gql(/* GraphQL */ `
+  fragment BazelInvocationOverview on BazelInvocation {
     id
     invocationID
-    startedAt
-    endedAt
-    exitCodeName
-    instanceName {
-      name
-    }
-    connectionMetadata {
-      connectionLastOpenAt
-      timeSinceLastConnectionMillis
-    }
-    username
-    authenticatedUser {
-      displayName
-      userUUID
-    }
-    build {
-      id
-      buildUUID
-    }
-    metrics {
-      id
-    }
     actions {
       id
     }
-    profile {
+    metrics {
       id
-      name
-      digest
-      sizeInBytes
-      digestFunction
     }
     sourceControl {
       id
@@ -53,14 +30,50 @@ const BAZEL_INVOCATION_COMMON_FRAGMENT = gql(/* GraphQL */ `
     tags {
       totalCount
     }
+    startedAt
+    endedAt
+    exitCodeName
+    instanceName {
+      id
+      name
+    }
+    hostname
+    connectionMetadata {
+      id
+      connectionLastOpenAt
+      timeSinceLastConnectionMillis
+    }
+    originalCommandLine
+    configurations {
+      id
+      cpu
+      mnemonic
+    }
+    numFetches
+    bazelVersion
+    username
+    authenticatedUser {
+      id
+    }
+    build {
+      id
+      buildUUID
+    }
+    profile {
+      digest
+      digestFunction
+      name
+      sizeInBytes
+    }
   }
 `);
 
 export const Route = createFileRoute("/bazel-invocations/$invocationID")({
   component: RouteComponent,
+  beforeLoad: requireFeature(env.featureFlags?.bes?.pageInvocations),
   loader: async ({ params }) => {
     const { data } = await apolloClient.query({
-      query: GET_BAZEL_INVOCATION_COMMON,
+      query: GET_BAZEL_INVOCATION_OVERVIEW,
       variables: { invocationID: params.invocationID },
       fetchPolicy: "network-only",
     });
@@ -71,11 +84,22 @@ export const Route = createFileRoute("/bazel-invocations/$invocationID")({
 
     return {
       invocation: getFragmentData(
-        BAZEL_INVOCATION_COMMON_FRAGMENT,
+        BAZEL_INVOCATION_OVERVIEW_FRAGMENT,
         data.getBazelInvocation,
       ),
     };
   },
+  head: (_ctx) => ({
+    meta: [
+      {
+        title: generatePageTitle([
+          "Invocation",
+          "Overview",
+          _ctx.params.invocationID,
+        ]),
+      },
+    ],
+  }),
 });
 
 function RouteComponent() {

@@ -66,11 +66,15 @@ type ActionEdges struct {
 	BazelInvocation *BazelInvocation `json:"bazel_invocation,omitempty"`
 	// Configuration holds the value of the configuration edge.
 	Configuration *Configuration `json:"configuration,omitempty"`
+	// ActionFiles holds the value of the action_files edge.
+	ActionFiles []*InvocationFiles `json:"action_files,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [3]map[string]int
+
+	namedActionFiles map[string][]*InvocationFiles
 }
 
 // BazelInvocationOrErr returns the BazelInvocation value or an error if the edge
@@ -93,6 +97,15 @@ func (e ActionEdges) ConfigurationOrErr() (*Configuration, error) {
 		return nil, &NotFoundError{label: configuration.Label}
 	}
 	return nil, &NotLoadedError{edge: "configuration"}
+}
+
+// ActionFilesOrErr returns the ActionFiles value or an error if the edge
+// was not loaded in eager-loading.
+func (e ActionEdges) ActionFilesOrErr() ([]*InvocationFiles, error) {
+	if e.loadedTypes[2] {
+		return e.ActionFiles, nil
+	}
+	return nil, &NotLoadedError{edge: "action_files"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -258,6 +271,11 @@ func (a *Action) QueryConfiguration() *ConfigurationQuery {
 	return NewActionClient(a.config).QueryConfiguration(a)
 }
 
+// QueryActionFiles queries the "action_files" edge of the Action entity.
+func (a *Action) QueryActionFiles() *InvocationFilesQuery {
+	return NewActionClient(a.config).QueryActionFiles(a)
+}
+
 // Update returns a builder for updating this Action.
 // Note that you need to call Action.Unwrap() before calling this method if this Action
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -333,6 +351,30 @@ func (a *Action) String() string {
 	builder.WriteString(a.StderrHashFunction)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// NamedActionFiles returns the ActionFiles named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (a *Action) NamedActionFiles(name string) ([]*InvocationFiles, error) {
+	if a.Edges.namedActionFiles == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := a.Edges.namedActionFiles[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (a *Action) appendNamedActionFiles(name string, edges ...*InvocationFiles) {
+	if a.Edges.namedActionFiles == nil {
+		a.Edges.namedActionFiles = make(map[string][]*InvocationFiles)
+	}
+	if len(edges) == 0 {
+		a.Edges.namedActionFiles[name] = []*InvocationFiles{}
+	} else {
+		a.Edges.namedActionFiles[name] = append(a.Edges.namedActionFiles[name], edges...)
+	}
 }
 
 // Actions is a parsable slice of Action.

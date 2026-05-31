@@ -25,7 +25,7 @@ export type StatusTuple = typeof ALL_STATUS_VALUES;
 export type TestStatusEnum = StatusTuple[number];
 
 interface Props {
-  status: TestStatusEnum;
+  status: TestStatusEnum | string | null | undefined;
   displayText: boolean;
 }
 
@@ -78,7 +78,10 @@ const TEST_RESULT_TAGS: { [key in TestStatusEnum]: TagVariables } = {
 };
 
 const TestStatusTag: React.FC<Props> = ({ status, displayText }) => {
-  const tagVars = TEST_RESULT_TAGS[status];
+  const tagVars =
+    status && status in TEST_RESULT_TAGS
+      ? TEST_RESULT_TAGS[status as TestStatusEnum]
+      : TEST_RESULT_TAGS.NO_STATUS;
 
   if (displayText) {
     return <ResultTag tagVars={tagVars} />;

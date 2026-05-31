@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/predicate"
 )
 
@@ -342,9 +343,45 @@ func (au *ActionUpdate) ClearStderrHashFunction() *ActionUpdate {
 	return au
 }
 
+// AddActionFileIDs adds the "action_files" edge to the InvocationFiles entity by IDs.
+func (au *ActionUpdate) AddActionFileIDs(ids ...int64) *ActionUpdate {
+	au.mutation.AddActionFileIDs(ids...)
+	return au
+}
+
+// AddActionFiles adds the "action_files" edges to the InvocationFiles entity.
+func (au *ActionUpdate) AddActionFiles(i ...*InvocationFiles) *ActionUpdate {
+	ids := make([]int64, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return au.AddActionFileIDs(ids...)
+}
+
 // Mutation returns the ActionMutation object of the builder.
 func (au *ActionUpdate) Mutation() *ActionMutation {
 	return au.mutation
+}
+
+// ClearActionFiles clears all "action_files" edges to the InvocationFiles entity.
+func (au *ActionUpdate) ClearActionFiles() *ActionUpdate {
+	au.mutation.ClearActionFiles()
+	return au
+}
+
+// RemoveActionFileIDs removes the "action_files" edge to InvocationFiles entities by IDs.
+func (au *ActionUpdate) RemoveActionFileIDs(ids ...int64) *ActionUpdate {
+	au.mutation.RemoveActionFileIDs(ids...)
+	return au
+}
+
+// RemoveActionFiles removes "action_files" edges to InvocationFiles entities.
+func (au *ActionUpdate) RemoveActionFiles(i ...*InvocationFiles) *ActionUpdate {
+	ids := make([]int64, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return au.RemoveActionFileIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -497,6 +534,51 @@ func (au *ActionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if au.mutation.StderrHashFunctionCleared() {
 		_spec.ClearField(action.FieldStderrHashFunction, field.TypeString)
+	}
+	if au.mutation.ActionFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.ActionFilesTable,
+			Columns: []string{action.ActionFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedActionFilesIDs(); len(nodes) > 0 && !au.mutation.ActionFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.ActionFilesTable,
+			Columns: []string{action.ActionFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.ActionFilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.ActionFilesTable,
+			Columns: []string{action.ActionFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -831,9 +913,45 @@ func (auo *ActionUpdateOne) ClearStderrHashFunction() *ActionUpdateOne {
 	return auo
 }
 
+// AddActionFileIDs adds the "action_files" edge to the InvocationFiles entity by IDs.
+func (auo *ActionUpdateOne) AddActionFileIDs(ids ...int64) *ActionUpdateOne {
+	auo.mutation.AddActionFileIDs(ids...)
+	return auo
+}
+
+// AddActionFiles adds the "action_files" edges to the InvocationFiles entity.
+func (auo *ActionUpdateOne) AddActionFiles(i ...*InvocationFiles) *ActionUpdateOne {
+	ids := make([]int64, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return auo.AddActionFileIDs(ids...)
+}
+
 // Mutation returns the ActionMutation object of the builder.
 func (auo *ActionUpdateOne) Mutation() *ActionMutation {
 	return auo.mutation
+}
+
+// ClearActionFiles clears all "action_files" edges to the InvocationFiles entity.
+func (auo *ActionUpdateOne) ClearActionFiles() *ActionUpdateOne {
+	auo.mutation.ClearActionFiles()
+	return auo
+}
+
+// RemoveActionFileIDs removes the "action_files" edge to InvocationFiles entities by IDs.
+func (auo *ActionUpdateOne) RemoveActionFileIDs(ids ...int64) *ActionUpdateOne {
+	auo.mutation.RemoveActionFileIDs(ids...)
+	return auo
+}
+
+// RemoveActionFiles removes "action_files" edges to InvocationFiles entities.
+func (auo *ActionUpdateOne) RemoveActionFiles(i ...*InvocationFiles) *ActionUpdateOne {
+	ids := make([]int64, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return auo.RemoveActionFileIDs(ids...)
 }
 
 // Where appends a list predicates to the ActionUpdate builder.
@@ -1016,6 +1134,51 @@ func (auo *ActionUpdateOne) sqlSave(ctx context.Context) (_node *Action, err err
 	}
 	if auo.mutation.StderrHashFunctionCleared() {
 		_spec.ClearField(action.FieldStderrHashFunction, field.TypeString)
+	}
+	if auo.mutation.ActionFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.ActionFilesTable,
+			Columns: []string{action.ActionFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedActionFilesIDs(); len(nodes) > 0 && !auo.mutation.ActionFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.ActionFilesTable,
+			Columns: []string{action.ActionFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.ActionFilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.ActionFilesTable,
+			Columns: []string{action.ActionFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Action{config: auo.config}
 	_spec.Assign = _node.assignValues

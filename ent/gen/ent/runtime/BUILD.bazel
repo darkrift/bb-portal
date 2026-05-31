@@ -14,6 +14,7 @@ go_library(
         "//ent/gen/ent/target",
         "//ent/gen/ent/testsummary",
         "//ent/gen/ent/testtarget",
+        "//ent/gen/ent/testresult",
         "@io_entgo_ent//:ent",
         "@io_entgo_ent//privacy",
     ],

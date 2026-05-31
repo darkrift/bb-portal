@@ -53,13 +53,16 @@ type InvocationTargetEdges struct {
 	Configuration *Configuration `json:"configuration,omitempty"`
 	// TestSummary holds the value of the test_summary edge.
 	TestSummary []*TestSummary `json:"test_summary,omitempty"`
+	// TargetFiles holds the value of the target_files edge.
+	TargetFiles []*InvocationFiles `json:"target_files,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [5]map[string]int
 
 	namedTestSummary map[string][]*TestSummary
+	namedTargetFiles map[string][]*InvocationFiles
 }
 
 // BazelInvocationOrErr returns the BazelInvocation value or an error if the edge
@@ -102,6 +105,15 @@ func (e InvocationTargetEdges) TestSummaryOrErr() ([]*TestSummary, error) {
 		return e.TestSummary, nil
 	}
 	return nil, &NotLoadedError{edge: "test_summary"}
+}
+
+// TargetFilesOrErr returns the TargetFiles value or an error if the edge
+// was not loaded in eager-loading.
+func (e InvocationTargetEdges) TargetFilesOrErr() ([]*InvocationFiles, error) {
+	if e.loadedTypes[4] {
+		return e.TargetFiles, nil
+	}
+	return nil, &NotLoadedError{edge: "target_files"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -242,6 +254,11 @@ func (it *InvocationTarget) QueryTestSummary() *TestSummaryQuery {
 	return NewInvocationTargetClient(it.config).QueryTestSummary(it)
 }
 
+// QueryTargetFiles queries the "target_files" edge of the InvocationTarget entity.
+func (it *InvocationTarget) QueryTargetFiles() *InvocationFilesQuery {
+	return NewInvocationTargetClient(it.config).QueryTargetFiles(it)
+}
+
 // Update returns a builder for updating this InvocationTarget.
 // Note that you need to call InvocationTarget.Unwrap() before calling this method if this InvocationTarget
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -310,6 +327,30 @@ func (it *InvocationTarget) appendNamedTestSummary(name string, edges ...*TestSu
 		it.Edges.namedTestSummary[name] = []*TestSummary{}
 	} else {
 		it.Edges.namedTestSummary[name] = append(it.Edges.namedTestSummary[name], edges...)
+	}
+}
+
+// NamedTargetFiles returns the TargetFiles named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (it *InvocationTarget) NamedTargetFiles(name string) ([]*InvocationFiles, error) {
+	if it.Edges.namedTargetFiles == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := it.Edges.namedTargetFiles[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (it *InvocationTarget) appendNamedTargetFiles(name string, edges ...*InvocationFiles) {
+	if it.Edges.namedTargetFiles == nil {
+		it.Edges.namedTargetFiles = make(map[string][]*InvocationFiles)
+	}
+	if len(edges) == 0 {
+		it.Edges.namedTargetFiles[name] = []*InvocationFiles{}
+	} else {
+		it.Edges.namedTargetFiles[name] = append(it.Edges.namedTargetFiles[name], edges...)
 	}
 }
 

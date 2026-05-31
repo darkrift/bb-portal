@@ -42,6 +42,9 @@ import { Route as BazelInvocationsInvocationIDMetricsRouteImport } from './route
 import { Route as BazelInvocationsInvocationIDLogRouteImport } from './routes/bazel-invocations.$invocationID/log'
 import { Route as BazelInvocationsInvocationIDCommandLineRouteImport } from './routes/bazel-invocations.$invocationID/command-line'
 import { Route as BazelInvocationsInvocationIDActionsRouteImport } from './routes/bazel-invocations.$invocationID/actions'
+import { Route as BazelInvocationsInvocationIDTestsIndexRouteImport } from './routes/bazel-invocations.$invocationID/tests.index'
+import { Route as BazelInvocationsInvocationIDTestsTargetIDRouteImport } from './routes/bazel-invocations.$invocationID/tests.$targetID'
+import { Route as BazelInvocationsInvocationIDTargetsTargetIDRouteImport } from './routes/bazel-invocations.$invocationID/targets.$targetID'
 
 const TrendsRoute = TrendsRouteImport.update({
   id: '/trends',
@@ -218,6 +221,24 @@ const BazelInvocationsInvocationIDActionsRoute =
     path: '/actions',
     getParentRoute: () => BazelInvocationsInvocationIDRoute,
   } as any)
+const BazelInvocationsInvocationIDTestsIndexRoute =
+  BazelInvocationsInvocationIDTestsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => BazelInvocationsInvocationIDTestsRoute,
+  } as any)
+const BazelInvocationsInvocationIDTestsTargetIDRoute =
+  BazelInvocationsInvocationIDTestsTargetIDRouteImport.update({
+    id: '/$targetID',
+    path: '/$targetID',
+    getParentRoute: () => BazelInvocationsInvocationIDTestsRoute,
+  } as any)
+const BazelInvocationsInvocationIDTargetsTargetIDRoute =
+  BazelInvocationsInvocationIDTargetsTargetIDRouteImport.update({
+    id: '/$targetID',
+    path: '/$targetID',
+    getParentRoute: () => BazelInvocationsInvocationIDTargetsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -248,11 +269,14 @@ export interface FileRoutesByFullPath {
   '/bazel-invocations/$invocationID/metrics': typeof BazelInvocationsInvocationIDMetricsRoute
   '/bazel-invocations/$invocationID/source-control': typeof BazelInvocationsInvocationIDSourceControlRoute
   '/bazel-invocations/$invocationID/tags': typeof BazelInvocationsInvocationIDTagsRoute
-  '/bazel-invocations/$invocationID/targets': typeof BazelInvocationsInvocationIDTargetsRoute
-  '/bazel-invocations/$invocationID/tests': typeof BazelInvocationsInvocationIDTestsRoute
+  '/bazel-invocations/$invocationID/targets': typeof BazelInvocationsInvocationIDTargetsRouteWithChildren
+  '/bazel-invocations/$invocationID/tests': typeof BazelInvocationsInvocationIDTestsRouteWithChildren
   '/targets/$targetID/tests': typeof TargetsTargetIDTestsRoute
   '/bazel-invocations/$invocationID/': typeof BazelInvocationsInvocationIDIndexRoute
   '/targets/$targetID/': typeof TargetsTargetIDIndexRoute
+  '/bazel-invocations/$invocationID/targets/$targetID': typeof BazelInvocationsInvocationIDTargetsTargetIDRoute
+  '/bazel-invocations/$invocationID/tests/$targetID': typeof BazelInvocationsInvocationIDTestsTargetIDRoute
+  '/bazel-invocations/$invocationID/tests/': typeof BazelInvocationsInvocationIDTestsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -275,11 +299,13 @@ export interface FileRoutesByTo {
   '/bazel-invocations/$invocationID/metrics': typeof BazelInvocationsInvocationIDMetricsRoute
   '/bazel-invocations/$invocationID/source-control': typeof BazelInvocationsInvocationIDSourceControlRoute
   '/bazel-invocations/$invocationID/tags': typeof BazelInvocationsInvocationIDTagsRoute
-  '/bazel-invocations/$invocationID/targets': typeof BazelInvocationsInvocationIDTargetsRoute
-  '/bazel-invocations/$invocationID/tests': typeof BazelInvocationsInvocationIDTestsRoute
+  '/bazel-invocations/$invocationID/targets': typeof BazelInvocationsInvocationIDTargetsRouteWithChildren
   '/targets/$targetID/tests': typeof TargetsTargetIDTestsRoute
   '/bazel-invocations/$invocationID': typeof BazelInvocationsInvocationIDIndexRoute
   '/targets/$targetID': typeof TargetsTargetIDIndexRoute
+  '/bazel-invocations/$invocationID/targets/$targetID': typeof BazelInvocationsInvocationIDTargetsTargetIDRoute
+  '/bazel-invocations/$invocationID/tests/$targetID': typeof BazelInvocationsInvocationIDTestsTargetIDRoute
+  '/bazel-invocations/$invocationID/tests': typeof BazelInvocationsInvocationIDTestsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -311,11 +337,14 @@ export interface FileRoutesById {
   '/bazel-invocations/$invocationID/metrics': typeof BazelInvocationsInvocationIDMetricsRoute
   '/bazel-invocations/$invocationID/source-control': typeof BazelInvocationsInvocationIDSourceControlRoute
   '/bazel-invocations/$invocationID/tags': typeof BazelInvocationsInvocationIDTagsRoute
-  '/bazel-invocations/$invocationID/targets': typeof BazelInvocationsInvocationIDTargetsRoute
-  '/bazel-invocations/$invocationID/tests': typeof BazelInvocationsInvocationIDTestsRoute
+  '/bazel-invocations/$invocationID/targets': typeof BazelInvocationsInvocationIDTargetsRouteWithChildren
+  '/bazel-invocations/$invocationID/tests': typeof BazelInvocationsInvocationIDTestsRouteWithChildren
   '/targets/$targetID/tests': typeof TargetsTargetIDTestsRoute
   '/bazel-invocations/$invocationID/': typeof BazelInvocationsInvocationIDIndexRoute
   '/targets/$targetID/': typeof TargetsTargetIDIndexRoute
+  '/bazel-invocations/$invocationID/targets/$targetID': typeof BazelInvocationsInvocationIDTargetsTargetIDRoute
+  '/bazel-invocations/$invocationID/tests/$targetID': typeof BazelInvocationsInvocationIDTestsTargetIDRoute
+  '/bazel-invocations/$invocationID/tests/': typeof BazelInvocationsInvocationIDTestsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -353,6 +382,9 @@ export interface FileRouteTypes {
     | '/targets/$targetID/tests'
     | '/bazel-invocations/$invocationID/'
     | '/targets/$targetID/'
+    | '/bazel-invocations/$invocationID/targets/$targetID'
+    | '/bazel-invocations/$invocationID/tests/$targetID'
+    | '/bazel-invocations/$invocationID/tests/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -376,10 +408,12 @@ export interface FileRouteTypes {
     | '/bazel-invocations/$invocationID/source-control'
     | '/bazel-invocations/$invocationID/tags'
     | '/bazel-invocations/$invocationID/targets'
-    | '/bazel-invocations/$invocationID/tests'
     | '/targets/$targetID/tests'
     | '/bazel-invocations/$invocationID'
     | '/targets/$targetID'
+    | '/bazel-invocations/$invocationID/targets/$targetID'
+    | '/bazel-invocations/$invocationID/tests/$targetID'
+    | '/bazel-invocations/$invocationID/tests'
   id:
     | '__root__'
     | '/'
@@ -415,6 +449,9 @@ export interface FileRouteTypes {
     | '/targets/$targetID/tests'
     | '/bazel-invocations/$invocationID/'
     | '/targets/$targetID/'
+    | '/bazel-invocations/$invocationID/targets/$targetID'
+    | '/bazel-invocations/$invocationID/tests/$targetID'
+    | '/bazel-invocations/$invocationID/tests/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -663,8 +700,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BazelInvocationsInvocationIDActionsRouteImport
       parentRoute: typeof BazelInvocationsInvocationIDRoute
     }
+    '/bazel-invocations/$invocationID/tests/': {
+      id: '/bazel-invocations/$invocationID/tests/'
+      path: '/'
+      fullPath: '/bazel-invocations/$invocationID/tests/'
+      preLoaderRoute: typeof BazelInvocationsInvocationIDTestsIndexRouteImport
+      parentRoute: typeof BazelInvocationsInvocationIDTestsRoute
+    }
+    '/bazel-invocations/$invocationID/tests/$targetID': {
+      id: '/bazel-invocations/$invocationID/tests/$targetID'
+      path: '/$targetID'
+      fullPath: '/bazel-invocations/$invocationID/tests/$targetID'
+      preLoaderRoute: typeof BazelInvocationsInvocationIDTestsTargetIDRouteImport
+      parentRoute: typeof BazelInvocationsInvocationIDTestsRoute
+    }
+    '/bazel-invocations/$invocationID/targets/$targetID': {
+      id: '/bazel-invocations/$invocationID/targets/$targetID'
+      path: '/$targetID'
+      fullPath: '/bazel-invocations/$invocationID/targets/$targetID'
+      preLoaderRoute: typeof BazelInvocationsInvocationIDTargetsTargetIDRouteImport
+      parentRoute: typeof BazelInvocationsInvocationIDTargetsRoute
+    }
   }
 }
+
+interface BazelInvocationsInvocationIDTargetsRouteChildren {
+  BazelInvocationsInvocationIDTargetsTargetIDRoute: typeof BazelInvocationsInvocationIDTargetsTargetIDRoute
+}
+
+const BazelInvocationsInvocationIDTargetsRouteChildren: BazelInvocationsInvocationIDTargetsRouteChildren =
+  {
+    BazelInvocationsInvocationIDTargetsTargetIDRoute:
+      BazelInvocationsInvocationIDTargetsTargetIDRoute,
+  }
+
+const BazelInvocationsInvocationIDTargetsRouteWithChildren =
+  BazelInvocationsInvocationIDTargetsRoute._addFileChildren(
+    BazelInvocationsInvocationIDTargetsRouteChildren,
+  )
+
+interface BazelInvocationsInvocationIDTestsRouteChildren {
+  BazelInvocationsInvocationIDTestsTargetIDRoute: typeof BazelInvocationsInvocationIDTestsTargetIDRoute
+  BazelInvocationsInvocationIDTestsIndexRoute: typeof BazelInvocationsInvocationIDTestsIndexRoute
+}
+
+const BazelInvocationsInvocationIDTestsRouteChildren: BazelInvocationsInvocationIDTestsRouteChildren =
+  {
+    BazelInvocationsInvocationIDTestsTargetIDRoute:
+      BazelInvocationsInvocationIDTestsTargetIDRoute,
+    BazelInvocationsInvocationIDTestsIndexRoute:
+      BazelInvocationsInvocationIDTestsIndexRoute,
+  }
+
+const BazelInvocationsInvocationIDTestsRouteWithChildren =
+  BazelInvocationsInvocationIDTestsRoute._addFileChildren(
+    BazelInvocationsInvocationIDTestsRouteChildren,
+  )
 
 interface BazelInvocationsInvocationIDRouteChildren {
   BazelInvocationsInvocationIDActionsRoute: typeof BazelInvocationsInvocationIDActionsRoute
@@ -673,8 +764,8 @@ interface BazelInvocationsInvocationIDRouteChildren {
   BazelInvocationsInvocationIDMetricsRoute: typeof BazelInvocationsInvocationIDMetricsRoute
   BazelInvocationsInvocationIDSourceControlRoute: typeof BazelInvocationsInvocationIDSourceControlRoute
   BazelInvocationsInvocationIDTagsRoute: typeof BazelInvocationsInvocationIDTagsRoute
-  BazelInvocationsInvocationIDTargetsRoute: typeof BazelInvocationsInvocationIDTargetsRoute
-  BazelInvocationsInvocationIDTestsRoute: typeof BazelInvocationsInvocationIDTestsRoute
+  BazelInvocationsInvocationIDTargetsRoute: typeof BazelInvocationsInvocationIDTargetsRouteWithChildren
+  BazelInvocationsInvocationIDTestsRoute: typeof BazelInvocationsInvocationIDTestsRouteWithChildren
   BazelInvocationsInvocationIDIndexRoute: typeof BazelInvocationsInvocationIDIndexRoute
 }
 
@@ -692,9 +783,9 @@ const BazelInvocationsInvocationIDRouteChildren: BazelInvocationsInvocationIDRou
     BazelInvocationsInvocationIDTagsRoute:
       BazelInvocationsInvocationIDTagsRoute,
     BazelInvocationsInvocationIDTargetsRoute:
-      BazelInvocationsInvocationIDTargetsRoute,
+      BazelInvocationsInvocationIDTargetsRouteWithChildren,
     BazelInvocationsInvocationIDTestsRoute:
-      BazelInvocationsInvocationIDTestsRoute,
+      BazelInvocationsInvocationIDTestsRouteWithChildren,
     BazelInvocationsInvocationIDIndexRoute:
       BazelInvocationsInvocationIDIndexRoute,
   }

@@ -50,6 +50,8 @@ const (
 	EdgeBazelInvocation = "bazel_invocation"
 	// EdgeConfiguration holds the string denoting the configuration edge name in mutations.
 	EdgeConfiguration = "configuration"
+	// EdgeActionFiles holds the string denoting the action_files edge name in mutations.
+	EdgeActionFiles = "action_files"
 	// Table holds the table name of the action in the database.
 	Table = "actions"
 	// BazelInvocationTable is the table that holds the bazel_invocation relation/edge.
@@ -66,6 +68,13 @@ const (
 	ConfigurationInverseTable = "configurations"
 	// ConfigurationColumn is the table column denoting the configuration relation/edge.
 	ConfigurationColumn = "configuration_id"
+	// ActionFilesTable is the table that holds the action_files relation/edge.
+	ActionFilesTable = "invocation_files"
+	// ActionFilesInverseTable is the table name for the InvocationFiles entity.
+	// It exists in this package in order to avoid circular dependency with the "invocationfiles" package.
+	ActionFilesInverseTable = "invocation_files"
+	// ActionFilesColumn is the table column denoting the action_files relation/edge.
+	ActionFilesColumn = "action_action_files"
 )
 
 // Columns holds all SQL columns for action fields.
@@ -201,6 +210,20 @@ func ByConfigurationField(field string, opts ...sql.OrderTermOption) OrderOption
 		sqlgraph.OrderByNeighborTerms(s, newConfigurationStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByActionFilesCount orders the results by action_files count.
+func ByActionFilesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newActionFilesStep(), opts...)
+	}
+}
+
+// ByActionFiles orders the results by action_files terms.
+func ByActionFiles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newActionFilesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newBazelInvocationStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -213,5 +236,12 @@ func newConfigurationStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ConfigurationInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, ConfigurationTable, ConfigurationColumn),
+	)
+}
+func newActionFilesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ActionFilesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ActionFilesTable, ActionFilesColumn),
 	)
 }

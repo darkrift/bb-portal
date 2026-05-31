@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/predicate"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/target"
@@ -31,10 +32,12 @@ type InvocationTargetQuery struct {
 	withTarget           *TargetQuery
 	withConfiguration    *ConfigurationQuery
 	withTestSummary      *TestSummaryQuery
+	withTargetFiles      *InvocationFilesQuery
 	withFKs              bool
 	modifiers            []func(*sql.Selector)
 	loadTotal            []func(context.Context, []*InvocationTarget) error
 	withNamedTestSummary map[string]*TestSummaryQuery
+	withNamedTargetFiles map[string]*InvocationFilesQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -152,6 +155,28 @@ func (itq *InvocationTargetQuery) QueryTestSummary() *TestSummaryQuery {
 			sqlgraph.From(invocationtarget.Table, invocationtarget.FieldID, selector),
 			sqlgraph.To(testsummary.Table, testsummary.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, invocationtarget.TestSummaryTable, invocationtarget.TestSummaryColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(itq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTargetFiles chains the current query on the "target_files" edge.
+func (itq *InvocationTargetQuery) QueryTargetFiles() *InvocationFilesQuery {
+	query := (&InvocationFilesClient{config: itq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := itq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := itq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invocationtarget.Table, invocationtarget.FieldID, selector),
+			sqlgraph.To(invocationfiles.Table, invocationfiles.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, invocationtarget.TargetFilesTable, invocationtarget.TargetFilesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(itq.driver.Dialect(), step)
 		return fromU, nil
@@ -355,6 +380,7 @@ func (itq *InvocationTargetQuery) Clone() *InvocationTargetQuery {
 		withTarget:          itq.withTarget.Clone(),
 		withConfiguration:   itq.withConfiguration.Clone(),
 		withTestSummary:     itq.withTestSummary.Clone(),
+		withTargetFiles:     itq.withTargetFiles.Clone(),
 		// clone intermediate query.
 		sql:  itq.sql.Clone(),
 		path: itq.path,
@@ -402,6 +428,17 @@ func (itq *InvocationTargetQuery) WithTestSummary(opts ...func(*TestSummaryQuery
 		opt(query)
 	}
 	itq.withTestSummary = query
+	return itq
+}
+
+// WithTargetFiles tells the query-builder to eager-load the nodes that are connected to
+// the "target_files" edge. The optional arguments are used to configure the query builder of the edge.
+func (itq *InvocationTargetQuery) WithTargetFiles(opts ...func(*InvocationFilesQuery)) *InvocationTargetQuery {
+	query := (&InvocationFilesClient{config: itq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	itq.withTargetFiles = query
 	return itq
 }
 
@@ -484,11 +521,12 @@ func (itq *InvocationTargetQuery) sqlAll(ctx context.Context, hooks ...queryHook
 		nodes       = []*InvocationTarget{}
 		withFKs     = itq.withFKs
 		_spec       = itq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			itq.withBazelInvocation != nil,
 			itq.withTarget != nil,
 			itq.withConfiguration != nil,
 			itq.withTestSummary != nil,
+			itq.withTargetFiles != nil,
 		}
 	)
 	if itq.withBazelInvocation != nil || itq.withTarget != nil || itq.withConfiguration != nil {
@@ -543,10 +581,24 @@ func (itq *InvocationTargetQuery) sqlAll(ctx context.Context, hooks ...queryHook
 			return nil, err
 		}
 	}
+	if query := itq.withTargetFiles; query != nil {
+		if err := itq.loadTargetFiles(ctx, query, nodes,
+			func(n *InvocationTarget) { n.Edges.TargetFiles = []*InvocationFiles{} },
+			func(n *InvocationTarget, e *InvocationFiles) { n.Edges.TargetFiles = append(n.Edges.TargetFiles, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range itq.withNamedTestSummary {
 		if err := itq.loadTestSummary(ctx, query, nodes,
 			func(n *InvocationTarget) { n.appendNamedTestSummary(name) },
 			func(n *InvocationTarget, e *TestSummary) { n.appendNamedTestSummary(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range itq.withNamedTargetFiles {
+		if err := itq.loadTargetFiles(ctx, query, nodes,
+			func(n *InvocationTarget) { n.appendNamedTargetFiles(name) },
+			func(n *InvocationTarget, e *InvocationFiles) { n.appendNamedTargetFiles(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -685,6 +737,37 @@ func (itq *InvocationTargetQuery) loadTestSummary(ctx context.Context, query *Te
 	}
 	return nil
 }
+func (itq *InvocationTargetQuery) loadTargetFiles(ctx context.Context, query *InvocationFilesQuery, nodes []*InvocationTarget, init func(*InvocationTarget), assign func(*InvocationTarget, *InvocationFiles)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*InvocationTarget)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.InvocationFiles(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(invocationtarget.TargetFilesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.invocation_target_target_files
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "invocation_target_target_files" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "invocation_target_target_files" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 
 func (itq *InvocationTargetQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := itq.querySpec()
@@ -781,6 +864,20 @@ func (itq *InvocationTargetQuery) WithNamedTestSummary(name string, opts ...func
 		itq.withNamedTestSummary = make(map[string]*TestSummaryQuery)
 	}
 	itq.withNamedTestSummary[name] = query
+	return itq
+}
+
+// WithNamedTargetFiles tells the query-builder to eager-load the nodes that are connected to the "target_files"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (itq *InvocationTargetQuery) WithNamedTargetFiles(name string, opts ...func(*InvocationFilesQuery)) *InvocationTargetQuery {
+	query := (&InvocationFilesClient{config: itq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if itq.withNamedTargetFiles == nil {
+		itq.withNamedTargetFiles = make(map[string]*InvocationFilesQuery)
+	}
+	itq.withNamedTargetFiles[name] = query
 	return itq
 }
 

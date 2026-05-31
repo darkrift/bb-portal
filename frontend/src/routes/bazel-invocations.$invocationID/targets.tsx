@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, Outlet, useLocation } from "@tanstack/react-router";
 import { apolloClient } from "@/components/ApolloWrapper";
 import { InvocationTargetsTab } from "@/components/InvocationTargets/InvocationTargetsTab";
 import { getFragmentData, gql } from "@/graphql/__generated__";
@@ -67,6 +67,18 @@ export const Route = createFileRoute(
 function RouteComponent() {
   const { invocationID } = Route.useParams();
   const { targetMetrics } = Route.useLoaderData();
+
+  const { pathname } = useLocation();
+  if (
+    pathname.match(
+      new RegExp(
+        `^/bazel-invocations/${invocationID}/targets/[^/]+$`,
+      ),
+    )
+  ) {
+    return <Outlet />;
+  }
+
   // TODO (isakstenstrom): Fetch data in the data loader
   return (
     <InvocationTargetsTab

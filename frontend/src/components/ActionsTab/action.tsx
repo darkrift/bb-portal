@@ -1,10 +1,11 @@
 import { WarningOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Descriptions, Flex, Space, Tooltip } from "antd";
+import { Button, Descriptions, Flex, Space, Tooltip, Typography } from "antd";
 import type { BazelInvocationActionsFragment } from "@/graphql/__generated__/graphql";
 import { casByteStreamClient } from "@/grpc/casByteStreamClient";
 import { digestFunction_ValueFromJSON } from "@/lib/grpc-client/build/bazel/remote/execution/v2/remote_execution";
 import type { ByteStreamClient } from "@/lib/grpc-client/google/bytestream/bytestream";
+import { parseBytestreamUri } from "@/utils/bytestreamUri";
 import { digestFunctionValueFromString } from "@/utils/digestFunctionUtils";
 import { fetchCasObject } from "@/utils/fetchCasObject";
 import { readableFileSize } from "@/utils/filesize";
@@ -34,6 +35,45 @@ const fetchLog = async (
     },
   );
   return new TextDecoder().decode(data);
+};
+
+const renderActionFileLink = (
+  file: { name: string; uri?: string | null },
+  actionLabel: string,
+) => {
+  if (!file.uri) {
+    return (
+      <Typography.Text type="secondary" key={file.name}>
+        {file.name}
+      </Typography.Text>
+    );
+  }
+
+  const parsed = parseBytestreamUri(file.uri);
+  if (!parsed) {
+    return (
+      <Typography.Text type="secondary" key={file.name}>
+        {file.name}
+      </Typography.Text>
+    );
+  }
+
+  return (
+    <a
+      key={file.name}
+      href={generateFileUrl(
+        parsed.instanceName,
+        parsed.digestFunction,
+        parsed.digest,
+        file.name,
+      )}
+      download={`${actionLabel}-${file.name}`}
+      target="_self"
+      rel="noreferrer"
+    >
+      {file.name}
+    </a>
+  );
 };
 
 interface Props {
@@ -217,6 +257,16 @@ export const ActionDetails: React.FC<Props> = ({ instanceName, action }) => {
             : undefined
         }
       />
+      {Array.isArray(action.actionFiles) && action.actionFiles.length > 0 && (
+        <Space direction="vertical" size="small" style={{ width: "100%" }}>
+          <Typography.Text strong>Files</Typography.Text>
+          <Space direction="vertical" size={2}>
+            {[...action.actionFiles]
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((file) => renderActionFileLink(file, action.label))}
+          </Space>
+        </Space>
+      )}
       {data?.historicalUrl && (
         <Space
           size="small"

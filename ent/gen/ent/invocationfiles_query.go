@@ -11,22 +11,26 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/predicate"
 )
 
 // InvocationFilesQuery is the builder for querying InvocationFiles entities.
 type InvocationFilesQuery struct {
 	config
-	ctx                 *QueryContext
-	order               []invocationfiles.OrderOption
-	inters              []Interceptor
-	predicates          []predicate.InvocationFiles
-	withBazelInvocation *BazelInvocationQuery
-	withFKs             bool
-	modifiers           []func(*sql.Selector)
-	loadTotal           []func(context.Context, []*InvocationFiles) error
+	ctx                  *QueryContext
+	order                []invocationfiles.OrderOption
+	inters               []Interceptor
+	predicates           []predicate.InvocationFiles
+	withBazelInvocation  *BazelInvocationQuery
+	withAction           *ActionQuery
+	withInvocationTarget *InvocationTargetQuery
+	withFKs              bool
+	modifiers            []func(*sql.Selector)
+	loadTotal            []func(context.Context, []*InvocationFiles) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -78,6 +82,50 @@ func (ifq *InvocationFilesQuery) QueryBazelInvocation() *BazelInvocationQuery {
 			sqlgraph.From(invocationfiles.Table, invocationfiles.FieldID, selector),
 			sqlgraph.To(bazelinvocation.Table, bazelinvocation.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, invocationfiles.BazelInvocationTable, invocationfiles.BazelInvocationColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(ifq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAction chains the current query on the "action" edge.
+func (ifq *InvocationFilesQuery) QueryAction() *ActionQuery {
+	query := (&ActionClient{config: ifq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := ifq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := ifq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invocationfiles.Table, invocationfiles.FieldID, selector),
+			sqlgraph.To(action.Table, action.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, invocationfiles.ActionTable, invocationfiles.ActionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(ifq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryInvocationTarget chains the current query on the "invocation_target" edge.
+func (ifq *InvocationFilesQuery) QueryInvocationTarget() *InvocationTargetQuery {
+	query := (&InvocationTargetClient{config: ifq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := ifq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := ifq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invocationfiles.Table, invocationfiles.FieldID, selector),
+			sqlgraph.To(invocationtarget.Table, invocationtarget.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, invocationfiles.InvocationTargetTable, invocationfiles.InvocationTargetColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ifq.driver.Dialect(), step)
 		return fromU, nil
@@ -272,12 +320,14 @@ func (ifq *InvocationFilesQuery) Clone() *InvocationFilesQuery {
 		return nil
 	}
 	return &InvocationFilesQuery{
-		config:              ifq.config,
-		ctx:                 ifq.ctx.Clone(),
-		order:               append([]invocationfiles.OrderOption{}, ifq.order...),
-		inters:              append([]Interceptor{}, ifq.inters...),
-		predicates:          append([]predicate.InvocationFiles{}, ifq.predicates...),
-		withBazelInvocation: ifq.withBazelInvocation.Clone(),
+		config:               ifq.config,
+		ctx:                  ifq.ctx.Clone(),
+		order:                append([]invocationfiles.OrderOption{}, ifq.order...),
+		inters:               append([]Interceptor{}, ifq.inters...),
+		predicates:           append([]predicate.InvocationFiles{}, ifq.predicates...),
+		withBazelInvocation:  ifq.withBazelInvocation.Clone(),
+		withAction:           ifq.withAction.Clone(),
+		withInvocationTarget: ifq.withInvocationTarget.Clone(),
 		// clone intermediate query.
 		sql:  ifq.sql.Clone(),
 		path: ifq.path,
@@ -292,6 +342,28 @@ func (ifq *InvocationFilesQuery) WithBazelInvocation(opts ...func(*BazelInvocati
 		opt(query)
 	}
 	ifq.withBazelInvocation = query
+	return ifq
+}
+
+// WithAction tells the query-builder to eager-load the nodes that are connected to
+// the "action" edge. The optional arguments are used to configure the query builder of the edge.
+func (ifq *InvocationFilesQuery) WithAction(opts ...func(*ActionQuery)) *InvocationFilesQuery {
+	query := (&ActionClient{config: ifq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	ifq.withAction = query
+	return ifq
+}
+
+// WithInvocationTarget tells the query-builder to eager-load the nodes that are connected to
+// the "invocation_target" edge. The optional arguments are used to configure the query builder of the edge.
+func (ifq *InvocationFilesQuery) WithInvocationTarget(opts ...func(*InvocationTargetQuery)) *InvocationFilesQuery {
+	query := (&InvocationTargetClient{config: ifq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	ifq.withInvocationTarget = query
 	return ifq
 }
 
@@ -374,11 +446,13 @@ func (ifq *InvocationFilesQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 		nodes       = []*InvocationFiles{}
 		withFKs     = ifq.withFKs
 		_spec       = ifq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [3]bool{
 			ifq.withBazelInvocation != nil,
+			ifq.withAction != nil,
+			ifq.withInvocationTarget != nil,
 		}
 	)
-	if ifq.withBazelInvocation != nil {
+	if ifq.withBazelInvocation != nil || ifq.withAction != nil || ifq.withInvocationTarget != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -408,6 +482,18 @@ func (ifq *InvocationFilesQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 	if query := ifq.withBazelInvocation; query != nil {
 		if err := ifq.loadBazelInvocation(ctx, query, nodes, nil,
 			func(n *InvocationFiles, e *BazelInvocation) { n.Edges.BazelInvocation = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := ifq.withAction; query != nil {
+		if err := ifq.loadAction(ctx, query, nodes, nil,
+			func(n *InvocationFiles, e *Action) { n.Edges.Action = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := ifq.withInvocationTarget; query != nil {
+		if err := ifq.loadInvocationTarget(ctx, query, nodes, nil,
+			func(n *InvocationFiles, e *InvocationTarget) { n.Edges.InvocationTarget = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -444,6 +530,70 @@ func (ifq *InvocationFilesQuery) loadBazelInvocation(ctx context.Context, query 
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "bazel_invocation_invocation_files" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (ifq *InvocationFilesQuery) loadAction(ctx context.Context, query *ActionQuery, nodes []*InvocationFiles, init func(*InvocationFiles), assign func(*InvocationFiles, *Action)) error {
+	ids := make([]int64, 0, len(nodes))
+	nodeids := make(map[int64][]*InvocationFiles)
+	for i := range nodes {
+		if nodes[i].action_action_files == nil {
+			continue
+		}
+		fk := *nodes[i].action_action_files
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(action.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "action_action_files" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (ifq *InvocationFilesQuery) loadInvocationTarget(ctx context.Context, query *InvocationTargetQuery, nodes []*InvocationFiles, init func(*InvocationFiles), assign func(*InvocationFiles, *InvocationTarget)) error {
+	ids := make([]int64, 0, len(nodes))
+	nodeids := make(map[int64][]*InvocationFiles)
+	for i := range nodes {
+		if nodes[i].invocation_target_target_files == nil {
+			continue
+		}
+		fk := *nodes[i].invocation_target_target_files
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(invocationtarget.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "invocation_target_target_files" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

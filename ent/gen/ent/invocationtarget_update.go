@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/predicate"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/target"
@@ -235,6 +236,21 @@ func (itu *InvocationTargetUpdate) AddTestSummary(t ...*TestSummary) *Invocation
 	return itu.AddTestSummaryIDs(ids...)
 }
 
+// AddTargetFileIDs adds the "target_files" edge to the InvocationFiles entity by IDs.
+func (itu *InvocationTargetUpdate) AddTargetFileIDs(ids ...int64) *InvocationTargetUpdate {
+	itu.mutation.AddTargetFileIDs(ids...)
+	return itu
+}
+
+// AddTargetFiles adds the "target_files" edges to the InvocationFiles entity.
+func (itu *InvocationTargetUpdate) AddTargetFiles(i ...*InvocationFiles) *InvocationTargetUpdate {
+	ids := make([]int64, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return itu.AddTargetFileIDs(ids...)
+}
+
 // Mutation returns the InvocationTargetMutation object of the builder.
 func (itu *InvocationTargetUpdate) Mutation() *InvocationTargetMutation {
 	return itu.mutation
@@ -277,6 +293,27 @@ func (itu *InvocationTargetUpdate) RemoveTestSummary(t ...*TestSummary) *Invocat
 		ids[i] = t[i].ID
 	}
 	return itu.RemoveTestSummaryIDs(ids...)
+}
+
+// ClearTargetFiles clears all "target_files" edges to the InvocationFiles entity.
+func (itu *InvocationTargetUpdate) ClearTargetFiles() *InvocationTargetUpdate {
+	itu.mutation.ClearTargetFiles()
+	return itu
+}
+
+// RemoveTargetFileIDs removes the "target_files" edge to InvocationFiles entities by IDs.
+func (itu *InvocationTargetUpdate) RemoveTargetFileIDs(ids ...int64) *InvocationTargetUpdate {
+	itu.mutation.RemoveTargetFileIDs(ids...)
+	return itu
+}
+
+// RemoveTargetFiles removes "target_files" edges to InvocationFiles entities.
+func (itu *InvocationTargetUpdate) RemoveTargetFiles(i ...*InvocationFiles) *InvocationTargetUpdate {
+	ids := make([]int64, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return itu.RemoveTargetFileIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -516,6 +553,51 @@ func (itu *InvocationTargetUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if itu.mutation.TargetFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   invocationtarget.TargetFilesTable,
+			Columns: []string{invocationtarget.TargetFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := itu.mutation.RemovedTargetFilesIDs(); len(nodes) > 0 && !itu.mutation.TargetFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   invocationtarget.TargetFilesTable,
+			Columns: []string{invocationtarget.TargetFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := itu.mutation.TargetFilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   invocationtarget.TargetFilesTable,
+			Columns: []string{invocationtarget.TargetFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, itu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{invocationtarget.Label}
@@ -739,6 +821,21 @@ func (ituo *InvocationTargetUpdateOne) AddTestSummary(t ...*TestSummary) *Invoca
 	return ituo.AddTestSummaryIDs(ids...)
 }
 
+// AddTargetFileIDs adds the "target_files" edge to the InvocationFiles entity by IDs.
+func (ituo *InvocationTargetUpdateOne) AddTargetFileIDs(ids ...int64) *InvocationTargetUpdateOne {
+	ituo.mutation.AddTargetFileIDs(ids...)
+	return ituo
+}
+
+// AddTargetFiles adds the "target_files" edges to the InvocationFiles entity.
+func (ituo *InvocationTargetUpdateOne) AddTargetFiles(i ...*InvocationFiles) *InvocationTargetUpdateOne {
+	ids := make([]int64, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return ituo.AddTargetFileIDs(ids...)
+}
+
 // Mutation returns the InvocationTargetMutation object of the builder.
 func (ituo *InvocationTargetUpdateOne) Mutation() *InvocationTargetMutation {
 	return ituo.mutation
@@ -781,6 +878,27 @@ func (ituo *InvocationTargetUpdateOne) RemoveTestSummary(t ...*TestSummary) *Inv
 		ids[i] = t[i].ID
 	}
 	return ituo.RemoveTestSummaryIDs(ids...)
+}
+
+// ClearTargetFiles clears all "target_files" edges to the InvocationFiles entity.
+func (ituo *InvocationTargetUpdateOne) ClearTargetFiles() *InvocationTargetUpdateOne {
+	ituo.mutation.ClearTargetFiles()
+	return ituo
+}
+
+// RemoveTargetFileIDs removes the "target_files" edge to InvocationFiles entities by IDs.
+func (ituo *InvocationTargetUpdateOne) RemoveTargetFileIDs(ids ...int64) *InvocationTargetUpdateOne {
+	ituo.mutation.RemoveTargetFileIDs(ids...)
+	return ituo
+}
+
+// RemoveTargetFiles removes "target_files" edges to InvocationFiles entities.
+func (ituo *InvocationTargetUpdateOne) RemoveTargetFiles(i ...*InvocationFiles) *InvocationTargetUpdateOne {
+	ids := make([]int64, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return ituo.RemoveTargetFileIDs(ids...)
 }
 
 // Where appends a list predicates to the InvocationTargetUpdate builder.
@@ -1043,6 +1161,51 @@ func (ituo *InvocationTargetUpdateOne) sqlSave(ctx context.Context) (_node *Invo
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testsummary.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ituo.mutation.TargetFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   invocationtarget.TargetFilesTable,
+			Columns: []string{invocationtarget.TargetFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ituo.mutation.RemovedTargetFilesIDs(); len(nodes) > 0 && !ituo.mutation.TargetFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   invocationtarget.TargetFilesTable,
+			Columns: []string{invocationtarget.TargetFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ituo.mutation.TargetFilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   invocationtarget.TargetFilesTable,
+			Columns: []string{invocationtarget.TargetFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

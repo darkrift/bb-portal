@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/target"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testsummary"
@@ -167,6 +168,21 @@ func (itc *InvocationTargetCreate) AddTestSummary(t ...*TestSummary) *Invocation
 		ids[i] = t[i].ID
 	}
 	return itc.AddTestSummaryIDs(ids...)
+}
+
+// AddTargetFileIDs adds the "target_files" edge to the InvocationFiles entity by IDs.
+func (itc *InvocationTargetCreate) AddTargetFileIDs(ids ...int64) *InvocationTargetCreate {
+	itc.mutation.AddTargetFileIDs(ids...)
+	return itc
+}
+
+// AddTargetFiles adds the "target_files" edges to the InvocationFiles entity.
+func (itc *InvocationTargetCreate) AddTargetFiles(i ...*InvocationFiles) *InvocationTargetCreate {
+	ids := make([]int64, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return itc.AddTargetFileIDs(ids...)
 }
 
 // Mutation returns the InvocationTargetMutation object of the builder.
@@ -350,6 +366,22 @@ func (itc *InvocationTargetCreate) createSpec() (*InvocationTarget, *sqlgraph.Cr
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testsummary.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := itc.mutation.TargetFilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   invocationtarget.TargetFilesTable,
+			Columns: []string{invocationtarget.TargetFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

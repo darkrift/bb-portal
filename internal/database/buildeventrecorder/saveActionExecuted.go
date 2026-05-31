@@ -123,9 +123,36 @@ func (r *buildEventRecorder) saveActionExecuted(ctx context.Context, tx *ent.Cli
 			create.SetStderrHashFunction(*digestFunction)
 		}
 	}
-	err := create.Exec(ctx)
+	action, err := create.Save(ctx)
 	if err != nil {
 		return util.StatusWrap(err, "failed to save Action")
+	}
+
+	if err := saveActionFiles(ctx, tx, actionExecuted, action); err != nil {
+		return util.StatusWrap(err, "failed to save action files")
+	}
+	return nil
+}
+
+func saveActionFiles(ctx context.Context, tx *ent.Client, actionExecuted *bes.ActionExecuted, action *ent.Action) error {
+	if actionExecuted == nil || action == nil {
+		return nil
+	}
+
+	for _, file := range []*bes.File{
+		actionExecuted.GetStdout(),
+		actionExecuted.GetStderr(),
+		actionExecuted.GetPrimaryOutput(),
+	} {
+		if !shouldPersistBesFile(file) {
+			continue
+		}
+		create := tx.InvocationFiles.Create().
+			SetActionID(action.ID)
+		applyBesFileFields(create, file)
+		if _, err := create.Save(ctx); err != nil {
+			return util.StatusWrap(err, "failed to insert action file")
+		}
 	}
 	return nil
 }

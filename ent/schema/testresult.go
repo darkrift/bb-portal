@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -65,6 +66,12 @@ func (TestResult) Edges() []ent.Edge {
 			Ref("test_results").
 			Required().
 			Unique(),
+
+		// Files reported for this test result.
+		edge.To("test_result_files", TestResultFile.Type).
+			Annotations(
+				entsql.OnDelete(entsql.Cascade),
+			),
 	}
 }
 

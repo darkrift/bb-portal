@@ -20,6 +20,9 @@ func (InvocationFiles) Fields() []ent.Field {
 		// Name of the file, including path relative to the invocation root.
 		field.String("name"),
 
+		// Uri of the file, if available.
+		field.String("uri").Optional(),
+
 		// Content of the file, if available.
 		field.String("content").Optional(),
 
@@ -41,6 +44,16 @@ func (InvocationFiles) Edges() []ent.Edge {
 		edge.From("bazel_invocation", BazelInvocation.Type).
 			Ref("invocation_files").
 			Unique(),
+
+		// Edge back to the action that produced this file.
+		edge.From("action", Action.Type).
+			Ref("action_files").
+			Unique(),
+
+		// Edge back to the completed invocation target that produced this file.
+		edge.From("invocation_target", InvocationTarget.Type).
+			Ref("target_files").
+			Unique(),
 	}
 }
 
@@ -52,13 +65,21 @@ func (InvocationFiles) Indexes() []ent.Index {
 		index.Fields("name").
 			Edges("bazel_invocation").
 			Unique(),
+		index.Edges("action"),
+		index.Fields("name").
+			Edges("action").
+			Unique(),
+		index.Edges("invocation_target"),
+		index.Fields("name").
+			Edges("invocation_target").
+			Unique(),
 	}
 }
 
 // Annotations of the InvocationFiles.
 func (InvocationFiles) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entgql.Skip(),
+		entgql.RelayConnection(),
 	}
 }
 

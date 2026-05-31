@@ -435,6 +435,29 @@ func HasTestSummaryWith(preds ...predicate.TestSummary) predicate.InvocationTarg
 	})
 }
 
+// HasTargetFiles applies the HasEdge predicate on the "target_files" edge.
+func HasTargetFiles() predicate.InvocationTarget {
+	return predicate.InvocationTarget(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TargetFilesTable, TargetFilesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTargetFilesWith applies the HasEdge predicate on the "target_files" edge with a given conditions (other predicates).
+func HasTargetFilesWith(preds ...predicate.InvocationFiles) predicate.InvocationTarget {
+	return predicate.InvocationTarget(func(s *sql.Selector) {
+		step := newTargetFilesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.InvocationTarget) predicate.InvocationTarget {
 	return predicate.InvocationTarget(sql.AndPredicates(predicates...))

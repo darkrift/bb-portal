@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/predicate"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testresult"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/testresultfile"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testsummary"
 )
 
@@ -265,6 +266,21 @@ func (tru *TestResultUpdate) SetTestSummary(t *TestSummary) *TestResultUpdate {
 	return tru.SetTestSummaryID(t.ID)
 }
 
+// AddTestResultFileIDs adds the "test_result_files" edge to the TestResultFile entity by IDs.
+func (tru *TestResultUpdate) AddTestResultFileIDs(ids ...int64) *TestResultUpdate {
+	tru.mutation.AddTestResultFileIDs(ids...)
+	return tru
+}
+
+// AddTestResultFiles adds the "test_result_files" edges to the TestResultFile entity.
+func (tru *TestResultUpdate) AddTestResultFiles(t ...*TestResultFile) *TestResultUpdate {
+	ids := make([]int64, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return tru.AddTestResultFileIDs(ids...)
+}
+
 // Mutation returns the TestResultMutation object of the builder.
 func (tru *TestResultUpdate) Mutation() *TestResultMutation {
 	return tru.mutation
@@ -274,6 +290,27 @@ func (tru *TestResultUpdate) Mutation() *TestResultMutation {
 func (tru *TestResultUpdate) ClearTestSummary() *TestResultUpdate {
 	tru.mutation.ClearTestSummary()
 	return tru
+}
+
+// ClearTestResultFiles clears all "test_result_files" edges to the TestResultFile entity.
+func (tru *TestResultUpdate) ClearTestResultFiles() *TestResultUpdate {
+	tru.mutation.ClearTestResultFiles()
+	return tru
+}
+
+// RemoveTestResultFileIDs removes the "test_result_files" edge to TestResultFile entities by IDs.
+func (tru *TestResultUpdate) RemoveTestResultFileIDs(ids ...int64) *TestResultUpdate {
+	tru.mutation.RemoveTestResultFileIDs(ids...)
+	return tru
+}
+
+// RemoveTestResultFiles removes "test_result_files" edges to TestResultFile entities.
+func (tru *TestResultUpdate) RemoveTestResultFiles(t ...*TestResultFile) *TestResultUpdate {
+	ids := make([]int64, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return tru.RemoveTestResultFileIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -422,6 +459,51 @@ func (tru *TestResultUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testsummary.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tru.mutation.TestResultFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   testresult.TestResultFilesTable,
+			Columns: []string{testresult.TestResultFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testresultfile.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tru.mutation.RemovedTestResultFilesIDs(); len(nodes) > 0 && !tru.mutation.TestResultFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   testresult.TestResultFilesTable,
+			Columns: []string{testresult.TestResultFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testresultfile.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tru.mutation.TestResultFilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   testresult.TestResultFilesTable,
+			Columns: []string{testresult.TestResultFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testresultfile.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -684,6 +766,21 @@ func (truo *TestResultUpdateOne) SetTestSummary(t *TestSummary) *TestResultUpdat
 	return truo.SetTestSummaryID(t.ID)
 }
 
+// AddTestResultFileIDs adds the "test_result_files" edge to the TestResultFile entity by IDs.
+func (truo *TestResultUpdateOne) AddTestResultFileIDs(ids ...int64) *TestResultUpdateOne {
+	truo.mutation.AddTestResultFileIDs(ids...)
+	return truo
+}
+
+// AddTestResultFiles adds the "test_result_files" edges to the TestResultFile entity.
+func (truo *TestResultUpdateOne) AddTestResultFiles(t ...*TestResultFile) *TestResultUpdateOne {
+	ids := make([]int64, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return truo.AddTestResultFileIDs(ids...)
+}
+
 // Mutation returns the TestResultMutation object of the builder.
 func (truo *TestResultUpdateOne) Mutation() *TestResultMutation {
 	return truo.mutation
@@ -693,6 +790,27 @@ func (truo *TestResultUpdateOne) Mutation() *TestResultMutation {
 func (truo *TestResultUpdateOne) ClearTestSummary() *TestResultUpdateOne {
 	truo.mutation.ClearTestSummary()
 	return truo
+}
+
+// ClearTestResultFiles clears all "test_result_files" edges to the TestResultFile entity.
+func (truo *TestResultUpdateOne) ClearTestResultFiles() *TestResultUpdateOne {
+	truo.mutation.ClearTestResultFiles()
+	return truo
+}
+
+// RemoveTestResultFileIDs removes the "test_result_files" edge to TestResultFile entities by IDs.
+func (truo *TestResultUpdateOne) RemoveTestResultFileIDs(ids ...int64) *TestResultUpdateOne {
+	truo.mutation.RemoveTestResultFileIDs(ids...)
+	return truo
+}
+
+// RemoveTestResultFiles removes "test_result_files" edges to TestResultFile entities.
+func (truo *TestResultUpdateOne) RemoveTestResultFiles(t ...*TestResultFile) *TestResultUpdateOne {
+	ids := make([]int64, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return truo.RemoveTestResultFileIDs(ids...)
 }
 
 // Where appends a list predicates to the TestResultUpdate builder.
@@ -871,6 +989,51 @@ func (truo *TestResultUpdateOne) sqlSave(ctx context.Context) (_node *TestResult
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(testsummary.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if truo.mutation.TestResultFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   testresult.TestResultFilesTable,
+			Columns: []string{testresult.TestResultFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testresultfile.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := truo.mutation.RemovedTestResultFilesIDs(); len(nodes) > 0 && !truo.mutation.TestResultFilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   testresult.TestResultFilesTable,
+			Columns: []string{testresult.TestResultFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testresultfile.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := truo.mutation.TestResultFilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   testresult.TestResultFilesTable,
+			Columns: []string{testresult.TestResultFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(testresultfile.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

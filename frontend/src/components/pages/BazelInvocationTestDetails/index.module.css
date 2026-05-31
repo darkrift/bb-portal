@@ -1,0 +1,149 @@
+.page {
+  width: 100%;
+}
+
+.runCard {
+  width: 100%;
+}
+
+.normalWeight {
+  font-weight: 400;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px 16px;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px 16px;
+}
+
+.detailItem {
+  min-width: 0;
+}
+
+.detailLabel {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.detailValue {
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.summaryLabel {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.summaryValue {
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.runSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px 16px;
+}
+
+.runSummaryLabel {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.runSummaryValue {
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.warningBlock {
+  grid-column: 1 / -1;
+}
+
+.warningList {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.phaseSection {
+  width: 100%;
+}
+
+.phaseHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.phaseTree {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timingGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timingChildren {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.phaseChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.phaseBullet {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.phaseName {
+  min-width: 0;
+  word-break: break-word;
+}
+
+.phaseDuration {
+  margin-left: 4px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.fileRow {
+  padding-left: 0;
+  padding-right: 0;
+}

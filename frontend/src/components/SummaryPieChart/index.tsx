@@ -20,6 +20,7 @@ export interface SummaryChartItem {
   percent: string;
   fill?: string;
   count: number;
+  countLabel?: string;
   link?: LinkOptions;
 }
 
@@ -72,7 +73,7 @@ const SummaryPieChart: React.FC<Props> = ({
 
     let legendText = (
       <>
-        <b>{item?.count ?? 0}</b>{" "}
+        <b>{item?.countLabel ?? item?.count ?? 0}</b>{" "}
         {item?.link ? <Link {...item.link}>{item.value}</Link> : item?.value} (
         {item?.percent})
       </>

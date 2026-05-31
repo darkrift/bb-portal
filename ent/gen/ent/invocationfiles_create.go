@@ -10,8 +10,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 )
 
 // InvocationFilesCreate is the builder for creating a InvocationFiles entity.
@@ -25,6 +27,20 @@ type InvocationFilesCreate struct {
 // SetName sets the "name" field.
 func (ifc *InvocationFilesCreate) SetName(s string) *InvocationFilesCreate {
 	ifc.mutation.SetName(s)
+	return ifc
+}
+
+// SetURI sets the "uri" field.
+func (ifc *InvocationFilesCreate) SetURI(s string) *InvocationFilesCreate {
+	ifc.mutation.SetURI(s)
+	return ifc
+}
+
+// SetNillableURI sets the "uri" field if the given value is not nil.
+func (ifc *InvocationFilesCreate) SetNillableURI(s *string) *InvocationFilesCreate {
+	if s != nil {
+		ifc.SetURI(*s)
+	}
 	return ifc
 }
 
@@ -109,6 +125,44 @@ func (ifc *InvocationFilesCreate) SetBazelInvocation(b *BazelInvocation) *Invoca
 	return ifc.SetBazelInvocationID(b.ID)
 }
 
+// SetActionID sets the "action" edge to the Action entity by ID.
+func (ifc *InvocationFilesCreate) SetActionID(id int64) *InvocationFilesCreate {
+	ifc.mutation.SetActionID(id)
+	return ifc
+}
+
+// SetNillableActionID sets the "action" edge to the Action entity by ID if the given value is not nil.
+func (ifc *InvocationFilesCreate) SetNillableActionID(id *int64) *InvocationFilesCreate {
+	if id != nil {
+		ifc = ifc.SetActionID(*id)
+	}
+	return ifc
+}
+
+// SetAction sets the "action" edge to the Action entity.
+func (ifc *InvocationFilesCreate) SetAction(a *Action) *InvocationFilesCreate {
+	return ifc.SetActionID(a.ID)
+}
+
+// SetInvocationTargetID sets the "invocation_target" edge to the InvocationTarget entity by ID.
+func (ifc *InvocationFilesCreate) SetInvocationTargetID(id int64) *InvocationFilesCreate {
+	ifc.mutation.SetInvocationTargetID(id)
+	return ifc
+}
+
+// SetNillableInvocationTargetID sets the "invocation_target" edge to the InvocationTarget entity by ID if the given value is not nil.
+func (ifc *InvocationFilesCreate) SetNillableInvocationTargetID(id *int64) *InvocationFilesCreate {
+	if id != nil {
+		ifc = ifc.SetInvocationTargetID(*id)
+	}
+	return ifc
+}
+
+// SetInvocationTarget sets the "invocation_target" edge to the InvocationTarget entity.
+func (ifc *InvocationFilesCreate) SetInvocationTarget(i *InvocationTarget) *InvocationFilesCreate {
+	return ifc.SetInvocationTargetID(i.ID)
+}
+
 // Mutation returns the InvocationFilesMutation object of the builder.
 func (ifc *InvocationFilesCreate) Mutation() *InvocationFilesMutation {
 	return ifc.mutation
@@ -183,6 +237,10 @@ func (ifc *InvocationFilesCreate) createSpec() (*InvocationFiles, *sqlgraph.Crea
 		_spec.SetField(invocationfiles.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
+	if value, ok := ifc.mutation.URI(); ok {
+		_spec.SetField(invocationfiles.FieldURI, field.TypeString, value)
+		_node.URI = value
+	}
 	if value, ok := ifc.mutation.Content(); ok {
 		_spec.SetField(invocationfiles.FieldContent, field.TypeString, value)
 		_node.Content = value
@@ -214,6 +272,40 @@ func (ifc *InvocationFilesCreate) createSpec() (*InvocationFiles, *sqlgraph.Crea
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.bazel_invocation_invocation_files = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ifc.mutation.ActionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invocationfiles.ActionTable,
+			Columns: []string{invocationfiles.ActionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(action.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.action_action_files = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ifc.mutation.InvocationTargetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invocationfiles.InvocationTargetTable,
+			Columns: []string{invocationfiles.InvocationTargetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationtarget.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.invocation_target_target_files = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -277,6 +369,24 @@ func (u *InvocationFilesUpsert) SetName(v string) *InvocationFilesUpsert {
 // UpdateName sets the "name" field to the value that was provided on create.
 func (u *InvocationFilesUpsert) UpdateName() *InvocationFilesUpsert {
 	u.SetExcluded(invocationfiles.FieldName)
+	return u
+}
+
+// SetURI sets the "uri" field.
+func (u *InvocationFilesUpsert) SetURI(v string) *InvocationFilesUpsert {
+	u.Set(invocationfiles.FieldURI, v)
+	return u
+}
+
+// UpdateURI sets the "uri" field to the value that was provided on create.
+func (u *InvocationFilesUpsert) UpdateURI() *InvocationFilesUpsert {
+	u.SetExcluded(invocationfiles.FieldURI)
+	return u
+}
+
+// ClearURI clears the value of the "uri" field.
+func (u *InvocationFilesUpsert) ClearURI() *InvocationFilesUpsert {
+	u.SetNull(invocationfiles.FieldURI)
 	return u
 }
 
@@ -417,6 +527,27 @@ func (u *InvocationFilesUpsertOne) SetName(v string) *InvocationFilesUpsertOne {
 func (u *InvocationFilesUpsertOne) UpdateName() *InvocationFilesUpsertOne {
 	return u.Update(func(s *InvocationFilesUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetURI sets the "uri" field.
+func (u *InvocationFilesUpsertOne) SetURI(v string) *InvocationFilesUpsertOne {
+	return u.Update(func(s *InvocationFilesUpsert) {
+		s.SetURI(v)
+	})
+}
+
+// UpdateURI sets the "uri" field to the value that was provided on create.
+func (u *InvocationFilesUpsertOne) UpdateURI() *InvocationFilesUpsertOne {
+	return u.Update(func(s *InvocationFilesUpsert) {
+		s.UpdateURI()
+	})
+}
+
+// ClearURI clears the value of the "uri" field.
+func (u *InvocationFilesUpsertOne) ClearURI() *InvocationFilesUpsertOne {
+	return u.Update(func(s *InvocationFilesUpsert) {
+		s.ClearURI()
 	})
 }
 
@@ -735,6 +866,27 @@ func (u *InvocationFilesUpsertBulk) SetName(v string) *InvocationFilesUpsertBulk
 func (u *InvocationFilesUpsertBulk) UpdateName() *InvocationFilesUpsertBulk {
 	return u.Update(func(s *InvocationFilesUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetURI sets the "uri" field.
+func (u *InvocationFilesUpsertBulk) SetURI(v string) *InvocationFilesUpsertBulk {
+	return u.Update(func(s *InvocationFilesUpsert) {
+		s.SetURI(v)
+	})
+}
+
+// UpdateURI sets the "uri" field to the value that was provided on create.
+func (u *InvocationFilesUpsertBulk) UpdateURI() *InvocationFilesUpsertBulk {
+	return u.Update(func(s *InvocationFilesUpsert) {
+		s.UpdateURI()
+	})
+}
+
+// ClearURI clears the value of the "uri" field.
+func (u *InvocationFilesUpsertBulk) ClearURI() *InvocationFilesUpsertBulk {
+	return u.Update(func(s *InvocationFilesUpsert) {
+		s.ClearURI()
 	})
 }
 

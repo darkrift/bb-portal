@@ -72,6 +72,10 @@ func (r *buildEventRecorder) saveTargetCompletedBatch(ctx context.Context, batch
 		return util.StatusWrap(err, "Failed to bulk insert invocation targets")
 	}
 
+	if err := saveInvocationTargetFiles(ctx, tx, batch, targetInfoMap); err != nil {
+		return util.StatusWrap(err, "Failed to bulk insert invocation target files")
+	}
+
 	if err := r.createTestSummariesFromTargetCompletedChildren(ctx, tx, batch, targetInfoMap); err != nil {
 		return util.StatusWrap(err, "Failed to bulk insert test summaries")
 	}
@@ -84,6 +88,68 @@ func (r *buildEventRecorder) saveTargetCompletedBatch(ctx context.Context, batch
 		return util.StatusWrap(err, "Failed to commit batch of target completed events")
 	}
 
+	return nil
+}
+
+func saveInvocationTargetFiles(ctx context.Context, tx database.Handle, batch []BuildEventWithInfo, targetInfoMap map[invocationTargetKey]completedTargetInfo) error {
+	for _, x := range batch {
+		be := x.Event
+		targetCompletedID := be.GetId().GetTargetCompleted()
+		targetCompleted := be.GetCompleted()
+		if targetCompletedID == nil || targetCompleted == nil {
+			continue
+		}
+
+		key := invocationTargetKey{
+			label:  targetCompletedID.Label,
+			aspect: stripParams(targetCompletedID.Aspect),
+		}
+		targetInfo, ok := targetInfoMap[key]
+		if !ok {
+			continue
+		}
+
+		seen := make(map[string]struct{})
+		addFile := func(file *bes.File) error {
+			if !shouldPersistBesFile(file) {
+				return nil
+			}
+			name := file.GetName()
+			if name == "" {
+				return nil
+			}
+			if _, exists := seen[name]; exists {
+				return nil
+			}
+			seen[name] = struct{}{}
+
+			create := tx.Ent().InvocationFiles.Create().
+				SetInvocationTargetID(int64(targetInfo.targetID))
+			applyBesFileFields(create, file)
+			if _, err := create.Save(ctx); err != nil {
+				return util.StatusWrap(err, "Failed to insert invocation target file")
+			}
+			return nil
+		}
+
+		for _, outputGroup := range targetCompleted.GetOutputGroup() {
+			for _, file := range outputGroup.GetInlineFiles() {
+				if err := addFile(file); err != nil {
+					return err
+				}
+			}
+		}
+		for _, file := range targetCompleted.GetImportantOutput() {
+			if err := addFile(file); err != nil {
+				return err
+			}
+		}
+		for _, file := range targetCompleted.GetDirectoryOutput() {
+			if err := addFile(file); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 

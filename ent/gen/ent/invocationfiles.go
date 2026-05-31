@@ -8,8 +8,10 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 )
 
 // InvocationFiles is the model entity for the InvocationFiles schema.
@@ -19,6 +21,8 @@ type InvocationFiles struct {
 	ID int64 `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// URI holds the value of the "uri" field.
+	URI string `json:"uri,omitempty"`
 	// Content holds the value of the "content" field.
 	Content string `json:"content,omitempty"`
 	// Digest holds the value of the "digest" field.
@@ -30,7 +34,9 @@ type InvocationFiles struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the InvocationFilesQuery when eager-loading is set.
 	Edges                             InvocationFilesEdges `json:"edges"`
+	action_action_files               *int64
 	bazel_invocation_invocation_files *int64
+	invocation_target_target_files    *int64
 	selectValues                      sql.SelectValues
 }
 
@@ -38,11 +44,15 @@ type InvocationFiles struct {
 type InvocationFilesEdges struct {
 	// BazelInvocation holds the value of the bazel_invocation edge.
 	BazelInvocation *BazelInvocation `json:"bazel_invocation,omitempty"`
+	// Action holds the value of the action edge.
+	Action *Action `json:"action,omitempty"`
+	// InvocationTarget holds the value of the invocation_target edge.
+	InvocationTarget *InvocationTarget `json:"invocation_target,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [3]map[string]int
 }
 
 // BazelInvocationOrErr returns the BazelInvocation value or an error if the edge
@@ -56,6 +66,28 @@ func (e InvocationFilesEdges) BazelInvocationOrErr() (*BazelInvocation, error) {
 	return nil, &NotLoadedError{edge: "bazel_invocation"}
 }
 
+// ActionOrErr returns the Action value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e InvocationFilesEdges) ActionOrErr() (*Action, error) {
+	if e.Action != nil {
+		return e.Action, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: action.Label}
+	}
+	return nil, &NotLoadedError{edge: "action"}
+}
+
+// InvocationTargetOrErr returns the InvocationTarget value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e InvocationFilesEdges) InvocationTargetOrErr() (*InvocationTarget, error) {
+	if e.InvocationTarget != nil {
+		return e.InvocationTarget, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: invocationtarget.Label}
+	}
+	return nil, &NotLoadedError{edge: "invocation_target"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*InvocationFiles) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -63,9 +95,13 @@ func (*InvocationFiles) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case invocationfiles.FieldID, invocationfiles.FieldSizeBytes:
 			values[i] = new(sql.NullInt64)
-		case invocationfiles.FieldName, invocationfiles.FieldContent, invocationfiles.FieldDigest, invocationfiles.FieldDigestFunction:
+		case invocationfiles.FieldName, invocationfiles.FieldURI, invocationfiles.FieldContent, invocationfiles.FieldDigest, invocationfiles.FieldDigestFunction:
 			values[i] = new(sql.NullString)
-		case invocationfiles.ForeignKeys[0]: // bazel_invocation_invocation_files
+		case invocationfiles.ForeignKeys[0]: // action_action_files
+			values[i] = new(sql.NullInt64)
+		case invocationfiles.ForeignKeys[1]: // bazel_invocation_invocation_files
+			values[i] = new(sql.NullInt64)
+		case invocationfiles.ForeignKeys[2]: // invocation_target_target_files
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -94,6 +130,12 @@ func (_if *InvocationFiles) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_if.Name = value.String
 			}
+		case invocationfiles.FieldURI:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field uri", values[i])
+			} else if value.Valid {
+				_if.URI = value.String
+			}
 		case invocationfiles.FieldContent:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field content", values[i])
@@ -120,10 +162,24 @@ func (_if *InvocationFiles) assignValues(columns []string, values []any) error {
 			}
 		case invocationfiles.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field action_action_files", value)
+			} else if value.Valid {
+				_if.action_action_files = new(int64)
+				*_if.action_action_files = int64(value.Int64)
+			}
+		case invocationfiles.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field bazel_invocation_invocation_files", value)
 			} else if value.Valid {
 				_if.bazel_invocation_invocation_files = new(int64)
 				*_if.bazel_invocation_invocation_files = int64(value.Int64)
+			}
+		case invocationfiles.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field invocation_target_target_files", value)
+			} else if value.Valid {
+				_if.invocation_target_target_files = new(int64)
+				*_if.invocation_target_target_files = int64(value.Int64)
 			}
 		default:
 			_if.selectValues.Set(columns[i], values[i])
@@ -141,6 +197,16 @@ func (_if *InvocationFiles) Value(name string) (ent.Value, error) {
 // QueryBazelInvocation queries the "bazel_invocation" edge of the InvocationFiles entity.
 func (_if *InvocationFiles) QueryBazelInvocation() *BazelInvocationQuery {
 	return NewInvocationFilesClient(_if.config).QueryBazelInvocation(_if)
+}
+
+// QueryAction queries the "action" edge of the InvocationFiles entity.
+func (_if *InvocationFiles) QueryAction() *ActionQuery {
+	return NewInvocationFilesClient(_if.config).QueryAction(_if)
+}
+
+// QueryInvocationTarget queries the "invocation_target" edge of the InvocationFiles entity.
+func (_if *InvocationFiles) QueryInvocationTarget() *InvocationTargetQuery {
+	return NewInvocationFilesClient(_if.config).QueryInvocationTarget(_if)
 }
 
 // Update returns a builder for updating this InvocationFiles.
@@ -168,6 +234,9 @@ func (_if *InvocationFiles) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", _if.ID))
 	builder.WriteString("name=")
 	builder.WriteString(_if.Name)
+	builder.WriteString(", ")
+	builder.WriteString("uri=")
+	builder.WriteString(_if.URI)
 	builder.WriteString(", ")
 	builder.WriteString("content=")
 	builder.WriteString(_if.Content)

@@ -43,6 +43,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/targetkindmapping"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/targetmetrics"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testresult"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/testresultfile"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testsummary"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/timingmetrics"
@@ -137,6 +138,7 @@ func checkColumn(table, column string) error {
 			targetkindmapping.Table:     targetkindmapping.ValidColumn,
 			targetmetrics.Table:         targetmetrics.ValidColumn,
 			testresult.Table:            testresult.ValidColumn,
+			testresultfile.Table:        testresultfile.ValidColumn,
 			testsummary.Table:           testsummary.ValidColumn,
 			testtarget.Table:            testtarget.ValidColumn,
 			timingmetrics.Table:         timingmetrics.ValidColumn,

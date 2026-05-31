@@ -14,6 +14,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 )
 
 // ActionCreate is the builder for creating a Action entity.
@@ -246,6 +247,21 @@ func (ac *ActionCreate) SetConfiguration(c *Configuration) *ActionCreate {
 	return ac.SetConfigurationID(c.ID)
 }
 
+// AddActionFileIDs adds the "action_files" edge to the InvocationFiles entity by IDs.
+func (ac *ActionCreate) AddActionFileIDs(ids ...int64) *ActionCreate {
+	ac.mutation.AddActionFileIDs(ids...)
+	return ac
+}
+
+// AddActionFiles adds the "action_files" edges to the InvocationFiles entity.
+func (ac *ActionCreate) AddActionFiles(i ...*InvocationFiles) *ActionCreate {
+	ids := make([]int64, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return ac.AddActionFileIDs(ids...)
+}
+
 // Mutation returns the ActionMutation object of the builder.
 func (ac *ActionCreate) Mutation() *ActionMutation {
 	return ac.mutation
@@ -420,6 +436,22 @@ func (ac *ActionCreate) createSpec() (*Action, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.ConfigurationID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.ActionFilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.ActionFilesTable,
+			Columns: []string{action.ActionFilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

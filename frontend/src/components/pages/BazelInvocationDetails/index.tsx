@@ -1,5 +1,5 @@
 import { BuildOutlined } from "@ant-design/icons";
-import { Link, Outlet } from "@tanstack/react-router";
+import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import { Typography } from "antd";
 import { useMemo } from "react";
 import styles from "@/components/AppBar/index.module.css";
@@ -9,10 +9,25 @@ import { PortalCard } from "@/components/PortalCard";
 import PortalDuration from "@/components/PortalDuration";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import UserStatusIndicator from "@/components/UserStatusIndicator";
-import type { BazelInvocationCommonFragment } from "@/graphql/__generated__/graphql";
+
+interface BazelInvocationLike {
+  invocationID: string;
+  startedAt?: string | null;
+  endedAt?: string | null;
+  exitCodeName?: string | null;
+  instanceName: { name: string };
+  connectionMetadata?: {
+    connectionLastOpenAt?: string | null;
+    timeSinceLastConnectionMillis?: number | null;
+  } | null;
+  username?: string | null;
+  authenticatedUser?: any;
+  build?: { buildUUID?: string | null } | null;
+  profile?: any;
+}
 
 const getTitleBits = (
-  invocation: BazelInvocationCommonFragment,
+  invocation: BazelInvocationLike,
 ): React.ReactNode[] => {
   const { invocationID, authenticatedUser, username } = invocation;
 
@@ -57,7 +72,7 @@ const getTitleBits = (
 };
 
 const getExtraBits = (
-  invocation: BazelInvocationCommonFragment,
+  invocation: BazelInvocationLike,
 ): React.ReactNode[] => {
   const { invocationID, instanceName, build, profile } = invocation;
 
@@ -65,7 +80,7 @@ const getExtraBits = (
   if (build?.buildUUID) {
     extraBits.push(
       <span key="build">
-        Build{" "}
+        Build:{" "}
         <Link to={`/builds/$buildUUID`} params={{ buildUUID: build.buildUUID }}>
           {build.buildUUID}
         </Link>
@@ -79,7 +94,7 @@ const getExtraBits = (
       to={
         invocation.endedAt
           ? invocation.endedAt
-          : invocation.connectionMetadata?.connectionLastOpenAt
+          : invocation.connectionMetadata?.connectionLastOpenAt || undefined
       }
       includeIcon
       formatConfig={{ smallestUnit: "s" }}
@@ -88,7 +103,7 @@ const getExtraBits = (
   if (profile)
     extraBits.push(
       <ProfileDropdown
-        instanceName={instanceName.name}
+        instanceName={instanceName.name || undefined}
         profile={profile}
         invocationID={invocationID}
       />,
@@ -97,12 +112,28 @@ const getExtraBits = (
 };
 
 interface Props {
-  invocation: BazelInvocationCommonFragment;
+  invocation: BazelInvocationLike;
 }
 
 export const BazelInvocationDetailsPage: React.FC<Props> = ({ invocation }) => {
   const titleBits = useMemo(() => getTitleBits(invocation), [invocation]);
   const extraBits = useMemo(() => getExtraBits(invocation), [invocation]);
+  const { pathname } = useLocation();
+
+  if (
+    pathname.match(
+      new RegExp(
+        `^/bazel-invocations/${invocation.invocationID}/tests/[^/]+$`,
+      ),
+    )
+    || pathname.match(
+      new RegExp(
+        `^/bazel-invocations/${invocation.invocationID}/targets/[^/]+$`,
+      ),
+    )
+  ) {
+    return <Outlet />;
+  }
 
   return (
     <PortalCard

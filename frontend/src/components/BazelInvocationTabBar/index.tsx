@@ -14,11 +14,18 @@ import { Menu } from "antd";
 import type { ItemType } from "antd/lib/menu/interface";
 import type React from "react";
 import { useMemo } from "react";
-import type { BazelInvocationCommonFragment } from "@/graphql/__generated__/graphql";
 import { env } from "@/utils/env";
 
+interface BazelInvocationLike {
+  invocationID: string;
+  actions?: Array<unknown> | null;
+  metrics?: unknown | null;
+  sourceControl?: Array<unknown> | null;
+  tags?: { totalCount?: number | null } | null;
+}
+
 const getMenuItems = (
-  invocation: BazelInvocationCommonFragment,
+  invocation: BazelInvocationLike,
 ): ItemType[] => {
   const { invocationID } = invocation;
 
@@ -142,7 +149,7 @@ const getMenuItems = (
 };
 
 interface Props {
-  invocation: BazelInvocationCommonFragment;
+  invocation: BazelInvocationLike;
 }
 
 export const BazelInvocationTabBar: React.FC<Props> = ({ invocation }) => {

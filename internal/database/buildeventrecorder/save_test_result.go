@@ -4,9 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"strings"
 	"time"
 
 	bes "github.com/bazelbuild/bazel/src/main/java/com/google/devtools/build/lib/buildeventstream/proto"
+	"github.com/buildbarn/bb-portal/ent/gen/ent"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/target"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/testresult"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/testsummary"
 	"github.com/buildbarn/bb-portal/internal/database"
 	"github.com/buildbarn/bb-portal/internal/database/sqlc"
 	"github.com/buildbarn/bb-portal/pkg/proto/configuration/bb_portal"
@@ -69,6 +76,10 @@ func (r *buildEventRecorder) saveTestResultBatch(ctx context.Context, batch []Bu
 
 	if err := createTestResultsBulk(ctx, r.InvocationDbID, r.InstanceNameDbID, tx, filteredBatch); err != nil {
 		return util.StatusWrap(err, "Failed to bulk insert test results")
+	}
+
+	if err := saveTestResultFiles(ctx, tx, filteredBatch); err != nil {
+		return util.StatusWrap(err, "Failed to bulk insert test result files")
 	}
 
 	if err := r.saveHandledEventsForBatch(ctx, batch, tx); err != nil {
@@ -167,6 +178,74 @@ func createTestResultsBulk(ctx context.Context, invocationDbID, instanceNameDbID
 	}
 
 	return nil
+}
+
+func saveTestResultFiles(ctx context.Context, tx database.Handle, batch []BuildEventWithInfo) error {
+	for _, x := range batch {
+		be := x.Event
+		testResultID := be.GetId().GetTestResult()
+		testResult := be.GetTestResult()
+
+		if testResultID == nil || testResult == nil {
+			continue
+		}
+
+		insertedTestResult, err := tx.Ent().TestResult.Query().Where(
+			testresult.RunEQ(testResultID.Run),
+			testresult.ShardEQ(testResultID.Shard),
+			testresult.AttemptEQ(testResultID.Attempt),
+			testresult.HasTestSummaryWith(
+				testsummary.HasInvocationTargetWith(
+					invocationtarget.HasTargetWith(
+						target.LabelEQ(testResultID.Label),
+						target.AspectEQ(""),
+					),
+					invocationtarget.HasConfigurationWith(
+						configuration.ConfigurationIDEQ(testResultID.Configuration.GetId()),
+					),
+				),
+			),
+		).Only(ctx)
+		if err != nil {
+			return util.StatusWrap(err, "Failed to resolve inserted test result")
+		}
+
+		createdFiles := make([]*ent.TestResultFile, 0, len(testResult.GetTestActionOutput()))
+		for _, file := range testResult.GetTestActionOutput() {
+			if !shouldPersistTestResultFile(file) {
+				continue
+			}
+			createdFile, err := tx.Ent().TestResultFile.Create().
+				SetName(file.GetName()).
+				SetURI(file.GetUri()).
+				Save(ctx)
+			if err != nil {
+				return util.StatusWrap(err, "Failed to insert test result file")
+			}
+			createdFiles = append(createdFiles, createdFile)
+		}
+
+		if len(createdFiles) > 0 {
+			if _, err := insertedTestResult.Update().AddTestResultFiles(createdFiles...).Save(ctx); err != nil {
+				return util.StatusWrap(err, "Failed to attach test result files")
+			}
+		}
+	}
+	return nil
+}
+
+func shouldPersistTestResultFile(file *bes.File) bool {
+	if file == nil {
+		return false
+	}
+	uri := file.GetUri()
+	if uri == "" {
+		return false
+	}
+	if strings.HasPrefix(uri, "file://") {
+		return false
+	}
+	return true
 }
 
 type timingBreakdown struct {

@@ -10,8 +10,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/predicate"
 )
 
@@ -39,6 +41,26 @@ func (ifu *InvocationFilesUpdate) SetNillableName(s *string) *InvocationFilesUpd
 	if s != nil {
 		ifu.SetName(*s)
 	}
+	return ifu
+}
+
+// SetURI sets the "uri" field.
+func (ifu *InvocationFilesUpdate) SetURI(s string) *InvocationFilesUpdate {
+	ifu.mutation.SetURI(s)
+	return ifu
+}
+
+// SetNillableURI sets the "uri" field if the given value is not nil.
+func (ifu *InvocationFilesUpdate) SetNillableURI(s *string) *InvocationFilesUpdate {
+	if s != nil {
+		ifu.SetURI(*s)
+	}
+	return ifu
+}
+
+// ClearURI clears the value of the "uri" field.
+func (ifu *InvocationFilesUpdate) ClearURI() *InvocationFilesUpdate {
+	ifu.mutation.ClearURI()
 	return ifu
 }
 
@@ -148,6 +170,44 @@ func (ifu *InvocationFilesUpdate) SetBazelInvocation(b *BazelInvocation) *Invoca
 	return ifu.SetBazelInvocationID(b.ID)
 }
 
+// SetActionID sets the "action" edge to the Action entity by ID.
+func (ifu *InvocationFilesUpdate) SetActionID(id int64) *InvocationFilesUpdate {
+	ifu.mutation.SetActionID(id)
+	return ifu
+}
+
+// SetNillableActionID sets the "action" edge to the Action entity by ID if the given value is not nil.
+func (ifu *InvocationFilesUpdate) SetNillableActionID(id *int64) *InvocationFilesUpdate {
+	if id != nil {
+		ifu = ifu.SetActionID(*id)
+	}
+	return ifu
+}
+
+// SetAction sets the "action" edge to the Action entity.
+func (ifu *InvocationFilesUpdate) SetAction(a *Action) *InvocationFilesUpdate {
+	return ifu.SetActionID(a.ID)
+}
+
+// SetInvocationTargetID sets the "invocation_target" edge to the InvocationTarget entity by ID.
+func (ifu *InvocationFilesUpdate) SetInvocationTargetID(id int64) *InvocationFilesUpdate {
+	ifu.mutation.SetInvocationTargetID(id)
+	return ifu
+}
+
+// SetNillableInvocationTargetID sets the "invocation_target" edge to the InvocationTarget entity by ID if the given value is not nil.
+func (ifu *InvocationFilesUpdate) SetNillableInvocationTargetID(id *int64) *InvocationFilesUpdate {
+	if id != nil {
+		ifu = ifu.SetInvocationTargetID(*id)
+	}
+	return ifu
+}
+
+// SetInvocationTarget sets the "invocation_target" edge to the InvocationTarget entity.
+func (ifu *InvocationFilesUpdate) SetInvocationTarget(i *InvocationTarget) *InvocationFilesUpdate {
+	return ifu.SetInvocationTargetID(i.ID)
+}
+
 // Mutation returns the InvocationFilesMutation object of the builder.
 func (ifu *InvocationFilesUpdate) Mutation() *InvocationFilesMutation {
 	return ifu.mutation
@@ -156,6 +216,18 @@ func (ifu *InvocationFilesUpdate) Mutation() *InvocationFilesMutation {
 // ClearBazelInvocation clears the "bazel_invocation" edge to the BazelInvocation entity.
 func (ifu *InvocationFilesUpdate) ClearBazelInvocation() *InvocationFilesUpdate {
 	ifu.mutation.ClearBazelInvocation()
+	return ifu
+}
+
+// ClearAction clears the "action" edge to the Action entity.
+func (ifu *InvocationFilesUpdate) ClearAction() *InvocationFilesUpdate {
+	ifu.mutation.ClearAction()
+	return ifu
+}
+
+// ClearInvocationTarget clears the "invocation_target" edge to the InvocationTarget entity.
+func (ifu *InvocationFilesUpdate) ClearInvocationTarget() *InvocationFilesUpdate {
+	ifu.mutation.ClearInvocationTarget()
 	return ifu
 }
 
@@ -197,6 +269,12 @@ func (ifu *InvocationFilesUpdate) sqlSave(ctx context.Context) (n int, err error
 	}
 	if value, ok := ifu.mutation.Name(); ok {
 		_spec.SetField(invocationfiles.FieldName, field.TypeString, value)
+	}
+	if value, ok := ifu.mutation.URI(); ok {
+		_spec.SetField(invocationfiles.FieldURI, field.TypeString, value)
+	}
+	if ifu.mutation.URICleared() {
+		_spec.ClearField(invocationfiles.FieldURI, field.TypeString)
 	}
 	if value, ok := ifu.mutation.Content(); ok {
 		_spec.SetField(invocationfiles.FieldContent, field.TypeString, value)
@@ -254,6 +332,64 @@ func (ifu *InvocationFilesUpdate) sqlSave(ctx context.Context) (n int, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if ifu.mutation.ActionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invocationfiles.ActionTable,
+			Columns: []string{invocationfiles.ActionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(action.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ifu.mutation.ActionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invocationfiles.ActionTable,
+			Columns: []string{invocationfiles.ActionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(action.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ifu.mutation.InvocationTargetCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invocationfiles.InvocationTargetTable,
+			Columns: []string{invocationfiles.InvocationTargetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationtarget.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ifu.mutation.InvocationTargetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invocationfiles.InvocationTargetTable,
+			Columns: []string{invocationfiles.InvocationTargetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationtarget.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ifu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{invocationfiles.Label}
@@ -285,6 +421,26 @@ func (ifuo *InvocationFilesUpdateOne) SetNillableName(s *string) *InvocationFile
 	if s != nil {
 		ifuo.SetName(*s)
 	}
+	return ifuo
+}
+
+// SetURI sets the "uri" field.
+func (ifuo *InvocationFilesUpdateOne) SetURI(s string) *InvocationFilesUpdateOne {
+	ifuo.mutation.SetURI(s)
+	return ifuo
+}
+
+// SetNillableURI sets the "uri" field if the given value is not nil.
+func (ifuo *InvocationFilesUpdateOne) SetNillableURI(s *string) *InvocationFilesUpdateOne {
+	if s != nil {
+		ifuo.SetURI(*s)
+	}
+	return ifuo
+}
+
+// ClearURI clears the value of the "uri" field.
+func (ifuo *InvocationFilesUpdateOne) ClearURI() *InvocationFilesUpdateOne {
+	ifuo.mutation.ClearURI()
 	return ifuo
 }
 
@@ -394,6 +550,44 @@ func (ifuo *InvocationFilesUpdateOne) SetBazelInvocation(b *BazelInvocation) *In
 	return ifuo.SetBazelInvocationID(b.ID)
 }
 
+// SetActionID sets the "action" edge to the Action entity by ID.
+func (ifuo *InvocationFilesUpdateOne) SetActionID(id int64) *InvocationFilesUpdateOne {
+	ifuo.mutation.SetActionID(id)
+	return ifuo
+}
+
+// SetNillableActionID sets the "action" edge to the Action entity by ID if the given value is not nil.
+func (ifuo *InvocationFilesUpdateOne) SetNillableActionID(id *int64) *InvocationFilesUpdateOne {
+	if id != nil {
+		ifuo = ifuo.SetActionID(*id)
+	}
+	return ifuo
+}
+
+// SetAction sets the "action" edge to the Action entity.
+func (ifuo *InvocationFilesUpdateOne) SetAction(a *Action) *InvocationFilesUpdateOne {
+	return ifuo.SetActionID(a.ID)
+}
+
+// SetInvocationTargetID sets the "invocation_target" edge to the InvocationTarget entity by ID.
+func (ifuo *InvocationFilesUpdateOne) SetInvocationTargetID(id int64) *InvocationFilesUpdateOne {
+	ifuo.mutation.SetInvocationTargetID(id)
+	return ifuo
+}
+
+// SetNillableInvocationTargetID sets the "invocation_target" edge to the InvocationTarget entity by ID if the given value is not nil.
+func (ifuo *InvocationFilesUpdateOne) SetNillableInvocationTargetID(id *int64) *InvocationFilesUpdateOne {
+	if id != nil {
+		ifuo = ifuo.SetInvocationTargetID(*id)
+	}
+	return ifuo
+}
+
+// SetInvocationTarget sets the "invocation_target" edge to the InvocationTarget entity.
+func (ifuo *InvocationFilesUpdateOne) SetInvocationTarget(i *InvocationTarget) *InvocationFilesUpdateOne {
+	return ifuo.SetInvocationTargetID(i.ID)
+}
+
 // Mutation returns the InvocationFilesMutation object of the builder.
 func (ifuo *InvocationFilesUpdateOne) Mutation() *InvocationFilesMutation {
 	return ifuo.mutation
@@ -402,6 +596,18 @@ func (ifuo *InvocationFilesUpdateOne) Mutation() *InvocationFilesMutation {
 // ClearBazelInvocation clears the "bazel_invocation" edge to the BazelInvocation entity.
 func (ifuo *InvocationFilesUpdateOne) ClearBazelInvocation() *InvocationFilesUpdateOne {
 	ifuo.mutation.ClearBazelInvocation()
+	return ifuo
+}
+
+// ClearAction clears the "action" edge to the Action entity.
+func (ifuo *InvocationFilesUpdateOne) ClearAction() *InvocationFilesUpdateOne {
+	ifuo.mutation.ClearAction()
+	return ifuo
+}
+
+// ClearInvocationTarget clears the "invocation_target" edge to the InvocationTarget entity.
+func (ifuo *InvocationFilesUpdateOne) ClearInvocationTarget() *InvocationFilesUpdateOne {
+	ifuo.mutation.ClearInvocationTarget()
 	return ifuo
 }
 
@@ -474,6 +680,12 @@ func (ifuo *InvocationFilesUpdateOne) sqlSave(ctx context.Context) (_node *Invoc
 	if value, ok := ifuo.mutation.Name(); ok {
 		_spec.SetField(invocationfiles.FieldName, field.TypeString, value)
 	}
+	if value, ok := ifuo.mutation.URI(); ok {
+		_spec.SetField(invocationfiles.FieldURI, field.TypeString, value)
+	}
+	if ifuo.mutation.URICleared() {
+		_spec.ClearField(invocationfiles.FieldURI, field.TypeString)
+	}
 	if value, ok := ifuo.mutation.Content(); ok {
 		_spec.SetField(invocationfiles.FieldContent, field.TypeString, value)
 	}
@@ -523,6 +735,64 @@ func (ifuo *InvocationFilesUpdateOne) sqlSave(ctx context.Context) (_node *Invoc
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(bazelinvocation.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ifuo.mutation.ActionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invocationfiles.ActionTable,
+			Columns: []string{invocationfiles.ActionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(action.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ifuo.mutation.ActionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invocationfiles.ActionTable,
+			Columns: []string{invocationfiles.ActionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(action.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ifuo.mutation.InvocationTargetCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invocationfiles.InvocationTargetTable,
+			Columns: []string{invocationfiles.InvocationTargetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationtarget.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ifuo.mutation.InvocationTargetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invocationfiles.InvocationTargetTable,
+			Columns: []string{invocationfiles.InvocationTargetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invocationtarget.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

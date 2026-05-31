@@ -1,12 +1,12 @@
 import { Descriptions, Space } from "antd";
 import type React from "react";
-import type { BazelInvocationOverviewFragment } from "@/graphql/__generated__/graphql";
+import type { BazelInvocationSummaryFragment } from "@/graphql/__generated__/graphql";
 import { commandLineDataToString } from "@/utils/commandLineDataToString";
 import { InvocationResultTag } from "../InvocationResultTag";
 import PortalDuration from "../PortalDuration";
 
 interface Props {
-  invocation: BazelInvocationOverviewFragment;
+  invocation: BazelInvocationSummaryFragment;
 }
 
 export const InvocationOverviewDisplay: React.FC<Props> = ({ invocation }) => {

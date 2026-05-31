@@ -27,6 +27,9 @@ export const GET_INVOCATION_TARGETS_FOR_INVOCATION = gql(/* GraphQl */ `
             durationInMs
             failureMessage
             tags
+            bazelInvocation {
+              invocationID
+            }
             target {
               id
               label

@@ -58,6 +58,11 @@ func Name(v string) predicate.InvocationFiles {
 	return predicate.InvocationFiles(sql.FieldEQ(FieldName, v))
 }
 
+// URI applies equality check predicate on the "uri" field. It's identical to URIEQ.
+func URI(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldEQ(FieldURI, v))
+}
+
 // Content applies equality check predicate on the "content" field. It's identical to ContentEQ.
 func Content(v string) predicate.InvocationFiles {
 	return predicate.InvocationFiles(sql.FieldEQ(FieldContent, v))
@@ -141,6 +146,81 @@ func NameEqualFold(v string) predicate.InvocationFiles {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.InvocationFiles {
 	return predicate.InvocationFiles(sql.FieldContainsFold(FieldName, v))
+}
+
+// URIEQ applies the EQ predicate on the "uri" field.
+func URIEQ(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldEQ(FieldURI, v))
+}
+
+// URINEQ applies the NEQ predicate on the "uri" field.
+func URINEQ(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldNEQ(FieldURI, v))
+}
+
+// URIIn applies the In predicate on the "uri" field.
+func URIIn(vs ...string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldIn(FieldURI, vs...))
+}
+
+// URINotIn applies the NotIn predicate on the "uri" field.
+func URINotIn(vs ...string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldNotIn(FieldURI, vs...))
+}
+
+// URIGT applies the GT predicate on the "uri" field.
+func URIGT(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldGT(FieldURI, v))
+}
+
+// URIGTE applies the GTE predicate on the "uri" field.
+func URIGTE(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldGTE(FieldURI, v))
+}
+
+// URILT applies the LT predicate on the "uri" field.
+func URILT(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldLT(FieldURI, v))
+}
+
+// URILTE applies the LTE predicate on the "uri" field.
+func URILTE(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldLTE(FieldURI, v))
+}
+
+// URIContains applies the Contains predicate on the "uri" field.
+func URIContains(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldContains(FieldURI, v))
+}
+
+// URIHasPrefix applies the HasPrefix predicate on the "uri" field.
+func URIHasPrefix(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldHasPrefix(FieldURI, v))
+}
+
+// URIHasSuffix applies the HasSuffix predicate on the "uri" field.
+func URIHasSuffix(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldHasSuffix(FieldURI, v))
+}
+
+// URIIsNil applies the IsNil predicate on the "uri" field.
+func URIIsNil() predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldIsNull(FieldURI))
+}
+
+// URINotNil applies the NotNil predicate on the "uri" field.
+func URINotNil() predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldNotNull(FieldURI))
+}
+
+// URIEqualFold applies the EqualFold predicate on the "uri" field.
+func URIEqualFold(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldEqualFold(FieldURI, v))
+}
+
+// URIContainsFold applies the ContainsFold predicate on the "uri" field.
+func URIContainsFold(v string) predicate.InvocationFiles {
+	return predicate.InvocationFiles(sql.FieldContainsFold(FieldURI, v))
 }
 
 // ContentEQ applies the EQ predicate on the "content" field.
@@ -433,6 +513,52 @@ func HasBazelInvocation() predicate.InvocationFiles {
 func HasBazelInvocationWith(preds ...predicate.BazelInvocation) predicate.InvocationFiles {
 	return predicate.InvocationFiles(func(s *sql.Selector) {
 		step := newBazelInvocationStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAction applies the HasEdge predicate on the "action" edge.
+func HasAction() predicate.InvocationFiles {
+	return predicate.InvocationFiles(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ActionTable, ActionColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasActionWith applies the HasEdge predicate on the "action" edge with a given conditions (other predicates).
+func HasActionWith(preds ...predicate.Action) predicate.InvocationFiles {
+	return predicate.InvocationFiles(func(s *sql.Selector) {
+		step := newActionStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasInvocationTarget applies the HasEdge predicate on the "invocation_target" edge.
+func HasInvocationTarget() predicate.InvocationFiles {
+	return predicate.InvocationFiles(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, InvocationTargetTable, InvocationTargetColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasInvocationTargetWith applies the HasEdge predicate on the "invocation_target" edge with a given conditions (other predicates).
+func HasInvocationTargetWith(preds ...predicate.InvocationTarget) predicate.InvocationFiles {
+	return predicate.InvocationFiles(func(s *sql.Selector) {
+		step := newInvocationTargetStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

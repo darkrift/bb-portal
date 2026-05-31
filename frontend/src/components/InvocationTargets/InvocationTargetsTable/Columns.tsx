@@ -45,7 +45,13 @@ export const columns: TableColumnsType<InvocationTargetsTableRowType> = [
     dataIndex: "label",
     filterSearch: true,
     render: (_, record) => (
-      <Link to="/targets/$targetID" params={{ targetID: record.target.id }}>
+      <Link
+        to="/bazel-invocations/$invocationID/targets/$targetID"
+        params={{
+          invocationID: record.bazelInvocation.invocationID,
+          targetID: record.target.id,
+        }}
+      >
         {record.target.label}
       </Link>
     ),

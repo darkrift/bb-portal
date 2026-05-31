@@ -1086,6 +1086,29 @@ func HasConfigurationWith(preds ...predicate.Configuration) predicate.Action {
 	})
 }
 
+// HasActionFiles applies the HasEdge predicate on the "action_files" edge.
+func HasActionFiles() predicate.Action {
+	return predicate.Action(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ActionFilesTable, ActionFilesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasActionFilesWith applies the HasEdge predicate on the "action_files" edge with a given conditions (other predicates).
+func HasActionFilesWith(preds ...predicate.InvocationFiles) predicate.Action {
+	return predicate.Action(func(s *sql.Selector) {
+		step := newActionFilesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Action) predicate.Action {
 	return predicate.Action(sql.AndPredicates(predicates...))

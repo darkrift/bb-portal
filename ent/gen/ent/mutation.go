@@ -43,6 +43,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/targetkindmapping"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/targetmetrics"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testresult"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/testresultfile"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testsummary"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/timingmetrics"
@@ -90,6 +91,7 @@ const (
 	TypeTargetKindMapping     = "TargetKindMapping"
 	TypeTargetMetrics         = "TargetMetrics"
 	TypeTestResult            = "TestResult"
+	TypeTestResultFile        = "TestResultFile"
 	TypeTestSummary           = "TestSummary"
 	TypeTestTarget            = "TestTarget"
 	TypeTimingMetrics         = "TimingMetrics"
@@ -125,6 +127,9 @@ type ActionMutation struct {
 	clearedbazel_invocation bool
 	configuration           *int64
 	clearedconfiguration    bool
+	action_files            map[int64]struct{}
+	removedaction_files     map[int64]struct{}
+	clearedaction_files     bool
 	done                    bool
 	oldValue                func(context.Context) (*Action, error)
 	predicates              []predicate.Action
@@ -1161,6 +1166,60 @@ func (m *ActionMutation) ResetConfiguration() {
 	m.clearedconfiguration = false
 }
 
+// AddActionFileIDs adds the "action_files" edge to the InvocationFiles entity by ids.
+func (m *ActionMutation) AddActionFileIDs(ids ...int64) {
+	if m.action_files == nil {
+		m.action_files = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.action_files[ids[i]] = struct{}{}
+	}
+}
+
+// ClearActionFiles clears the "action_files" edge to the InvocationFiles entity.
+func (m *ActionMutation) ClearActionFiles() {
+	m.clearedaction_files = true
+}
+
+// ActionFilesCleared reports if the "action_files" edge to the InvocationFiles entity was cleared.
+func (m *ActionMutation) ActionFilesCleared() bool {
+	return m.clearedaction_files
+}
+
+// RemoveActionFileIDs removes the "action_files" edge to the InvocationFiles entity by IDs.
+func (m *ActionMutation) RemoveActionFileIDs(ids ...int64) {
+	if m.removedaction_files == nil {
+		m.removedaction_files = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.action_files, ids[i])
+		m.removedaction_files[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedActionFiles returns the removed IDs of the "action_files" edge to the InvocationFiles entity.
+func (m *ActionMutation) RemovedActionFilesIDs() (ids []int64) {
+	for id := range m.removedaction_files {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ActionFilesIDs returns the "action_files" edge IDs in the mutation.
+func (m *ActionMutation) ActionFilesIDs() (ids []int64) {
+	for id := range m.action_files {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetActionFiles resets all changes to the "action_files" edge.
+func (m *ActionMutation) ResetActionFiles() {
+	m.action_files = nil
+	m.clearedaction_files = false
+	m.removedaction_files = nil
+}
+
 // Where appends a list predicates to the ActionMutation builder.
 func (m *ActionMutation) Where(ps ...predicate.Action) {
 	m.predicates = append(m.predicates, ps...)
@@ -1692,12 +1751,15 @@ func (m *ActionMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ActionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.bazel_invocation != nil {
 		edges = append(edges, action.EdgeBazelInvocation)
 	}
 	if m.configuration != nil {
 		edges = append(edges, action.EdgeConfiguration)
+	}
+	if m.action_files != nil {
+		edges = append(edges, action.EdgeActionFiles)
 	}
 	return edges
 }
@@ -1714,30 +1776,50 @@ func (m *ActionMutation) AddedIDs(name string) []ent.Value {
 		if id := m.configuration; id != nil {
 			return []ent.Value{*id}
 		}
+	case action.EdgeActionFiles:
+		ids := make([]ent.Value, 0, len(m.action_files))
+		for id := range m.action_files {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ActionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.removedaction_files != nil {
+		edges = append(edges, action.EdgeActionFiles)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *ActionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case action.EdgeActionFiles:
+		ids := make([]ent.Value, 0, len(m.removedaction_files))
+		for id := range m.removedaction_files {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ActionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedbazel_invocation {
 		edges = append(edges, action.EdgeBazelInvocation)
 	}
 	if m.clearedconfiguration {
 		edges = append(edges, action.EdgeConfiguration)
+	}
+	if m.clearedaction_files {
+		edges = append(edges, action.EdgeActionFiles)
 	}
 	return edges
 }
@@ -1750,6 +1832,8 @@ func (m *ActionMutation) EdgeCleared(name string) bool {
 		return m.clearedbazel_invocation
 	case action.EdgeConfiguration:
 		return m.clearedconfiguration
+	case action.EdgeActionFiles:
+		return m.clearedaction_files
 	}
 	return false
 }
@@ -1777,6 +1861,9 @@ func (m *ActionMutation) ResetEdge(name string) error {
 		return nil
 	case action.EdgeConfiguration:
 		m.ResetConfiguration()
+		return nil
+	case action.EdgeActionFiles:
+		m.ResetActionFiles()
 		return nil
 	}
 	return fmt.Errorf("unknown Action edge %s", name)
@@ -16162,21 +16249,26 @@ func (m *InstanceNameMutation) ResetEdge(name string) error {
 // InvocationFilesMutation represents an operation that mutates the InvocationFiles nodes in the graph.
 type InvocationFilesMutation struct {
 	config
-	op                      Op
-	typ                     string
-	id                      *int64
-	name                    *string
-	content                 *string
-	digest                  *string
-	size_bytes              *int64
-	addsize_bytes           *int64
-	digest_function         *string
-	clearedFields           map[string]struct{}
-	bazel_invocation        *int64
-	clearedbazel_invocation bool
-	done                    bool
-	oldValue                func(context.Context) (*InvocationFiles, error)
-	predicates              []predicate.InvocationFiles
+	op                       Op
+	typ                      string
+	id                       *int64
+	name                     *string
+	uri                      *string
+	content                  *string
+	digest                   *string
+	size_bytes               *int64
+	addsize_bytes            *int64
+	digest_function          *string
+	clearedFields            map[string]struct{}
+	bazel_invocation         *int64
+	clearedbazel_invocation  bool
+	action                   *int64
+	clearedaction            bool
+	invocation_target        *int64
+	clearedinvocation_target bool
+	done                     bool
+	oldValue                 func(context.Context) (*InvocationFiles, error)
+	predicates               []predicate.InvocationFiles
 }
 
 var _ ent.Mutation = (*InvocationFilesMutation)(nil)
@@ -16317,6 +16409,55 @@ func (m *InvocationFilesMutation) OldName(ctx context.Context) (v string, err er
 // ResetName resets all changes to the "name" field.
 func (m *InvocationFilesMutation) ResetName() {
 	m.name = nil
+}
+
+// SetURI sets the "uri" field.
+func (m *InvocationFilesMutation) SetURI(s string) {
+	m.uri = &s
+}
+
+// URI returns the value of the "uri" field in the mutation.
+func (m *InvocationFilesMutation) URI() (r string, exists bool) {
+	v := m.uri
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldURI returns the old "uri" field's value of the InvocationFiles entity.
+// If the InvocationFiles object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvocationFilesMutation) OldURI(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldURI is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldURI requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldURI: %w", err)
+	}
+	return oldValue.URI, nil
+}
+
+// ClearURI clears the value of the "uri" field.
+func (m *InvocationFilesMutation) ClearURI() {
+	m.uri = nil
+	m.clearedFields[invocationfiles.FieldURI] = struct{}{}
+}
+
+// URICleared returns if the "uri" field was cleared in this mutation.
+func (m *InvocationFilesMutation) URICleared() bool {
+	_, ok := m.clearedFields[invocationfiles.FieldURI]
+	return ok
+}
+
+// ResetURI resets all changes to the "uri" field.
+func (m *InvocationFilesMutation) ResetURI() {
+	m.uri = nil
+	delete(m.clearedFields, invocationfiles.FieldURI)
 }
 
 // SetContent sets the "content" field.
@@ -16575,6 +16716,84 @@ func (m *InvocationFilesMutation) ResetBazelInvocation() {
 	m.clearedbazel_invocation = false
 }
 
+// SetActionID sets the "action" edge to the Action entity by id.
+func (m *InvocationFilesMutation) SetActionID(id int64) {
+	m.action = &id
+}
+
+// ClearAction clears the "action" edge to the Action entity.
+func (m *InvocationFilesMutation) ClearAction() {
+	m.clearedaction = true
+}
+
+// ActionCleared reports if the "action" edge to the Action entity was cleared.
+func (m *InvocationFilesMutation) ActionCleared() bool {
+	return m.clearedaction
+}
+
+// ActionID returns the "action" edge ID in the mutation.
+func (m *InvocationFilesMutation) ActionID() (id int64, exists bool) {
+	if m.action != nil {
+		return *m.action, true
+	}
+	return
+}
+
+// ActionIDs returns the "action" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ActionID instead. It exists only for internal usage by the builders.
+func (m *InvocationFilesMutation) ActionIDs() (ids []int64) {
+	if id := m.action; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAction resets all changes to the "action" edge.
+func (m *InvocationFilesMutation) ResetAction() {
+	m.action = nil
+	m.clearedaction = false
+}
+
+// SetInvocationTargetID sets the "invocation_target" edge to the InvocationTarget entity by id.
+func (m *InvocationFilesMutation) SetInvocationTargetID(id int64) {
+	m.invocation_target = &id
+}
+
+// ClearInvocationTarget clears the "invocation_target" edge to the InvocationTarget entity.
+func (m *InvocationFilesMutation) ClearInvocationTarget() {
+	m.clearedinvocation_target = true
+}
+
+// InvocationTargetCleared reports if the "invocation_target" edge to the InvocationTarget entity was cleared.
+func (m *InvocationFilesMutation) InvocationTargetCleared() bool {
+	return m.clearedinvocation_target
+}
+
+// InvocationTargetID returns the "invocation_target" edge ID in the mutation.
+func (m *InvocationFilesMutation) InvocationTargetID() (id int64, exists bool) {
+	if m.invocation_target != nil {
+		return *m.invocation_target, true
+	}
+	return
+}
+
+// InvocationTargetIDs returns the "invocation_target" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// InvocationTargetID instead. It exists only for internal usage by the builders.
+func (m *InvocationFilesMutation) InvocationTargetIDs() (ids []int64) {
+	if id := m.invocation_target; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetInvocationTarget resets all changes to the "invocation_target" edge.
+func (m *InvocationFilesMutation) ResetInvocationTarget() {
+	m.invocation_target = nil
+	m.clearedinvocation_target = false
+}
+
 // Where appends a list predicates to the InvocationFilesMutation builder.
 func (m *InvocationFilesMutation) Where(ps ...predicate.InvocationFiles) {
 	m.predicates = append(m.predicates, ps...)
@@ -16609,9 +16828,12 @@ func (m *InvocationFilesMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *InvocationFilesMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.name != nil {
 		fields = append(fields, invocationfiles.FieldName)
+	}
+	if m.uri != nil {
+		fields = append(fields, invocationfiles.FieldURI)
 	}
 	if m.content != nil {
 		fields = append(fields, invocationfiles.FieldContent)
@@ -16635,6 +16857,8 @@ func (m *InvocationFilesMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case invocationfiles.FieldName:
 		return m.Name()
+	case invocationfiles.FieldURI:
+		return m.URI()
 	case invocationfiles.FieldContent:
 		return m.Content()
 	case invocationfiles.FieldDigest:
@@ -16654,6 +16878,8 @@ func (m *InvocationFilesMutation) OldField(ctx context.Context, name string) (en
 	switch name {
 	case invocationfiles.FieldName:
 		return m.OldName(ctx)
+	case invocationfiles.FieldURI:
+		return m.OldURI(ctx)
 	case invocationfiles.FieldContent:
 		return m.OldContent(ctx)
 	case invocationfiles.FieldDigest:
@@ -16677,6 +16903,13 @@ func (m *InvocationFilesMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case invocationfiles.FieldURI:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetURI(v)
 		return nil
 	case invocationfiles.FieldContent:
 		v, ok := value.(string)
@@ -16751,6 +16984,9 @@ func (m *InvocationFilesMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *InvocationFilesMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(invocationfiles.FieldURI) {
+		fields = append(fields, invocationfiles.FieldURI)
+	}
 	if m.FieldCleared(invocationfiles.FieldContent) {
 		fields = append(fields, invocationfiles.FieldContent)
 	}
@@ -16777,6 +17013,9 @@ func (m *InvocationFilesMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *InvocationFilesMutation) ClearField(name string) error {
 	switch name {
+	case invocationfiles.FieldURI:
+		m.ClearURI()
+		return nil
 	case invocationfiles.FieldContent:
 		m.ClearContent()
 		return nil
@@ -16800,6 +17039,9 @@ func (m *InvocationFilesMutation) ResetField(name string) error {
 	case invocationfiles.FieldName:
 		m.ResetName()
 		return nil
+	case invocationfiles.FieldURI:
+		m.ResetURI()
+		return nil
 	case invocationfiles.FieldContent:
 		m.ResetContent()
 		return nil
@@ -16818,9 +17060,15 @@ func (m *InvocationFilesMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *InvocationFilesMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.bazel_invocation != nil {
 		edges = append(edges, invocationfiles.EdgeBazelInvocation)
+	}
+	if m.action != nil {
+		edges = append(edges, invocationfiles.EdgeAction)
+	}
+	if m.invocation_target != nil {
+		edges = append(edges, invocationfiles.EdgeInvocationTarget)
 	}
 	return edges
 }
@@ -16833,13 +17081,21 @@ func (m *InvocationFilesMutation) AddedIDs(name string) []ent.Value {
 		if id := m.bazel_invocation; id != nil {
 			return []ent.Value{*id}
 		}
+	case invocationfiles.EdgeAction:
+		if id := m.action; id != nil {
+			return []ent.Value{*id}
+		}
+	case invocationfiles.EdgeInvocationTarget:
+		if id := m.invocation_target; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *InvocationFilesMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	return edges
 }
 
@@ -16851,9 +17107,15 @@ func (m *InvocationFilesMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *InvocationFilesMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.clearedbazel_invocation {
 		edges = append(edges, invocationfiles.EdgeBazelInvocation)
+	}
+	if m.clearedaction {
+		edges = append(edges, invocationfiles.EdgeAction)
+	}
+	if m.clearedinvocation_target {
+		edges = append(edges, invocationfiles.EdgeInvocationTarget)
 	}
 	return edges
 }
@@ -16864,6 +17126,10 @@ func (m *InvocationFilesMutation) EdgeCleared(name string) bool {
 	switch name {
 	case invocationfiles.EdgeBazelInvocation:
 		return m.clearedbazel_invocation
+	case invocationfiles.EdgeAction:
+		return m.clearedaction
+	case invocationfiles.EdgeInvocationTarget:
+		return m.clearedinvocation_target
 	}
 	return false
 }
@@ -16875,6 +17141,12 @@ func (m *InvocationFilesMutation) ClearEdge(name string) error {
 	case invocationfiles.EdgeBazelInvocation:
 		m.ClearBazelInvocation()
 		return nil
+	case invocationfiles.EdgeAction:
+		m.ClearAction()
+		return nil
+	case invocationfiles.EdgeInvocationTarget:
+		m.ClearInvocationTarget()
+		return nil
 	}
 	return fmt.Errorf("unknown InvocationFiles unique edge %s", name)
 }
@@ -16885,6 +17157,12 @@ func (m *InvocationFilesMutation) ResetEdge(name string) error {
 	switch name {
 	case invocationfiles.EdgeBazelInvocation:
 		m.ResetBazelInvocation()
+		return nil
+	case invocationfiles.EdgeAction:
+		m.ResetAction()
+		return nil
+	case invocationfiles.EdgeInvocationTarget:
+		m.ResetInvocationTarget()
 		return nil
 	}
 	return fmt.Errorf("unknown InvocationFiles edge %s", name)
@@ -17414,6 +17692,9 @@ type InvocationTargetMutation struct {
 	test_summary            map[int64]struct{}
 	removedtest_summary     map[int64]struct{}
 	clearedtest_summary     bool
+	target_files            map[int64]struct{}
+	removedtarget_files     map[int64]struct{}
+	clearedtarget_files     bool
 	done                    bool
 	oldValue                func(context.Context) (*InvocationTarget, error)
 	predicates              []predicate.InvocationTarget
@@ -18090,6 +18371,60 @@ func (m *InvocationTargetMutation) ResetTestSummary() {
 	m.removedtest_summary = nil
 }
 
+// AddTargetFileIDs adds the "target_files" edge to the InvocationFiles entity by ids.
+func (m *InvocationTargetMutation) AddTargetFileIDs(ids ...int64) {
+	if m.target_files == nil {
+		m.target_files = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.target_files[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTargetFiles clears the "target_files" edge to the InvocationFiles entity.
+func (m *InvocationTargetMutation) ClearTargetFiles() {
+	m.clearedtarget_files = true
+}
+
+// TargetFilesCleared reports if the "target_files" edge to the InvocationFiles entity was cleared.
+func (m *InvocationTargetMutation) TargetFilesCleared() bool {
+	return m.clearedtarget_files
+}
+
+// RemoveTargetFileIDs removes the "target_files" edge to the InvocationFiles entity by IDs.
+func (m *InvocationTargetMutation) RemoveTargetFileIDs(ids ...int64) {
+	if m.removedtarget_files == nil {
+		m.removedtarget_files = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.target_files, ids[i])
+		m.removedtarget_files[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTargetFiles returns the removed IDs of the "target_files" edge to the InvocationFiles entity.
+func (m *InvocationTargetMutation) RemovedTargetFilesIDs() (ids []int64) {
+	for id := range m.removedtarget_files {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TargetFilesIDs returns the "target_files" edge IDs in the mutation.
+func (m *InvocationTargetMutation) TargetFilesIDs() (ids []int64) {
+	for id := range m.target_files {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTargetFiles resets all changes to the "target_files" edge.
+func (m *InvocationTargetMutation) ResetTargetFiles() {
+	m.target_files = nil
+	m.clearedtarget_files = false
+	m.removedtarget_files = nil
+}
+
 // Where appends a list predicates to the InvocationTargetMutation builder.
 func (m *InvocationTargetMutation) Where(ps ...predicate.InvocationTarget) {
 	m.predicates = append(m.predicates, ps...)
@@ -18397,7 +18732,7 @@ func (m *InvocationTargetMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *InvocationTargetMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.bazel_invocation != nil {
 		edges = append(edges, invocationtarget.EdgeBazelInvocation)
 	}
@@ -18409,6 +18744,9 @@ func (m *InvocationTargetMutation) AddedEdges() []string {
 	}
 	if m.test_summary != nil {
 		edges = append(edges, invocationtarget.EdgeTestSummary)
+	}
+	if m.target_files != nil {
+		edges = append(edges, invocationtarget.EdgeTargetFiles)
 	}
 	return edges
 }
@@ -18435,15 +18773,24 @@ func (m *InvocationTargetMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case invocationtarget.EdgeTargetFiles:
+		ids := make([]ent.Value, 0, len(m.target_files))
+		for id := range m.target_files {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *InvocationTargetMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedtest_summary != nil {
 		edges = append(edges, invocationtarget.EdgeTestSummary)
+	}
+	if m.removedtarget_files != nil {
+		edges = append(edges, invocationtarget.EdgeTargetFiles)
 	}
 	return edges
 }
@@ -18458,13 +18805,19 @@ func (m *InvocationTargetMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case invocationtarget.EdgeTargetFiles:
+		ids := make([]ent.Value, 0, len(m.removedtarget_files))
+		for id := range m.removedtarget_files {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *InvocationTargetMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedbazel_invocation {
 		edges = append(edges, invocationtarget.EdgeBazelInvocation)
 	}
@@ -18476,6 +18829,9 @@ func (m *InvocationTargetMutation) ClearedEdges() []string {
 	}
 	if m.clearedtest_summary {
 		edges = append(edges, invocationtarget.EdgeTestSummary)
+	}
+	if m.clearedtarget_files {
+		edges = append(edges, invocationtarget.EdgeTargetFiles)
 	}
 	return edges
 }
@@ -18492,6 +18848,8 @@ func (m *InvocationTargetMutation) EdgeCleared(name string) bool {
 		return m.clearedconfiguration
 	case invocationtarget.EdgeTestSummary:
 		return m.clearedtest_summary
+	case invocationtarget.EdgeTargetFiles:
+		return m.clearedtarget_files
 	}
 	return false
 }
@@ -18528,6 +18886,9 @@ func (m *InvocationTargetMutation) ResetEdge(name string) error {
 		return nil
 	case invocationtarget.EdgeTestSummary:
 		m.ResetTestSummary()
+		return nil
+	case invocationtarget.EdgeTargetFiles:
+		m.ResetTargetFiles()
 		return nil
 	}
 	return fmt.Errorf("unknown InvocationTarget edge %s", name)
@@ -25579,6 +25940,9 @@ type TestResultMutation struct {
 	clearedFields                  map[string]struct{}
 	test_summary                   *int64
 	clearedtest_summary            bool
+	test_result_files              map[int64]struct{}
+	removedtest_result_files       map[int64]struct{}
+	clearedtest_result_files       bool
 	done                           bool
 	oldValue                       func(context.Context) (*TestResult, error)
 	predicates                     []predicate.TestResult
@@ -26492,6 +26856,60 @@ func (m *TestResultMutation) ResetTestSummary() {
 	m.clearedtest_summary = false
 }
 
+// AddTestResultFileIDs adds the "test_result_files" edge to the TestResultFile entity by ids.
+func (m *TestResultMutation) AddTestResultFileIDs(ids ...int64) {
+	if m.test_result_files == nil {
+		m.test_result_files = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.test_result_files[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTestResultFiles clears the "test_result_files" edge to the TestResultFile entity.
+func (m *TestResultMutation) ClearTestResultFiles() {
+	m.clearedtest_result_files = true
+}
+
+// TestResultFilesCleared reports if the "test_result_files" edge to the TestResultFile entity was cleared.
+func (m *TestResultMutation) TestResultFilesCleared() bool {
+	return m.clearedtest_result_files
+}
+
+// RemoveTestResultFileIDs removes the "test_result_files" edge to the TestResultFile entity by IDs.
+func (m *TestResultMutation) RemoveTestResultFileIDs(ids ...int64) {
+	if m.removedtest_result_files == nil {
+		m.removedtest_result_files = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.test_result_files, ids[i])
+		m.removedtest_result_files[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTestResultFiles returns the removed IDs of the "test_result_files" edge to the TestResultFile entity.
+func (m *TestResultMutation) RemovedTestResultFilesIDs() (ids []int64) {
+	for id := range m.removedtest_result_files {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TestResultFilesIDs returns the "test_result_files" edge IDs in the mutation.
+func (m *TestResultMutation) TestResultFilesIDs() (ids []int64) {
+	for id := range m.test_result_files {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTestResultFiles resets all changes to the "test_result_files" edge.
+func (m *TestResultMutation) ResetTestResultFiles() {
+	m.test_result_files = nil
+	m.clearedtest_result_files = false
+	m.removedtest_result_files = nil
+}
+
 // Where appends a list predicates to the TestResultMutation builder.
 func (m *TestResultMutation) Where(ps ...predicate.TestResult) {
 	m.predicates = append(m.predicates, ps...)
@@ -26978,9 +27396,12 @@ func (m *TestResultMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TestResultMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.test_summary != nil {
 		edges = append(edges, testresult.EdgeTestSummary)
+	}
+	if m.test_result_files != nil {
+		edges = append(edges, testresult.EdgeTestResultFiles)
 	}
 	return edges
 }
@@ -26993,27 +27414,47 @@ func (m *TestResultMutation) AddedIDs(name string) []ent.Value {
 		if id := m.test_summary; id != nil {
 			return []ent.Value{*id}
 		}
+	case testresult.EdgeTestResultFiles:
+		ids := make([]ent.Value, 0, len(m.test_result_files))
+		for id := range m.test_result_files {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TestResultMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.removedtest_result_files != nil {
+		edges = append(edges, testresult.EdgeTestResultFiles)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *TestResultMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case testresult.EdgeTestResultFiles:
+		ids := make([]ent.Value, 0, len(m.removedtest_result_files))
+		for id := range m.removedtest_result_files {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TestResultMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedtest_summary {
 		edges = append(edges, testresult.EdgeTestSummary)
+	}
+	if m.clearedtest_result_files {
+		edges = append(edges, testresult.EdgeTestResultFiles)
 	}
 	return edges
 }
@@ -27024,6 +27465,8 @@ func (m *TestResultMutation) EdgeCleared(name string) bool {
 	switch name {
 	case testresult.EdgeTestSummary:
 		return m.clearedtest_summary
+	case testresult.EdgeTestResultFiles:
+		return m.clearedtest_result_files
 	}
 	return false
 }
@@ -27046,8 +27489,397 @@ func (m *TestResultMutation) ResetEdge(name string) error {
 	case testresult.EdgeTestSummary:
 		m.ResetTestSummary()
 		return nil
+	case testresult.EdgeTestResultFiles:
+		m.ResetTestResultFiles()
+		return nil
 	}
 	return fmt.Errorf("unknown TestResult edge %s", name)
+}
+
+// TestResultFileMutation represents an operation that mutates the TestResultFile nodes in the graph.
+type TestResultFileMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int64
+	name          *string
+	uri           *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*TestResultFile, error)
+	predicates    []predicate.TestResultFile
+}
+
+var _ ent.Mutation = (*TestResultFileMutation)(nil)
+
+// testresultfileOption allows management of the mutation configuration using functional options.
+type testresultfileOption func(*TestResultFileMutation)
+
+// newTestResultFileMutation creates new mutation for the TestResultFile entity.
+func newTestResultFileMutation(c config, op Op, opts ...testresultfileOption) *TestResultFileMutation {
+	m := &TestResultFileMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTestResultFile,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTestResultFileID sets the ID field of the mutation.
+func withTestResultFileID(id int64) testresultfileOption {
+	return func(m *TestResultFileMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *TestResultFile
+		)
+		m.oldValue = func(ctx context.Context) (*TestResultFile, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().TestResultFile.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTestResultFile sets the old TestResultFile of the mutation.
+func withTestResultFile(node *TestResultFile) testresultfileOption {
+	return func(m *TestResultFileMutation) {
+		m.oldValue = func(context.Context) (*TestResultFile, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TestResultFileMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TestResultFileMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of TestResultFile entities.
+func (m *TestResultFileMutation) SetID(id int64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TestResultFileMutation) ID() (id int64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TestResultFileMutation) IDs(ctx context.Context) ([]int64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().TestResultFile.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *TestResultFileMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *TestResultFileMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the TestResultFile entity.
+// If the TestResultFile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TestResultFileMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *TestResultFileMutation) ResetName() {
+	m.name = nil
+}
+
+// SetURI sets the "uri" field.
+func (m *TestResultFileMutation) SetURI(s string) {
+	m.uri = &s
+}
+
+// URI returns the value of the "uri" field in the mutation.
+func (m *TestResultFileMutation) URI() (r string, exists bool) {
+	v := m.uri
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldURI returns the old "uri" field's value of the TestResultFile entity.
+// If the TestResultFile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TestResultFileMutation) OldURI(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldURI is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldURI requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldURI: %w", err)
+	}
+	return oldValue.URI, nil
+}
+
+// ResetURI resets all changes to the "uri" field.
+func (m *TestResultFileMutation) ResetURI() {
+	m.uri = nil
+}
+
+// Where appends a list predicates to the TestResultFileMutation builder.
+func (m *TestResultFileMutation) Where(ps ...predicate.TestResultFile) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TestResultFileMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TestResultFileMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.TestResultFile, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TestResultFileMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TestResultFileMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (TestResultFile).
+func (m *TestResultFileMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TestResultFileMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.name != nil {
+		fields = append(fields, testresultfile.FieldName)
+	}
+	if m.uri != nil {
+		fields = append(fields, testresultfile.FieldURI)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TestResultFileMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case testresultfile.FieldName:
+		return m.Name()
+	case testresultfile.FieldURI:
+		return m.URI()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TestResultFileMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case testresultfile.FieldName:
+		return m.OldName(ctx)
+	case testresultfile.FieldURI:
+		return m.OldURI(ctx)
+	}
+	return nil, fmt.Errorf("unknown TestResultFile field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TestResultFileMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case testresultfile.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case testresultfile.FieldURI:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetURI(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TestResultFile field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TestResultFileMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TestResultFileMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TestResultFileMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown TestResultFile numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TestResultFileMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TestResultFileMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TestResultFileMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown TestResultFile nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TestResultFileMutation) ResetField(name string) error {
+	switch name {
+	case testresultfile.FieldName:
+		m.ResetName()
+		return nil
+	case testresultfile.FieldURI:
+		m.ResetURI()
+		return nil
+	}
+	return fmt.Errorf("unknown TestResultFile field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TestResultFileMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TestResultFileMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TestResultFileMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TestResultFileMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TestResultFileMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TestResultFileMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TestResultFileMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown TestResultFile unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TestResultFileMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown TestResultFile edge %s", name)
 }
 
 // TestSummaryMutation represents an operation that mutates the TestSummary nodes in the graph.

@@ -69,6 +69,8 @@ type (
 	TestTarget struct{ schema.TestTarget }
 	// TestResult reexport with auth policy added
 	TestResult struct{ schema.TestResult }
+	// TestResultFile reexport with auth policy added
+	TestResultFile struct{ schema.TestResultFile }
 	// TestSummary reexport with auth policy added
 	TestSummary struct{ schema.TestSummary }
 	// TimingMetrics reexport with auth policy added

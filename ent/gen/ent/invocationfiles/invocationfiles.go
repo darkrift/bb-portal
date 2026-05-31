@@ -14,6 +14,8 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldURI holds the string denoting the uri field in the database.
+	FieldURI = "uri"
 	// FieldContent holds the string denoting the content field in the database.
 	FieldContent = "content"
 	// FieldDigest holds the string denoting the digest field in the database.
@@ -24,6 +26,10 @@ const (
 	FieldDigestFunction = "digest_function"
 	// EdgeBazelInvocation holds the string denoting the bazel_invocation edge name in mutations.
 	EdgeBazelInvocation = "bazel_invocation"
+	// EdgeAction holds the string denoting the action edge name in mutations.
+	EdgeAction = "action"
+	// EdgeInvocationTarget holds the string denoting the invocation_target edge name in mutations.
+	EdgeInvocationTarget = "invocation_target"
 	// Table holds the table name of the invocationfiles in the database.
 	Table = "invocation_files"
 	// BazelInvocationTable is the table that holds the bazel_invocation relation/edge.
@@ -33,12 +39,27 @@ const (
 	BazelInvocationInverseTable = "bazel_invocations"
 	// BazelInvocationColumn is the table column denoting the bazel_invocation relation/edge.
 	BazelInvocationColumn = "bazel_invocation_invocation_files"
+	// ActionTable is the table that holds the action relation/edge.
+	ActionTable = "invocation_files"
+	// ActionInverseTable is the table name for the Action entity.
+	// It exists in this package in order to avoid circular dependency with the "action" package.
+	ActionInverseTable = "actions"
+	// ActionColumn is the table column denoting the action relation/edge.
+	ActionColumn = "action_action_files"
+	// InvocationTargetTable is the table that holds the invocation_target relation/edge.
+	InvocationTargetTable = "invocation_files"
+	// InvocationTargetInverseTable is the table name for the InvocationTarget entity.
+	// It exists in this package in order to avoid circular dependency with the "invocationtarget" package.
+	InvocationTargetInverseTable = "invocation_targets"
+	// InvocationTargetColumn is the table column denoting the invocation_target relation/edge.
+	InvocationTargetColumn = "invocation_target_target_files"
 )
 
 // Columns holds all SQL columns for invocationfiles fields.
 var Columns = []string{
 	FieldID,
 	FieldName,
+	FieldURI,
 	FieldContent,
 	FieldDigest,
 	FieldSizeBytes,
@@ -48,7 +69,9 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "invocation_files"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"action_action_files",
 	"bazel_invocation_invocation_files",
+	"invocation_target_target_files",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -79,6 +102,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
+// ByURI orders the results by the uri field.
+func ByURI(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldURI, opts...).ToFunc()
+}
+
 // ByContent orders the results by the content field.
 func ByContent(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldContent, opts...).ToFunc()
@@ -105,10 +133,38 @@ func ByBazelInvocationField(field string, opts ...sql.OrderTermOption) OrderOpti
 		sqlgraph.OrderByNeighborTerms(s, newBazelInvocationStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByActionField orders the results by action field.
+func ByActionField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newActionStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByInvocationTargetField orders the results by invocation_target field.
+func ByInvocationTargetField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newInvocationTargetStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newBazelInvocationStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(BazelInvocationInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, BazelInvocationTable, BazelInvocationColumn),
+	)
+}
+func newActionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ActionInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ActionTable, ActionColumn),
+	)
+}
+func newInvocationTargetStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(InvocationTargetInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, InvocationTargetTable, InvocationTargetColumn),
 	)
 }
