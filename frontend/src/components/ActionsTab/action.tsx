@@ -12,7 +12,7 @@ import { readableFileSize } from "@/utils/filesize";
 import { generateFileUrl } from "@/utils/urlGenerator";
 import { LogViewerCard } from "../LogViewer";
 
-const SIZE_BYTE_LIMIT = 1000000; // 1MiB
+const SIZE_BYTE_LIMIT = 5 * 1024 * 1024; // 5MiB
 
 const fetchLog = async (
   casByteStreamClient: ByteStreamClient,

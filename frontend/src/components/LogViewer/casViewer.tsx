@@ -7,7 +7,7 @@ import { readableFileSize } from "@/utils/filesize";
 import { generateFileUrl } from "@/utils/urlGenerator";
 import { LogViewerCard } from ".";
 
-const SIZE_BYTE_LIMIT = 3 * 1024 * 1024; // 3MiB
+const SIZE_BYTE_LIMIT = 5 * 1024 * 1024; // 5MiB
 
 const fetchLog = async (
   instanceName: string,
