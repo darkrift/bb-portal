@@ -2,18 +2,24 @@ package completedactionlogger
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"log/slog"
 
 	remoteexecution "github.com/bazelbuild/remote-apis/build/bazel/remote/execution/v2"
 	"github.com/buildbarn/bb-portal/ent/gen/ent"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/completedaction"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/instancename"
 	"github.com/buildbarn/bb-portal/internal/database"
+	"github.com/buildbarn/bb-portal/internal/database/dbauthservice"
 	cal_proto "github.com/buildbarn/bb-remote-execution/pkg/proto/completedactionlogger"
 	"github.com/buildbarn/bb-storage/pkg/util"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -110,13 +116,49 @@ func setRequestMetadataFields(create *ent.CompletedActionCreate, requestMetadata
 	}
 }
 
-func linkToInvocation(ctx context.Context, tx *ent.Client, create *ent.CompletedActionCreate, completedAction *cal_proto.CompletedAction, requestMetadata *remoteexecution.RequestMetadata) error {
+func hasRequestMetadataFields(requestMetadata *remoteexecution.RequestMetadata) bool {
+	return requestMetadata != nil &&
+		(requestMetadata.GetToolInvocationId() != "" ||
+			requestMetadata.GetCorrelatedInvocationsId() != "" ||
+			requestMetadata.GetTargetId() != "" ||
+			requestMetadata.GetActionMnemonic() != "")
+}
+
+func setRequestMetadataUpdateFields(update *ent.CompletedActionUpdate, requestMetadata *remoteexecution.RequestMetadata) {
+	if requestMetadata == nil {
+		return
+	}
+	if toolInvocationID := requestMetadata.GetToolInvocationId(); toolInvocationID != "" {
+		update.SetToolInvocationID(toolInvocationID)
+	}
+	if correlatedInvocationsID := requestMetadata.GetCorrelatedInvocationsId(); correlatedInvocationsID != "" {
+		update.SetCorrelatedInvocationsID(correlatedInvocationsID)
+	}
+	if targetID := requestMetadata.GetTargetId(); targetID != "" {
+		update.SetTargetID(targetID)
+	}
+	if actionMnemonic := requestMetadata.GetActionMnemonic(); actionMnemonic != "" {
+		update.SetActionMnemonic(actionMnemonic)
+	}
+}
+
+type completedActionLinks struct {
+	bazelInvocationID *int64
+	actionID          *int64
+}
+
+func (links completedActionLinks) hasFields() bool {
+	return links.bazelInvocationID != nil || links.actionID != nil
+}
+
+func resolveInvocationLinks(ctx context.Context, tx *ent.Client, completedAction *cal_proto.CompletedAction, requestMetadata *remoteexecution.RequestMetadata) (completedActionLinks, error) {
+	var links completedActionLinks
 	if requestMetadata == nil || requestMetadata.GetToolInvocationId() == "" {
-		return nil
+		return links, nil
 	}
 	toolInvocationID, err := uuid.Parse(requestMetadata.GetToolInvocationId())
 	if err != nil {
-		return nil
+		return links, nil
 	}
 	invocationID, err := tx.BazelInvocation.Query().
 		Where(
@@ -125,12 +167,12 @@ func linkToInvocation(ctx context.Context, tx *ent.Client, create *ent.Completed
 		).
 		OnlyID(ctx)
 	if ent.IsNotFound(err) {
-		return nil
+		return links, status.Errorf(codes.Unavailable, "BazelInvocation %q for CompletedAction is not available yet", toolInvocationID)
 	}
 	if err != nil {
-		return util.StatusWrap(err, "failed to query BazelInvocation for CompletedAction")
+		return links, util.StatusWrap(err, "failed to query BazelInvocation for CompletedAction")
 	}
-	create.SetBazelInvocationID(invocationID)
+	links.bazelInvocationID = &invocationID
 
 	if targetID := requestMetadata.GetTargetId(); targetID != "" {
 		actionID, err := tx.Action.Query().
@@ -140,23 +182,43 @@ func linkToInvocation(ctx context.Context, tx *ent.Client, create *ent.Completed
 			).
 			OnlyID(ctx)
 		if ent.IsNotFound(err) {
-			return nil
+			return links, status.Errorf(codes.Unavailable, "Action %q for CompletedAction is not available yet", targetID)
 		}
 		if err != nil {
-			return util.StatusWrap(err, "failed to query Action for CompletedAction")
+			return links, util.StatusWrap(err, "failed to query Action for CompletedAction")
 		}
-		create.SetActionID(actionID)
+		links.actionID = &actionID
 	}
-	return nil
+	return links, nil
+}
+
+func setLinkFields(create *ent.CompletedActionCreate, links completedActionLinks) {
+	if links.bazelInvocationID != nil {
+		create.SetBazelInvocationID(*links.bazelInvocationID)
+	}
+	if links.actionID != nil {
+		create.SetActionID(*links.actionID)
+	}
+}
+
+func updateLinkFields(update *ent.CompletedActionUpdate, links completedActionLinks) {
+	if links.bazelInvocationID != nil {
+		update.SetBazelInvocationID(*links.bazelInvocationID)
+	}
+	if links.actionID != nil {
+		update.SetActionID(*links.actionID)
+	}
 }
 
 func (s *Server) saveCompletedAction(ctx context.Context, completedAction *cal_proto.CompletedAction) error {
-	if completedAction.GetUuid() == "" {
-		return nil
-	}
+	ctx = dbauthservice.NewContextWithDbAuthServiceBypass(ctx)
 	actionDigest := completedAction.GetHistoricalExecuteResponse().GetActionDigest()
-	if actionDigest.GetHash() == "" {
-		return nil
+	if actionDigest == nil || actionDigest.GetHash() == "" {
+		return status.Error(codes.InvalidArgument, "CompletedAction does not contain an action digest")
+	}
+	completedActionUUID := completedAction.GetUuid()
+	if completedActionUUID == "" {
+		completedActionUUID = fmt.Sprintf("%s/%s/%d", completedAction.GetInstanceName(), actionDigest.GetHash(), actionDigest.GetSizeBytes())
 	}
 	historicalExecuteResponse, err := proto.Marshal(completedAction.GetHistoricalExecuteResponse())
 	if err != nil {
@@ -171,18 +233,29 @@ func (s *Server) saveCompletedAction(ctx context.Context, completedAction *cal_p
 
 	requestMetadata := requestMetadataFromCompletedAction(completedAction)
 	create := tx.Ent().CompletedAction.Create().
-		SetUUID(completedAction.GetUuid()).
+		SetUUID(completedActionUUID).
 		SetInstanceName(completedAction.GetInstanceName()).
 		SetHistoricalExecuteResponse(historicalExecuteResponse)
 	setDigestFields(create, completedAction)
 	setExecuteResponseFields(create, completedAction)
 	setRequestMetadataFields(create, requestMetadata)
-	if err = linkToInvocation(ctx, tx.Ent(), create, completedAction, requestMetadata); err != nil {
+	links, err := resolveInvocationLinks(ctx, tx.Ent(), completedAction, requestMetadata)
+	if err != nil {
 		return err
 	}
+	setLinkFields(create, links)
 
 	if err = create.OnConflict().DoNothing().Exec(ctx); err != nil {
 		return util.StatusWrap(err, "failed to save CompletedAction")
+	}
+	if hasRequestMetadataFields(requestMetadata) || links.hasFields() {
+		update := tx.Ent().CompletedAction.Update().
+			Where(completedaction.UUID(completedActionUUID))
+		setRequestMetadataUpdateFields(update, requestMetadata)
+		updateLinkFields(update, links)
+		if err = update.Exec(ctx); err != nil {
+			return util.StatusWrap(err, "failed to update CompletedAction")
+		}
 	}
 	if err = tx.Commit(); err != nil {
 		return util.StatusWrap(err, "failed to commit CompletedAction")
@@ -200,9 +273,30 @@ func (s *Server) LogCompletedActions(stream grpc.BidiStreamingServer[cal_proto.C
 		if err != nil {
 			return err
 		}
+		actionDigest := completedAction.GetHistoricalExecuteResponse().GetActionDigest()
+		slog.Info(
+			"Received CompletedAction",
+			"uuid", completedAction.GetUuid(),
+			"instanceName", completedAction.GetInstanceName(),
+			"actionDigestHash", actionDigest.GetHash(),
+			"actionDigestSizeBytes", actionDigest.GetSizeBytes(),
+		)
 		if err = s.saveCompletedAction(stream.Context(), completedAction); err != nil {
+			slog.Warn(
+				"Failed to store CompletedAction; not acknowledging",
+				"uuid", completedAction.GetUuid(),
+				"instanceName", completedAction.GetInstanceName(),
+				"err", err,
+			)
 			return err
 		}
+		slog.Info(
+			"Stored CompletedAction; acknowledging",
+			"uuid", completedAction.GetUuid(),
+			"instanceName", completedAction.GetInstanceName(),
+			"actionDigestHash", actionDigest.GetHash(),
+			"actionDigestSizeBytes", actionDigest.GetSizeBytes(),
+		)
 		if err = stream.Send(&emptypb.Empty{}); err != nil {
 			return err
 		}

@@ -453,9 +453,6 @@ func (au *ActionUpdate) check() error {
 	if au.mutation.BazelInvocationCleared() && len(au.mutation.BazelInvocationIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Action.bazel_invocation"`)
 	}
-	if au.mutation.ConfigurationCleared() && len(au.mutation.ConfigurationIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Action.configuration"`)
-	}
 	return nil
 }
 
@@ -1116,9 +1113,6 @@ func (auo *ActionUpdateOne) ExecX(ctx context.Context) {
 func (auo *ActionUpdateOne) check() error {
 	if auo.mutation.BazelInvocationCleared() && len(auo.mutation.BazelInvocationIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Action.bazel_invocation"`)
-	}
-	if auo.mutation.ConfigurationCleared() && len(auo.mutation.ConfigurationIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Action.configuration"`)
 	}
 	return nil
 }

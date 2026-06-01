@@ -27,6 +27,7 @@ func (Action) Fields() []ent.Field {
 
 		field.Int64("configuration_id").
 			Comment("The id of the configuration").
+			Optional().
 			Immutable().
 			Unique().
 			Annotations(
@@ -71,7 +72,6 @@ func (Action) Edges() []ent.Edge {
 		edge.To("configuration", Configuration.Type).
 			Field("configuration_id").
 			Unique().
-			Required().
 			Immutable(),
 
 		edge.To("action_files", InvocationFiles.Type).

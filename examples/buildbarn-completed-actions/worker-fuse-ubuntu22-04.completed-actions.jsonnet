@@ -1,6 +1,7 @@
 local base = import 'worker-fuse-ubuntu22-04.jsonnet';
 
 base {
+  maximumMessageSizeBytes: 64 * 1024 * 1024,
   completedActionLoggers: [
     {
       client: {

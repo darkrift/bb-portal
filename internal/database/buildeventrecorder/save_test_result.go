@@ -153,6 +153,7 @@ func createTestResultsBulk(ctx context.Context, invocationDbID, instanceNameDbID
 				params.Warnings[i] = string(warningsJSON)
 			}
 		}
+		params.TimingBreakdowns[i] = "null"
 
 		if ei := testResult.GetExecutionInfo(); ei != nil {
 			params.Strategies[i] = ei.Strategy
@@ -160,7 +161,6 @@ func createTestResultsBulk(ctx context.Context, invocationDbID, instanceNameDbID
 			params.ExitCodes[i] = ei.ExitCode
 			params.Hostnames[i] = ei.Hostname
 
-			params.TimingBreakdowns[i] = "null"
 			tb := createTimingBreakdownRecursive(ei.TimingBreakdown)
 			if tb != nil {
 				if tbJSON, err := json.Marshal(tb); err == nil {
@@ -263,21 +263,33 @@ func createTimingBreakdownRecursive(tb *bes.TestResult_ExecutionInfo_TimingBreak
 		return nil
 	}
 
-	if tb.Time == nil || !tb.Time.IsValid() {
-		return nil
-	}
-	durationMillis := tb.Time.AsDuration().Milliseconds()
-
-	children := make([]*timingBreakdown, 0, len(tb.Child))
-	for _, child := range tb.Child {
+	durationMillis, hasDuration := timingBreakdownDurationMillis(tb)
+	children := make([]*timingBreakdown, 0, len(tb.GetChild()))
+	for _, child := range tb.GetChild() {
 		newChild := createTimingBreakdownRecursive(child)
 		if newChild != nil {
 			children = append(children, newChild)
 		}
 	}
+	if !hasDuration && len(children) == 0 {
+		return nil
+	}
 	return &timingBreakdown{
-		Name:           tb.Name,
+		Name:           tb.GetName(),
 		DurationMillis: durationMillis,
 		Children:       children,
 	}
+}
+
+func timingBreakdownDurationMillis(tb *bes.TestResult_ExecutionInfo_TimingBreakdown) (int64, bool) {
+	if tb == nil {
+		return 0, false
+	}
+	if duration := tb.GetTime(); duration != nil && duration.IsValid() {
+		return duration.AsDuration().Milliseconds(), true
+	}
+	if durationMillis := tb.GetTimeMillis(); durationMillis != 0 {
+		return durationMillis, true
+	}
+	return 0, false
 }

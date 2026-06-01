@@ -1,0 +1,116 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: bb_portal
+      POSTGRES_PASSWORD: bb_portal
+      POSTGRES_USER: bb_portal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bb_portal -d bb_portal"]
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  bb-portal:
+    image: bb-portal/bb-portal:local
+    command:
+      - /config/bb_portal.jsonnet
+    volumes:
+      - ${COMPOSE_FIXTURE_DIR:?COMPOSE_FIXTURE_DIR must be set}/config:/config:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  bb-portal-ready:
+    image: curlimages/curl:8.16.0
+    command:
+      - sh
+      - -c
+      - |
+        for i in $$(seq 1 120); do
+          curl -fsS -X POST -H 'Content-Type: application/json' --data '{"query":"query{__typename}"}' http://bb-portal:8080/graphql && exit 0
+          sleep 1
+        done
+        exit 1
+    depends_on:
+      - bb-portal
+  frontend:
+    image: ghcr.io/buildbarn/bb-storage:20260326T151518Z-d0c6f26
+    command:
+      - /config/frontend.jsonnet
+    volumes:
+      - ${COMPOSE_FIXTURE_DIR:?COMPOSE_FIXTURE_DIR must be set}/config:/config:ro
+    depends_on:
+      - storage
+      - scheduler
+
+  storage:
+    image: ghcr.io/buildbarn/bb-storage:20260326T151518Z-d0c6f26
+    command:
+      - /config/storage.jsonnet
+    volumes:
+      - ${COMPOSE_FIXTURE_DIR:?COMPOSE_FIXTURE_DIR must be set}/config:/config:ro
+      - storage-ac:/storage-ac
+      - storage-cas:/storage-cas
+      - storage-fsac:/storage-fsac
+
+  scheduler:
+    image: ghcr.io/buildbarn/bb-scheduler:20260326T163248Z-e6ab874
+    command:
+      - /config/scheduler.jsonnet
+    volumes:
+      - ${COMPOSE_FIXTURE_DIR:?COMPOSE_FIXTURE_DIR must be set}/config:/config:ro
+    depends_on:
+      - storage
+
+  runner-installer:
+    image: ghcr.io/buildbarn/bb-runner-installer:20260326T163248Z-e6ab874
+    volumes:
+      - runner-bb:/bb
+
+  worker-integration-test-ubuntu22-04:
+    image: ghcr.io/buildbarn/bb-worker:20260326T163248Z-e6ab874
+    command:
+      - /config/worker-integration-test-ubuntu22-04.jsonnet
+    volumes:
+      - ${COMPOSE_FIXTURE_DIR:?COMPOSE_FIXTURE_DIR must be set}/config:/config:ro
+      - runner-socket:/runner
+      - worker:/worker
+    depends_on:
+      bb-portal-ready:
+        condition: service_completed_successfully
+      runner-integration-test-ubuntu22-04:
+        condition: service_started
+      scheduler:
+        condition: service_started
+      storage:
+        condition: service_started
+
+  runner-integration-test-ubuntu22-04:
+    image: ghcr.io/catthehacker/ubuntu:act-22.04@sha256:dd7654ffb01d5b7b54b23b9ce928a1f7f2d08c7b3d7e320b6574b55d7ccde78b
+    command:
+      - sh
+      - -exc
+      - |
+        while ! test -f /bb/installed; do
+          ls -la /bb /worker
+          sleep 1
+        done
+        ls -la /bb /worker
+        exec /bb/bb_runner /config/runner-ubuntu22-04.jsonnet
+    network_mode: none
+    volumes:
+      - ${COMPOSE_FIXTURE_DIR:?COMPOSE_FIXTURE_DIR must be set}/config:/config:ro
+      - runner-bb:/bb
+      - runner-socket:/runner
+      - worker:/worker
+    depends_on:
+      - runner-installer
+
+volumes:
+  runner-bb:
+  runner-socket:
+  storage-ac:
+  storage-cas:
+  storage-fsac:
+  worker:

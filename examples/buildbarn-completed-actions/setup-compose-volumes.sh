@@ -19,6 +19,9 @@ mkdir -p \
   "${volumes_dir}/worker-hardlinking-ubuntu22-04/build" \
   "${volumes_dir}/worker-hardlinking-ubuntu22-04/cas/persistent_state" \
   "${volumes_dir}/worker-hardlinking-ubuntu22-04/cache" \
+  "${volumes_dir}/worker-integration-test-ubuntu22-04/build" \
+  "${volumes_dir}/worker-integration-test-ubuntu22-04/cas/persistent_state" \
+  "${volumes_dir}/worker-integration-test-ubuntu22-04/cache" \
   "${volumes_dir}/storage-ac-0/persistent_state" \
   "${volumes_dir}/storage-ac-1/persistent_state" \
   "${volumes_dir}/storage-cas-0/persistent_state" \
@@ -34,11 +37,16 @@ chmod 0777 \
   "${volumes_dir}/worker-hardlinking-ubuntu22-04" \
   "${volumes_dir}/worker-hardlinking-ubuntu22-04/build" \
   "${volumes_dir}/worker-hardlinking-ubuntu22-04/cas" \
-  "${volumes_dir}/worker-hardlinking-ubuntu22-04/cas/persistent_state"
+  "${volumes_dir}/worker-hardlinking-ubuntu22-04/cas/persistent_state" \
+  "${volumes_dir}/worker-integration-test-ubuntu22-04" \
+  "${volumes_dir}/worker-integration-test-ubuntu22-04/build" \
+  "${volumes_dir}/worker-integration-test-ubuntu22-04/cas" \
+  "${volumes_dir}/worker-integration-test-ubuntu22-04/cas/persistent_state"
 
 chmod 0700 \
   "${volumes_dir}/worker-fuse-ubuntu22-04/cache" \
   "${volumes_dir}/worker-hardlinking-ubuntu22-04/cache" \
+  "${volumes_dir}/worker-integration-test-ubuntu22-04/cache" \
   "${volumes_dir}/storage-ac-0" \
   "${volumes_dir}/storage-ac-1" \
   "${volumes_dir}/storage-cas-0" \

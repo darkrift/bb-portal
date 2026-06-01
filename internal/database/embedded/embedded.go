@@ -102,19 +102,28 @@ func NewDatabaseProvider(logger io.Writer) (*DatabaseProvider, error) {
 
 // CreateDatabase creates a new empty database.
 func (d *DatabaseProvider) CreateDatabase() (*sql.DB, error) {
-	if d.db == nil {
-		return nil, status.Error(codes.FailedPrecondition, "Creating database on closed connection")
+	connectionString, err := d.CreateDatabaseConnectionString()
+	if err != nil {
+		return nil, err
 	}
-	database := uuid.New().String()
-	if _, err := d.db.Exec(fmt.Sprintf("CREATE DATABASE %q", database)); err != nil {
-		return nil, util.StatusWrap(err, "Could not create database")
-	}
-	connectionString := fmt.Sprintf("postgres://%s:%s@localhost:%d/%s?sslmode=disable", d.user, d.password, d.port, database)
 	db, err := sql.Open("pgx", connectionString)
 	if err != nil {
 		return nil, util.StatusWrap(err, "Could not open connection to database")
 	}
 	return db, nil
+}
+
+// CreateDatabaseConnectionString creates a new empty database and returns a
+// connection string for it.
+func (d *DatabaseProvider) CreateDatabaseConnectionString() (string, error) {
+	if d.db == nil {
+		return "", status.Error(codes.FailedPrecondition, "Creating database on closed connection")
+	}
+	database := uuid.New().String()
+	if _, err := d.db.Exec(fmt.Sprintf("CREATE DATABASE %q", database)); err != nil {
+		return "", util.StatusWrap(err, "Could not create database")
+	}
+	return fmt.Sprintf("postgres://%s:%s@localhost:%d/%s?sslmode=disable", d.user, d.password, d.port, database), nil
 }
 
 // Cleanup closes the primary connection and stops the postgres server.

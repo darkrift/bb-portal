@@ -311,9 +311,22 @@ func (m *ActionMutation) OldConfigurationID(ctx context.Context) (v int64, err e
 	return oldValue.ConfigurationID, nil
 }
 
+// ClearConfigurationID clears the value of the "configuration_id" field.
+func (m *ActionMutation) ClearConfigurationID() {
+	m.configuration = nil
+	m.clearedFields[action.FieldConfigurationID] = struct{}{}
+}
+
+// ConfigurationIDCleared returns if the "configuration_id" field was cleared in this mutation.
+func (m *ActionMutation) ConfigurationIDCleared() bool {
+	_, ok := m.clearedFields[action.FieldConfigurationID]
+	return ok
+}
+
 // ResetConfigurationID resets all changes to the "configuration_id" field.
 func (m *ActionMutation) ResetConfigurationID() {
 	m.configuration = nil
+	delete(m.clearedFields, action.FieldConfigurationID)
 }
 
 // SetLabel sets the "label" field.
@@ -1152,7 +1165,7 @@ func (m *ActionMutation) ClearConfiguration() {
 
 // ConfigurationCleared reports if the "configuration" edge to the Configuration entity was cleared.
 func (m *ActionMutation) ConfigurationCleared() bool {
-	return m.clearedconfiguration
+	return m.ConfigurationIDCleared() || m.clearedconfiguration
 }
 
 // ConfigurationIDs returns the "configuration" edge IDs in the mutation.
@@ -1647,6 +1660,9 @@ func (m *ActionMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ActionMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(action.FieldConfigurationID) {
+		fields = append(fields, action.FieldConfigurationID)
+	}
 	if m.FieldCleared(action.FieldType) {
 		fields = append(fields, action.FieldType)
 	}
@@ -1703,6 +1719,9 @@ func (m *ActionMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ActionMutation) ClearField(name string) error {
 	switch name {
+	case action.FieldConfigurationID:
+		m.ClearConfigurationID()
+		return nil
 	case action.FieldType:
 		m.ClearType()
 		return nil

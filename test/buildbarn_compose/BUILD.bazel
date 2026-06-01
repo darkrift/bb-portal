@@ -1,0 +1,102 @@
+load("@bazel_binaries//:defs.bzl", "bazel_binaries")
+load("@rules_bazel_integration_test//bazel_integration_test:defs.bzl", "bazel_integration_test")
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+load("@rules_itest//:itest.bzl", "itest_service", "named_port", "service_test")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
+
+sh_binary(
+    name = "docker_compose_service",
+    srcs = ["docker_compose_service.sh"],
+    data = [
+        "config/bb_portal.jsonnet",
+        "config/common.libsonnet",
+        "config/frontend.jsonnet",
+        "config/runner-ubuntu22-04.jsonnet",
+        "config/scheduler.jsonnet",
+        "config/storage.jsonnet",
+        "config/worker-integration-test-ubuntu22-04.jsonnet",
+        "docker-compose.yml",
+        "//cmd/bb_portal:bb_portal_container_load",
+    ],
+)
+
+itest_service(
+    name = "buildbarn_compose",
+    args = [
+        "--http-port",
+        named_port(":buildbarn_compose", "http"),
+        "--bes-port",
+        named_port(":buildbarn_compose", "bes"),
+        "--frontend-port",
+        named_port(":buildbarn_compose", "frontend"),
+    ],
+    exe = ":docker_compose_service",
+    named_ports = [
+        "http",
+        "bes",
+        "frontend",
+    ],
+    shutdown_timeout = "60s",
+)
+
+go_binary(
+    name = "bazel_compose_runner",
+    srcs = ["bazel_compose_runner.go"],
+    data = [
+        "bazel_workspace/BUILD.fixture",
+        "bazel_workspace/MODULE.bazel",
+        "@build_bazel_bazel_9_0_0//:bazel_binary",
+    ],
+)
+
+bazel_integration_test(
+    name = "_completed_action_worker_bazel_test",
+    timeout = "long",
+    bazel_binaries = bazel_binaries,
+    bazel_version = "9.0.0",
+    tags = ["manual"],
+    test_runner = ":bazel_compose_runner",
+    workspace_files = glob(["bazel_workspace/**"]),
+    workspace_path = "bazel_workspace",
+)
+
+service_test(
+    name = "completed_action_worker_compose_test",
+    timeout = "long",
+    data = ["@build_bazel_bazel_9_0_0//:bazel_binary"],
+    env = {
+        "BIT_BAZEL_BINARY": "$(location @build_bazel_bazel_9_0_0//:bazel_binary)",
+    },
+    services = [":buildbarn_compose"],
+    tags = [
+        "docker",
+        "exclusive",
+        "external",
+        "manual",
+    ],
+    test = ":bazel_compose_runner",
+)
+
+go_library(
+    name = "buildbarn_compose_lib",
+    srcs = [
+        "bazel_compose_runner.go",
+        "validator.go",
+    ],
+    importpath = "github.com/buildbarn/bb-portal/test/buildbarn_compose",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//pkg/proto/bazelbuild/bazel/bes:build_event_stream",
+        "@bazel_remote_apis//build/bazel/remote/execution/v2:remote_execution_go_proto",
+        "@com_github_jackc_pgx_v5//stdlib",
+        "@org_golang_google_genproto//googleapis/devtools/build/v1:build",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_grpc//credentials/insecure",
+        "@org_golang_google_grpc//metadata",
+        "@org_golang_google_protobuf//encoding/protojson",
+        "@org_golang_google_protobuf//proto",
+        "@org_golang_google_protobuf//types/known/anypb",
+        "@org_golang_google_protobuf//types/known/durationpb",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)

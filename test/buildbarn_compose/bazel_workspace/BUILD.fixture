@@ -1,0 +1,5 @@
+genrule(
+    name = "worker_completed_action",
+    outs = ["worker_completed_action.txt"],
+    cmd = "echo remote stdout; echo remote stderr >&2; exit 34",
+)

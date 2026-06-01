@@ -1,0 +1,30 @@
+services:
+  frontend:
+    command:
+      - /config/frontend-large-messages.jsonnet
+    volumes:
+      - ${BB_PORTAL_CHECKOUT:?Set BB_PORTAL_CHECKOUT to the bb-portal checkout path}/examples/buildbarn-completed-actions/frontend-large-messages.jsonnet:/config/frontend-large-messages.jsonnet:ro
+
+  storage-0:
+    command:
+      - /config/storage-large-messages.jsonnet
+    volumes:
+      - ${BB_PORTAL_CHECKOUT:?Set BB_PORTAL_CHECKOUT to the bb-portal checkout path}/examples/buildbarn-completed-actions/storage-large-messages.jsonnet:/config/storage-large-messages.jsonnet:ro
+
+  storage-1:
+    command:
+      - /config/storage-large-messages.jsonnet
+    volumes:
+      - ${BB_PORTAL_CHECKOUT:?Set BB_PORTAL_CHECKOUT to the bb-portal checkout path}/examples/buildbarn-completed-actions/storage-large-messages.jsonnet:/config/storage-large-messages.jsonnet:ro
+
+  scheduler:
+    command:
+      - /config/scheduler-large-messages.jsonnet
+    volumes:
+      - ${BB_PORTAL_CHECKOUT:?Set BB_PORTAL_CHECKOUT to the bb-portal checkout path}/examples/buildbarn-completed-actions/scheduler-large-messages.jsonnet:/config/scheduler-large-messages.jsonnet:ro
+
+  browser:
+    command:
+      - /config/browser-large-messages.jsonnet
+    volumes:
+      - ${BB_PORTAL_CHECKOUT:?Set BB_PORTAL_CHECKOUT to the bb-portal checkout path}/examples/buildbarn-completed-actions/browser-large-messages.jsonnet:/config/browser-large-messages.jsonnet:ro

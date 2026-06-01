@@ -18,7 +18,7 @@ type Action implements Node {
   stderrSizeBytes: Int
   stderrHashFunction: String
   bazelInvocation: BazelInvocation!
-  configuration: Configuration!
+  configuration: Configuration
   actionFiles: [InvocationFiles!]
   completedActions: [CompletedAction!]
 }

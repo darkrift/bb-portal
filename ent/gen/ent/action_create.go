@@ -38,6 +38,14 @@ func (ac *ActionCreate) SetConfigurationID(i int64) *ActionCreate {
 	return ac
 }
 
+// SetNillableConfigurationID sets the "configuration_id" field if the given value is not nil.
+func (ac *ActionCreate) SetNillableConfigurationID(i *int64) *ActionCreate {
+	if i != nil {
+		ac.SetConfigurationID(*i)
+	}
+	return ac
+}
+
 // SetLabel sets the "label" field.
 func (ac *ActionCreate) SetLabel(s string) *ActionCreate {
 	ac.mutation.SetLabel(s)
@@ -315,17 +323,11 @@ func (ac *ActionCreate) check() error {
 	if _, ok := ac.mutation.BazelInvocationID(); !ok {
 		return &ValidationError{Name: "bazel_invocation_id", err: errors.New(`ent: missing required field "Action.bazel_invocation_id"`)}
 	}
-	if _, ok := ac.mutation.ConfigurationID(); !ok {
-		return &ValidationError{Name: "configuration_id", err: errors.New(`ent: missing required field "Action.configuration_id"`)}
-	}
 	if _, ok := ac.mutation.Label(); !ok {
 		return &ValidationError{Name: "label", err: errors.New(`ent: missing required field "Action.label"`)}
 	}
 	if len(ac.mutation.BazelInvocationIDs()) == 0 {
 		return &ValidationError{Name: "bazel_invocation", err: errors.New(`ent: missing required edge "Action.bazel_invocation"`)}
-	}
-	if len(ac.mutation.ConfigurationIDs()) == 0 {
-		return &ValidationError{Name: "configuration", err: errors.New(`ent: missing required edge "Action.configuration"`)}
 	}
 	return nil
 }

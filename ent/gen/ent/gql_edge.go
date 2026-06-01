@@ -21,7 +21,7 @@ func (a *Action) Configuration(ctx context.Context) (*Configuration, error) {
 	if IsNotLoaded(err) {
 		result, err = a.QueryConfiguration().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
 }
 
 func (a *Action) ActionFiles(ctx context.Context) (result []*InvocationFiles, err error) {

@@ -13,7 +13,7 @@ services:
       - -listen=0.0.0.0:8982
       - -output=/out/completed-actions.ndjson
     ports:
-      - "8982:8982"
+      - "127.0.0.1:${BB_PORTAL_COMPLETED_ACTION_DUMP_PORT:-8985}:8982"
     volumes:
       - ${BB_PORTAL_COMPLETED_ACTION_OUT:-./completed-action-events}:/out
     restart: unless-stopped

@@ -1,5 +1,11 @@
 load("@rules_go//go:def.bzl", "go_test")
 
+filegroup(
+    name = "nextjs_test_bep",
+    srcs = ["testdata/bepfiles/nextjs_test.bep.ndjson"],
+    visibility = ["//test/buildbarn_itest:__pkg__"],
+)
+
 go_test(
     name = "integrationtest_test",
     srcs = [

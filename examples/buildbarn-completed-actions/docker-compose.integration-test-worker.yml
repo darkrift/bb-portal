@@ -1,0 +1,26 @@
+services:
+  worker-integration-test-ubuntu22-04:
+    image: ghcr.io/buildbarn/bb-worker:20260326T163248Z-e6ab874
+    command:
+      - /bb-portal-examples/worker-integration-test-ubuntu22-04.completed-actions.jsonnet
+    privileged: false
+    depends_on:
+      - completed-action-relay
+    volumes:
+      - ${BB_DEPLOYMENTS_COMPOSE_DIR:?Set BB_DEPLOYMENTS_COMPOSE_DIR to the bb-deployments docker-compose directory}/config:/config
+      - ${BB_DEPLOYMENTS_COMPOSE_DIR:?Set BB_DEPLOYMENTS_COMPOSE_DIR to the bb-deployments docker-compose directory}/volumes/worker-integration-test-ubuntu22-04:/worker
+      - ${BB_PORTAL_CHECKOUT:?Set BB_PORTAL_CHECKOUT to the bb-portal checkout path}/examples/buildbarn-completed-actions:/bb-portal-examples:ro
+
+  runner-integration-test-ubuntu22-04:
+    image: ghcr.io/catthehacker/ubuntu:act-22.04@sha256:dd7654ffb01d5b7b54b23b9ce928a1f7f2d08c7b3d7e320b6574b55d7ccde78b
+    command:
+      - sh
+      - -c
+      - while ! test -f /bb/installed; do sleep 1; done; exec /bb/bb_runner /config/runner-ubuntu22-04.jsonnet
+    network_mode: none
+    depends_on:
+      - runner-installer
+    volumes:
+      - ${BB_DEPLOYMENTS_COMPOSE_DIR:?Set BB_DEPLOYMENTS_COMPOSE_DIR to the bb-deployments docker-compose directory}/config:/config
+      - ${BB_DEPLOYMENTS_COMPOSE_DIR:?Set BB_DEPLOYMENTS_COMPOSE_DIR to the bb-deployments docker-compose directory}/volumes/bb:/bb
+      - ${BB_DEPLOYMENTS_COMPOSE_DIR:?Set BB_DEPLOYMENTS_COMPOSE_DIR to the bb-deployments docker-compose directory}/volumes/worker-integration-test-ubuntu22-04:/worker

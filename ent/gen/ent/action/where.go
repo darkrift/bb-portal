@@ -170,6 +170,16 @@ func ConfigurationIDNotIn(vs ...int64) predicate.Action {
 	return predicate.Action(sql.FieldNotIn(FieldConfigurationID, vs...))
 }
 
+// ConfigurationIDIsNil applies the IsNil predicate on the "configuration_id" field.
+func ConfigurationIDIsNil() predicate.Action {
+	return predicate.Action(sql.FieldIsNull(FieldConfigurationID))
+}
+
+// ConfigurationIDNotNil applies the NotNil predicate on the "configuration_id" field.
+func ConfigurationIDNotNil() predicate.Action {
+	return predicate.Action(sql.FieldNotNull(FieldConfigurationID))
+}
+
 // LabelEQ applies the EQ predicate on the "label" field.
 func LabelEQ(v string) predicate.Action {
 	return predicate.Action(sql.FieldEQ(FieldLabel, v))

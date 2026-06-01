@@ -27,7 +27,7 @@ var (
 		{Name: "stderr_hash", Type: field.TypeString, Nullable: true},
 		{Name: "stderr_size_bytes", Type: field.TypeInt64, Nullable: true},
 		{Name: "stderr_hash_function", Type: field.TypeString, Nullable: true},
-		{Name: "configuration_id", Type: field.TypeInt64},
+		{Name: "configuration_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "bazel_invocation_id", Type: field.TypeInt64},
 	}
 	// ActionsTable holds the schema information for the "actions" table.
@@ -40,7 +40,7 @@ var (
 				Symbol:     "actions_configurations_configuration",
 				Columns:    []*schema.Column{ActionsColumns[16]},
 				RefColumns: []*schema.Column{ConfigurationsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "actions_bazel_invocations_actions",

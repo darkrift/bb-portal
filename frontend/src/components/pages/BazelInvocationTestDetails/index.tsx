@@ -34,6 +34,7 @@ type TimingNode = {
   children?: TimingNode[];
   child?: TimingNode[];
   time?: string;
+  timeMillis?: number;
 };
 
 const phaseColors = [
@@ -65,6 +66,9 @@ const getTimingDuration = (node: TimingNode) => {
   }
   if (typeof node.durationMillis === "number") {
     return node.durationMillis;
+  }
+  if (typeof node.timeMillis === "number") {
+    return node.timeMillis;
   }
   if (typeof node.time === "string" && node.time.length > 0) {
     const match = node.time.match(/([0-9.]+)(ms|s|m|h)$/);
@@ -103,10 +107,15 @@ const getTimingChildren = (node: TimingNode): TimingNode[] => {
 
 const buildPhaseItems = (root: TimingNode): SummaryChartItem[] => {
   const children = getTimingChildren(root);
-  const totalDuration = getTimingDuration(root);
+  const childDurations = children.map(getTimingDuration);
+  const rootDuration = getTimingDuration(root);
+  const totalDuration =
+    rootDuration > 0
+      ? rootDuration
+      : childDurations.reduce((total, duration) => total + duration, 0);
 
   return children.map((child, index) => {
-    const duration = getTimingDuration(child);
+    const duration = childDurations[index];
     return {
       key: `${getTimingName(child)}-${index}`,
       value: getTimingName(child),

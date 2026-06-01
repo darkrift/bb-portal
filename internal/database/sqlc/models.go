@@ -29,7 +29,7 @@ type Action struct {
 	StderrHash         sql.NullString
 	StderrSizeBytes    sql.NullInt64
 	StderrHashFunction sql.NullString
-	ConfigurationID    int64
+	ConfigurationID    sql.NullInt64
 	BazelInvocationID  int64
 }
 
@@ -149,6 +149,34 @@ type BuildTag struct {
 	BuildID int64
 }
 
+type CompletedAction struct {
+	ID                              int64
+	Uuid                            string
+	InstanceName                    string
+	ActionDigestHash                string
+	ActionDigestSizeBytes           int64
+	DigestFunction                  sql.NullString
+	ToolInvocationID                sql.NullString
+	CorrelatedInvocationsID         sql.NullString
+	TargetID                        sql.NullString
+	ActionMnemonic                  sql.NullString
+	CacheHit                        sql.NullBool
+	ExitCode                        sql.NullInt32
+	StatusCode                      sql.NullInt32
+	StatusMessage                   sql.NullString
+	QueuedAt                        sql.NullTime
+	WorkerStartAt                   sql.NullTime
+	WorkerCompletedAt               sql.NullTime
+	UploadedAt                      time.Time
+	StdoutHash                      sql.NullString
+	StdoutSizeBytes                 sql.NullInt64
+	StderrHash                      sql.NullString
+	StderrSizeBytes                 sql.NullInt64
+	HistoricalExecuteResponse       []byte
+	ActionCompletedActions          sql.NullInt64
+	BazelInvocationCompletedActions sql.NullInt64
+}
+
 type Configuration struct {
 	ID                int64
 	ConfigurationID   string
@@ -196,11 +224,14 @@ type InstanceName struct {
 type InvocationFile struct {
 	ID                             int64
 	Name                           string
+	Uri                            sql.NullString
 	Content                        sql.NullString
 	Digest                         sql.NullString
 	SizeBytes                      sql.NullInt64
 	DigestFunction                 sql.NullString
+	ActionActionFiles              sql.NullInt64
 	BazelInvocationInvocationFiles sql.NullInt64
+	InvocationTargetTargetFiles    sql.NullInt64
 }
 
 type InvocationTag struct {
@@ -357,6 +388,13 @@ type TestResult struct {
 	Hostname                sql.NullString
 	TimingBreakdown         pqtype.NullRawMessage
 	TestSummaryTestResults  int64
+}
+
+type TestResultFile struct {
+	ID                        int64
+	Name                      string
+	Uri                       string
+	TestResultTestResultFiles sql.NullInt64
 }
 
 type TestSummary struct {

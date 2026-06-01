@@ -56,11 +56,6 @@ func (r *buildEventRecorder) saveActionExecuted(ctx context.Context, tx *ent.Cli
 	if actionCompletedID.Label == "" {
 		return nil
 	}
-	// We are only interested in failed actions. If this is changed, some of
-	// the text in the frontend needs to be updated as well.
-	if actionExecuted.Success {
-		return nil
-	}
 
 	create := tx.Action.Create().
 		SetBazelInvocationID(r.InvocationDbID).
@@ -70,10 +65,8 @@ func (r *buildEventRecorder) saveActionExecuted(ctx context.Context, tx *ent.Cli
 		SetCommandLine(actionExecuted.CommandLine)
 
 	if configID := actionCompletedID.Configuration.GetId(); configID != "" {
-		// This results in a database query per ActionExecuted event. This is
-		// acceptable since we only care about failed actions, which are
-		// relatively rare. If we ever care about successful actions as well,
-		// we should batch this work.
+		// This results in a database query per ActionExecuted event. If this
+		// becomes too expensive, we should batch or cache configuration lookups.
 		configDbID, err := tx.Configuration.Query().
 			Where(
 				configuration.ConfigurationID(configID),
@@ -81,9 +74,15 @@ func (r *buildEventRecorder) saveActionExecuted(ctx context.Context, tx *ent.Cli
 			).
 			OnlyID(ctx)
 		if err != nil {
-			return util.StatusWrapf(err, "failed to query Configuration with ID %#v for ActionExecuted", configID)
+			if ent.IsNotFound(err) {
+				configDbID = 0
+			} else {
+				return util.StatusWrapf(err, "failed to query Configuration with ID %#v for ActionExecuted", configID)
+			}
 		}
-		create.SetConfigurationID(configDbID)
+		if configDbID != 0 {
+			create.SetConfigurationID(configDbID)
+		}
 	}
 
 	if actionExecuted.Type != "" {
@@ -96,7 +95,7 @@ func (r *buildEventRecorder) saveActionExecuted(ctx context.Context, tx *ent.Cli
 		create.SetFailureCode(failureCode)
 	}
 	if actionExecuted.StartTime != nil {
-		create.SetStartTime(actionExecuted.EndTime.AsTime())
+		create.SetStartTime(actionExecuted.StartTime.AsTime())
 	}
 	if actionExecuted.EndTime != nil {
 		create.SetEndTime(actionExecuted.EndTime.AsTime())
