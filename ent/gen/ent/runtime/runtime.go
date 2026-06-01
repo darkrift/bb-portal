@@ -4,11 +4,13 @@ package runtime
 
 import (
 	"context"
+	"time"
 
 	"github.com/buildbarn/bb-portal/ent/authschema"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/authenticateduser"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/build"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/completedaction"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/target"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testresult"
@@ -72,6 +74,12 @@ func init() {
 			return next.Mutate(ctx, m)
 		})
 	}
+	completedactionFields := authschema.CompletedAction{}.Fields()
+	_ = completedactionFields
+	// completedactionDescUploadedAt is the schema descriptor for uploaded_at field.
+	completedactionDescUploadedAt := completedactionFields[16].Descriptor()
+	// completedaction.DefaultUploadedAt holds the default value on creation for the uploaded_at field.
+	completedaction.DefaultUploadedAt = completedactionDescUploadedAt.Default.(func() time.Time)
 	invocationtargetFields := authschema.InvocationTarget{}.Fields()
 	_ = invocationtargetFields
 	// invocationtargetDescSuccess is the schema descriptor for success field.

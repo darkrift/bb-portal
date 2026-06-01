@@ -36,6 +36,18 @@ func (a *Action) ActionFiles(ctx context.Context) (result []*InvocationFiles, er
 	return result, err
 }
 
+func (a *Action) CompletedActions(ctx context.Context) (result []*CompletedAction, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = a.NamedCompletedActions(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = a.Edges.CompletedActionsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = a.QueryCompletedActions().All(ctx)
+	}
+	return result, err
+}
+
 func (acs *ActionCacheStatistics) ActionSummary(ctx context.Context) (*ActionSummary, error) {
 	result, err := acs.Edges.ActionSummaryOrErr()
 	if IsNotLoaded(err) {
@@ -210,6 +222,18 @@ func (bi *BazelInvocation) Actions(ctx context.Context) (result []*Action, err e
 	return result, err
 }
 
+func (bi *BazelInvocation) CompletedActions(ctx context.Context) (result []*CompletedAction, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = bi.NamedCompletedActions(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = bi.Edges.CompletedActionsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = bi.QueryCompletedActions().All(ctx)
+	}
+	return result, err
+}
+
 func (bi *BazelInvocation) Metrics(ctx context.Context) (*Metrics, error) {
 	result, err := bi.Edges.MetricsOrErr()
 	if IsNotLoaded(err) {
@@ -238,7 +262,7 @@ func (bi *BazelInvocation) InvocationTargets(
 		WithInvocationTargetFilter(where.Filter),
 	}
 	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := bi.Edges.totalCount[9][alias]
+	totalCount, hasTotalCount := bi.Edges.totalCount[10][alias]
 	if nodes, err := bi.NamedInvocationTargets(alias); err == nil || hasTotalCount {
 		pager, err := newInvocationTargetPager(opts, last != nil)
 		if err != nil {
@@ -327,6 +351,22 @@ func (bt *BuildTag) Build(ctx context.Context) (*Build, error) {
 		result, err = bt.QueryBuild().Only(ctx)
 	}
 	return result, err
+}
+
+func (ca *CompletedAction) BazelInvocation(ctx context.Context) (*BazelInvocation, error) {
+	result, err := ca.Edges.BazelInvocationOrErr()
+	if IsNotLoaded(err) {
+		result, err = ca.QueryBazelInvocation().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (ca *CompletedAction) Action(ctx context.Context) (*Action, error) {
+	result, err := ca.Edges.ActionOrErr()
+	if IsNotLoaded(err) {
+		result, err = ca.QueryAction().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }
 
 func (c *Configuration) BazelInvocation(ctx context.Context) (*BazelInvocation, error) {

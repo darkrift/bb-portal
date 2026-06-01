@@ -105,6 +105,17 @@ local semaphoreExtractor = importstr 'semaphore.jmespath';
     buildKey: "build_id",
   },
 
+  // CompletedActionLogger can be disabled by not setting this field. It uses
+  // the BES database, but has separate gRPC listeners and authentication
+  // policy from the BES service.
+  completedActionLoggerServiceConfiguration: {
+    grpcServers: [{
+      listenAddresses: [':8982'],
+      authenticationPolicy: { allow: {} },
+      maximumReceivedMessageSizeBytes: 10 * 1024 * 1024,
+    }],
+  },
+
   // The SchedulerService can be disabled by not setting this field.
   schedulerServiceConfiguration: {
     buildQueueStateClient: {

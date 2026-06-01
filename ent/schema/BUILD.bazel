@@ -14,6 +14,7 @@ go_library(
         "buildgraphmetrics.go",
         "buildlogchunk.go",
         "buildtag.go",
+        "completedaction.go",
         "configuration.go",
         "connectionmetadata.go",
         "eventmetadata.go",

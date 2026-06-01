@@ -1065,6 +1065,29 @@ func HasActionsWith(preds ...predicate.Action) predicate.BazelInvocation {
 	})
 }
 
+// HasCompletedActions applies the HasEdge predicate on the "completed_actions" edge.
+func HasCompletedActions() predicate.BazelInvocation {
+	return predicate.BazelInvocation(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CompletedActionsTable, CompletedActionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCompletedActionsWith applies the HasEdge predicate on the "completed_actions" edge with a given conditions (other predicates).
+func HasCompletedActionsWith(preds ...predicate.CompletedAction) predicate.BazelInvocation {
+	return predicate.BazelInvocation(func(s *sql.Selector) {
+		step := newCompletedActionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasMetrics applies the HasEdge predicate on the "metrics" edge.
 func HasMetrics() predicate.BazelInvocation {
 	return predicate.BazelInvocation(func(s *sql.Selector) {

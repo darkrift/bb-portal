@@ -3,6 +3,7 @@
 package migrate
 
 import (
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
@@ -438,6 +439,81 @@ var (
 				Name:    "buildtag_key_value_build_id",
 				Unique:  true,
 				Columns: []*schema.Column{BuildTagsColumns[1], BuildTagsColumns[2], BuildTagsColumns[3]},
+			},
+		},
+	}
+	// CompletedActionsColumns holds the columns for the "completed_actions" table.
+	CompletedActionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "uuid", Type: field.TypeString, Unique: true},
+		{Name: "instance_name", Type: field.TypeString},
+		{Name: "action_digest_hash", Type: field.TypeString},
+		{Name: "action_digest_size_bytes", Type: field.TypeInt64},
+		{Name: "digest_function", Type: field.TypeString, Nullable: true},
+		{Name: "tool_invocation_id", Type: field.TypeString, Nullable: true},
+		{Name: "correlated_invocations_id", Type: field.TypeString, Nullable: true},
+		{Name: "target_id", Type: field.TypeString, Nullable: true},
+		{Name: "action_mnemonic", Type: field.TypeString, Nullable: true},
+		{Name: "cache_hit", Type: field.TypeBool, Nullable: true},
+		{Name: "exit_code", Type: field.TypeInt32, Nullable: true},
+		{Name: "status_code", Type: field.TypeInt32, Nullable: true},
+		{Name: "status_message", Type: field.TypeString, Nullable: true},
+		{Name: "queued_at", Type: field.TypeTime, Nullable: true},
+		{Name: "worker_start_at", Type: field.TypeTime, Nullable: true},
+		{Name: "worker_completed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "uploaded_at", Type: field.TypeTime},
+		{Name: "stdout_hash", Type: field.TypeString, Nullable: true},
+		{Name: "stdout_size_bytes", Type: field.TypeInt64, Nullable: true},
+		{Name: "stderr_hash", Type: field.TypeString, Nullable: true},
+		{Name: "stderr_size_bytes", Type: field.TypeInt64, Nullable: true},
+		{Name: "historical_execute_response", Type: field.TypeBytes, Nullable: true},
+		{Name: "action_completed_actions", Type: field.TypeInt64, Nullable: true},
+		{Name: "bazel_invocation_completed_actions", Type: field.TypeInt64, Nullable: true},
+	}
+	// CompletedActionsTable holds the schema information for the "completed_actions" table.
+	CompletedActionsTable = &schema.Table{
+		Name:       "completed_actions",
+		Columns:    CompletedActionsColumns,
+		PrimaryKey: []*schema.Column{CompletedActionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "completed_actions_actions_completed_actions",
+				Columns:    []*schema.Column{CompletedActionsColumns[23]},
+				RefColumns: []*schema.Column{ActionsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "completed_actions_bazel_invocations_completed_actions",
+				Columns:    []*schema.Column{CompletedActionsColumns[24]},
+				RefColumns: []*schema.Column{BazelInvocationsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "completedaction_instance_name_action_digest_hash_action_digest_size_bytes_digest_function",
+				Unique:  false,
+				Columns: []*schema.Column{CompletedActionsColumns[2], CompletedActionsColumns[3], CompletedActionsColumns[4], CompletedActionsColumns[5]},
+			},
+			{
+				Name:    "completedaction_tool_invocation_id",
+				Unique:  false,
+				Columns: []*schema.Column{CompletedActionsColumns[6]},
+			},
+			{
+				Name:    "completedaction_target_id",
+				Unique:  false,
+				Columns: []*schema.Column{CompletedActionsColumns[8]},
+			},
+			{
+				Name:    "completedaction_bazel_invocation_completed_actions",
+				Unique:  false,
+				Columns: []*schema.Column{CompletedActionsColumns[24]},
+			},
+			{
+				Name:    "completedaction_action_completed_actions",
+				Unique:  false,
+				Columns: []*schema.Column{CompletedActionsColumns[23]},
 			},
 		},
 	}
@@ -1257,6 +1333,7 @@ var (
 		BuildGraphMetricsTable,
 		BuildLogChunksTable,
 		BuildTagsTable,
+		CompletedActionsTable,
 		ConfigurationsTable,
 		ConnectionMetadataTable,
 		EventMetadataTable,
@@ -1298,6 +1375,11 @@ func init() {
 	BuildGraphMetricsTable.ForeignKeys[0].RefTable = MetricsTable
 	BuildLogChunksTable.ForeignKeys[0].RefTable = BazelInvocationsTable
 	BuildTagsTable.ForeignKeys[0].RefTable = BuildsTable
+	CompletedActionsTable.ForeignKeys[0].RefTable = ActionsTable
+	CompletedActionsTable.ForeignKeys[1].RefTable = BazelInvocationsTable
+	CompletedActionsTable.Annotation = &entsql.Annotation{
+		Table: "completed_actions",
+	}
 	ConfigurationsTable.ForeignKeys[0].RefTable = BazelInvocationsTable
 	ConnectionMetadataTable.ForeignKeys[0].RefTable = BazelInvocationsTable
 	EventMetadataTable.ForeignKeys[0].RefTable = BazelInvocationsTable

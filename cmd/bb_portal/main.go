@@ -89,7 +89,7 @@ func main() {
 			}
 		}
 		if configuration.BesServiceConfiguration != nil {
-			if err = bep.NewBuildEventProtocolService(
+			besDatabase, err := bep.NewBuildEventProtocolService(
 				configuration.BesServiceConfiguration,
 				siblingsGroup,
 				dependenciesGroup,
@@ -97,9 +97,22 @@ func main() {
 				instanceNameAuthorizer,
 				router,
 				tracerProvider,
-			); err != nil {
+			)
+			if err != nil {
 				return util.StatusWrap(err, "Failed to create BES service")
 			}
+			if configuration.CompletedActionLoggerServiceConfiguration != nil {
+				if err = bep.NewCompletedActionLoggerService(
+					configuration.CompletedActionLoggerServiceConfiguration,
+					besDatabase,
+					siblingsGroup,
+					grpcClientFactory,
+				); err != nil {
+					return util.StatusWrap(err, "Failed to create CompletedActionLogger service")
+				}
+			}
+		} else if configuration.CompletedActionLoggerServiceConfiguration != nil {
+			return status.Error(codes.InvalidArgument, "CompletedActionLoggerServiceConfiguration requires BesServiceConfiguration")
 		}
 
 		// This must be the last service created for the router, as it will

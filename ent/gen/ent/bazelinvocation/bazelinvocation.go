@@ -69,6 +69,8 @@ const (
 	EdgeConfigurations = "configurations"
 	// EdgeActions holds the string denoting the actions edge name in mutations.
 	EdgeActions = "actions"
+	// EdgeCompletedActions holds the string denoting the completed_actions edge name in mutations.
+	EdgeCompletedActions = "completed_actions"
 	// EdgeMetrics holds the string denoting the metrics edge name in mutations.
 	EdgeMetrics = "metrics"
 	// EdgeIncompleteBuildLogs holds the string denoting the incomplete_build_logs edge name in mutations.
@@ -141,6 +143,13 @@ const (
 	ActionsInverseTable = "actions"
 	// ActionsColumn is the table column denoting the actions relation/edge.
 	ActionsColumn = "bazel_invocation_id"
+	// CompletedActionsTable is the table that holds the completed_actions relation/edge.
+	CompletedActionsTable = "completed_actions"
+	// CompletedActionsInverseTable is the table name for the CompletedAction entity.
+	// It exists in this package in order to avoid circular dependency with the "completedaction" package.
+	CompletedActionsInverseTable = "completed_actions"
+	// CompletedActionsColumn is the table column denoting the completed_actions relation/edge.
+	CompletedActionsColumn = "bazel_invocation_completed_actions"
 	// MetricsTable is the table that holds the metrics relation/edge.
 	MetricsTable = "metrics"
 	// MetricsInverseTable is the table name for the Metrics entity.
@@ -425,6 +434,20 @@ func ByActions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByCompletedActionsCount orders the results by completed_actions count.
+func ByCompletedActionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCompletedActionsStep(), opts...)
+	}
+}
+
+// ByCompletedActions orders the results by completed_actions terms.
+func ByCompletedActions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCompletedActionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByMetricsField orders the results by metrics field.
 func ByMetricsField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -569,6 +592,13 @@ func newActionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ActionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ActionsTable, ActionsColumn),
+	)
+}
+func newCompletedActionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CompletedActionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CompletedActionsTable, CompletedActionsColumn),
 	)
 }
 func newMetricsStep() *sqlgraph.Step {

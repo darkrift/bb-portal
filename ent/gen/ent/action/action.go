@@ -52,6 +52,8 @@ const (
 	EdgeConfiguration = "configuration"
 	// EdgeActionFiles holds the string denoting the action_files edge name in mutations.
 	EdgeActionFiles = "action_files"
+	// EdgeCompletedActions holds the string denoting the completed_actions edge name in mutations.
+	EdgeCompletedActions = "completed_actions"
 	// Table holds the table name of the action in the database.
 	Table = "actions"
 	// BazelInvocationTable is the table that holds the bazel_invocation relation/edge.
@@ -75,6 +77,13 @@ const (
 	ActionFilesInverseTable = "invocation_files"
 	// ActionFilesColumn is the table column denoting the action_files relation/edge.
 	ActionFilesColumn = "action_action_files"
+	// CompletedActionsTable is the table that holds the completed_actions relation/edge.
+	CompletedActionsTable = "completed_actions"
+	// CompletedActionsInverseTable is the table name for the CompletedAction entity.
+	// It exists in this package in order to avoid circular dependency with the "completedaction" package.
+	CompletedActionsInverseTable = "completed_actions"
+	// CompletedActionsColumn is the table column denoting the completed_actions relation/edge.
+	CompletedActionsColumn = "action_completed_actions"
 )
 
 // Columns holds all SQL columns for action fields.
@@ -224,6 +233,20 @@ func ByActionFiles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newActionFilesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCompletedActionsCount orders the results by completed_actions count.
+func ByCompletedActionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCompletedActionsStep(), opts...)
+	}
+}
+
+// ByCompletedActions orders the results by completed_actions terms.
+func ByCompletedActions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCompletedActionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newBazelInvocationStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -243,5 +266,12 @@ func newActionFilesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ActionFilesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ActionFilesTable, ActionFilesColumn),
+	)
+}
+func newCompletedActionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CompletedActionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CompletedActionsTable, CompletedActionsColumn),
 	)
 }

@@ -31,6 +31,8 @@ type (
 	Configuration struct{ schema.Configuration }
 	// ConnectionMetadata reexport with auth policy added
 	ConnectionMetadata struct{ schema.ConnectionMetadata }
+	// CompletedAction reexport with auth policy added
+	CompletedAction struct{ schema.CompletedAction }
 	// EventMetadata reexport with auth policy added
 	EventMetadata struct{ schema.EventMetadata }
 	// GarbageMetrics reexport with auth policy added

@@ -199,6 +199,12 @@ message BuildEventStreamService {
   string build_key = 12;
 }
 
+message CompletedActionLoggerService {
+  // gRPC servers to spawn to listen for CompletedActionLogger requests from
+  // workers.
+  repeated buildbarn.configuration.grpc.ServerConfiguration grpc_servers = 1;
+}
+
 message SchedulerService {
   // Configures the gRPC-Web proxies that are used from the web UI to
   // communicate with the Buildbarn.
@@ -284,4 +290,10 @@ message ApplicationConfiguration {
       initial_size_class_cache = 13;
   buildbarn.configuration.blobstore.BlobAccessConfiguration
       file_system_access_cache = 14;
+
+  // Config for starting the CompletedActionLogger service. If omitted,
+  // completed actions will not be accepted. This service requires
+  // bes_service_configuration to be set, as it stores data in the BES database.
+  CompletedActionLoggerService completed_action_logger_service_configuration =
+      15;
 }

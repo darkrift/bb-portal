@@ -68,13 +68,16 @@ type ActionEdges struct {
 	Configuration *Configuration `json:"configuration,omitempty"`
 	// ActionFiles holds the value of the action_files edge.
 	ActionFiles []*InvocationFiles `json:"action_files,omitempty"`
+	// CompletedActions holds the value of the completed_actions edge.
+	CompletedActions []*CompletedAction `json:"completed_actions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [4]map[string]int
 
-	namedActionFiles map[string][]*InvocationFiles
+	namedActionFiles      map[string][]*InvocationFiles
+	namedCompletedActions map[string][]*CompletedAction
 }
 
 // BazelInvocationOrErr returns the BazelInvocation value or an error if the edge
@@ -106,6 +109,15 @@ func (e ActionEdges) ActionFilesOrErr() ([]*InvocationFiles, error) {
 		return e.ActionFiles, nil
 	}
 	return nil, &NotLoadedError{edge: "action_files"}
+}
+
+// CompletedActionsOrErr returns the CompletedActions value or an error if the edge
+// was not loaded in eager-loading.
+func (e ActionEdges) CompletedActionsOrErr() ([]*CompletedAction, error) {
+	if e.loadedTypes[3] {
+		return e.CompletedActions, nil
+	}
+	return nil, &NotLoadedError{edge: "completed_actions"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -276,6 +288,11 @@ func (a *Action) QueryActionFiles() *InvocationFilesQuery {
 	return NewActionClient(a.config).QueryActionFiles(a)
 }
 
+// QueryCompletedActions queries the "completed_actions" edge of the Action entity.
+func (a *Action) QueryCompletedActions() *CompletedActionQuery {
+	return NewActionClient(a.config).QueryCompletedActions(a)
+}
+
 // Update returns a builder for updating this Action.
 // Note that you need to call Action.Unwrap() before calling this method if this Action
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -374,6 +391,30 @@ func (a *Action) appendNamedActionFiles(name string, edges ...*InvocationFiles) 
 		a.Edges.namedActionFiles[name] = []*InvocationFiles{}
 	} else {
 		a.Edges.namedActionFiles[name] = append(a.Edges.namedActionFiles[name], edges...)
+	}
+}
+
+// NamedCompletedActions returns the CompletedActions named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (a *Action) NamedCompletedActions(name string) ([]*CompletedAction, error) {
+	if a.Edges.namedCompletedActions == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := a.Edges.namedCompletedActions[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (a *Action) appendNamedCompletedActions(name string, edges ...*CompletedAction) {
+	if a.Edges.namedCompletedActions == nil {
+		a.Edges.namedCompletedActions = make(map[string][]*CompletedAction)
+	}
+	if len(edges) == 0 {
+		a.Edges.namedCompletedActions[name] = []*CompletedAction{}
+	} else {
+		a.Edges.namedCompletedActions[name] = append(a.Edges.namedCompletedActions[name], edges...)
 	}
 }
 

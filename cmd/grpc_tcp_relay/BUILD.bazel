@@ -1,0 +1,28 @@
+load("@com_github_buildbarn_bb_storage//tools:container.bzl", "multiarch_go_image")
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+load("@rules_img//img:load.bzl", "image_load")
+
+go_library(
+    name = "grpc_tcp_relay_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/buildbarn/bb-portal/cmd/grpc_tcp_relay",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "grpc_tcp_relay",
+    embed = [":grpc_tcp_relay_lib"],
+    visibility = ["//visibility:public"],
+)
+
+multiarch_go_image(
+    name = "grpc_tcp_relay_container",
+    binary = ":grpc_tcp_relay",
+)
+
+image_load(
+    name = "grpc_tcp_relay_container_load",
+    image = ":grpc_tcp_relay_container",
+    tag = "bb-portal/grpc-tcp-relay:local",
+    visibility = ["//visibility:public"],
+)

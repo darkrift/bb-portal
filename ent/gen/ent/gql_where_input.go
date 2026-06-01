@@ -17,6 +17,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/build"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildgraphmetrics"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildtag"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/completedaction"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/connectionmetadata"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/garbagemetrics"
@@ -270,6 +271,10 @@ type ActionWhereInput struct {
 	// "action_files" edge predicates.
 	HasActionFiles     *bool                        `json:"hasActionFiles,omitempty"`
 	HasActionFilesWith []*InvocationFilesWhereInput `json:"hasActionFilesWith,omitempty"`
+
+	// "completed_actions" edge predicates.
+	HasCompletedActions     *bool                        `json:"hasCompletedActions,omitempty"`
+	HasCompletedActionsWith []*CompletedActionWhereInput `json:"hasCompletedActionsWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -937,6 +942,24 @@ func (i *ActionWhereInput) P() (predicate.Action, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, action.HasActionFilesWith(with...))
+	}
+	if i.HasCompletedActions != nil {
+		p := action.HasCompletedActions()
+		if !*i.HasCompletedActions {
+			p = action.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCompletedActionsWith) > 0 {
+		with := make([]predicate.CompletedAction, 0, len(i.HasCompletedActionsWith))
+		for _, w := range i.HasCompletedActionsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasCompletedActionsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, action.HasCompletedActionsWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -3136,6 +3159,10 @@ type BazelInvocationWhereInput struct {
 	HasActions     *bool               `json:"hasActions,omitempty"`
 	HasActionsWith []*ActionWhereInput `json:"hasActionsWith,omitempty"`
 
+	// "completed_actions" edge predicates.
+	HasCompletedActions     *bool                        `json:"hasCompletedActions,omitempty"`
+	HasCompletedActionsWith []*CompletedActionWhereInput `json:"hasCompletedActionsWith,omitempty"`
+
 	// "metrics" edge predicates.
 	HasMetrics     *bool                `json:"hasMetrics,omitempty"`
 	HasMetricsWith []*MetricsWhereInput `json:"hasMetricsWith,omitempty"`
@@ -3749,6 +3776,24 @@ func (i *BazelInvocationWhereInput) P() (predicate.BazelInvocation, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, bazelinvocation.HasActionsWith(with...))
+	}
+	if i.HasCompletedActions != nil {
+		p := bazelinvocation.HasCompletedActions()
+		if !*i.HasCompletedActions {
+			p = bazelinvocation.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCompletedActionsWith) > 0 {
+		with := make([]predicate.CompletedAction, 0, len(i.HasCompletedActionsWith))
+		for _, w := range i.HasCompletedActionsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasCompletedActionsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, bazelinvocation.HasCompletedActionsWith(with...))
 	}
 	if i.HasMetrics != nil {
 		p := bazelinvocation.HasMetrics()
@@ -4865,6 +4910,1212 @@ func (i *BuildTagWhereInput) P() (predicate.BuildTag, error) {
 		return predicates[0], nil
 	default:
 		return buildtag.And(predicates...), nil
+	}
+}
+
+// CompletedActionWhereInput represents a where input for filtering CompletedAction queries.
+type CompletedActionWhereInput struct {
+	Predicates []predicate.CompletedAction  `json:"-"`
+	Not        *CompletedActionWhereInput   `json:"not,omitempty"`
+	Or         []*CompletedActionWhereInput `json:"or,omitempty"`
+	And        []*CompletedActionWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int64  `json:"id,omitempty"`
+	IDNEQ   *int64  `json:"idNEQ,omitempty"`
+	IDIn    []int64 `json:"idIn,omitempty"`
+	IDNotIn []int64 `json:"idNotIn,omitempty"`
+	IDGT    *int64  `json:"idGT,omitempty"`
+	IDGTE   *int64  `json:"idGTE,omitempty"`
+	IDLT    *int64  `json:"idLT,omitempty"`
+	IDLTE   *int64  `json:"idLTE,omitempty"`
+
+	// "uuid" field predicates.
+	UUID             *string  `json:"uuid,omitempty"`
+	UUIDNEQ          *string  `json:"uuidNEQ,omitempty"`
+	UUIDIn           []string `json:"uuidIn,omitempty"`
+	UUIDNotIn        []string `json:"uuidNotIn,omitempty"`
+	UUIDGT           *string  `json:"uuidGT,omitempty"`
+	UUIDGTE          *string  `json:"uuidGTE,omitempty"`
+	UUIDLT           *string  `json:"uuidLT,omitempty"`
+	UUIDLTE          *string  `json:"uuidLTE,omitempty"`
+	UUIDContains     *string  `json:"uuidContains,omitempty"`
+	UUIDHasPrefix    *string  `json:"uuidHasPrefix,omitempty"`
+	UUIDHasSuffix    *string  `json:"uuidHasSuffix,omitempty"`
+	UUIDEqualFold    *string  `json:"uuidEqualFold,omitempty"`
+	UUIDContainsFold *string  `json:"uuidContainsFold,omitempty"`
+
+	// "instance_name" field predicates.
+	InstanceName             *string  `json:"instanceName,omitempty"`
+	InstanceNameNEQ          *string  `json:"instanceNameNEQ,omitempty"`
+	InstanceNameIn           []string `json:"instanceNameIn,omitempty"`
+	InstanceNameNotIn        []string `json:"instanceNameNotIn,omitempty"`
+	InstanceNameGT           *string  `json:"instanceNameGT,omitempty"`
+	InstanceNameGTE          *string  `json:"instanceNameGTE,omitempty"`
+	InstanceNameLT           *string  `json:"instanceNameLT,omitempty"`
+	InstanceNameLTE          *string  `json:"instanceNameLTE,omitempty"`
+	InstanceNameContains     *string  `json:"instanceNameContains,omitempty"`
+	InstanceNameHasPrefix    *string  `json:"instanceNameHasPrefix,omitempty"`
+	InstanceNameHasSuffix    *string  `json:"instanceNameHasSuffix,omitempty"`
+	InstanceNameEqualFold    *string  `json:"instanceNameEqualFold,omitempty"`
+	InstanceNameContainsFold *string  `json:"instanceNameContainsFold,omitempty"`
+
+	// "action_digest_hash" field predicates.
+	ActionDigestHash             *string  `json:"actionDigestHash,omitempty"`
+	ActionDigestHashNEQ          *string  `json:"actionDigestHashNEQ,omitempty"`
+	ActionDigestHashIn           []string `json:"actionDigestHashIn,omitempty"`
+	ActionDigestHashNotIn        []string `json:"actionDigestHashNotIn,omitempty"`
+	ActionDigestHashGT           *string  `json:"actionDigestHashGT,omitempty"`
+	ActionDigestHashGTE          *string  `json:"actionDigestHashGTE,omitempty"`
+	ActionDigestHashLT           *string  `json:"actionDigestHashLT,omitempty"`
+	ActionDigestHashLTE          *string  `json:"actionDigestHashLTE,omitempty"`
+	ActionDigestHashContains     *string  `json:"actionDigestHashContains,omitempty"`
+	ActionDigestHashHasPrefix    *string  `json:"actionDigestHashHasPrefix,omitempty"`
+	ActionDigestHashHasSuffix    *string  `json:"actionDigestHashHasSuffix,omitempty"`
+	ActionDigestHashEqualFold    *string  `json:"actionDigestHashEqualFold,omitempty"`
+	ActionDigestHashContainsFold *string  `json:"actionDigestHashContainsFold,omitempty"`
+
+	// "action_digest_size_bytes" field predicates.
+	ActionDigestSizeBytes      *int64  `json:"actionDigestSizeBytes,omitempty"`
+	ActionDigestSizeBytesNEQ   *int64  `json:"actionDigestSizeBytesNEQ,omitempty"`
+	ActionDigestSizeBytesIn    []int64 `json:"actionDigestSizeBytesIn,omitempty"`
+	ActionDigestSizeBytesNotIn []int64 `json:"actionDigestSizeBytesNotIn,omitempty"`
+	ActionDigestSizeBytesGT    *int64  `json:"actionDigestSizeBytesGT,omitempty"`
+	ActionDigestSizeBytesGTE   *int64  `json:"actionDigestSizeBytesGTE,omitempty"`
+	ActionDigestSizeBytesLT    *int64  `json:"actionDigestSizeBytesLT,omitempty"`
+	ActionDigestSizeBytesLTE   *int64  `json:"actionDigestSizeBytesLTE,omitempty"`
+
+	// "digest_function" field predicates.
+	DigestFunction             *string  `json:"digestFunction,omitempty"`
+	DigestFunctionNEQ          *string  `json:"digestFunctionNEQ,omitempty"`
+	DigestFunctionIn           []string `json:"digestFunctionIn,omitempty"`
+	DigestFunctionNotIn        []string `json:"digestFunctionNotIn,omitempty"`
+	DigestFunctionGT           *string  `json:"digestFunctionGT,omitempty"`
+	DigestFunctionGTE          *string  `json:"digestFunctionGTE,omitempty"`
+	DigestFunctionLT           *string  `json:"digestFunctionLT,omitempty"`
+	DigestFunctionLTE          *string  `json:"digestFunctionLTE,omitempty"`
+	DigestFunctionContains     *string  `json:"digestFunctionContains,omitempty"`
+	DigestFunctionHasPrefix    *string  `json:"digestFunctionHasPrefix,omitempty"`
+	DigestFunctionHasSuffix    *string  `json:"digestFunctionHasSuffix,omitempty"`
+	DigestFunctionIsNil        bool     `json:"digestFunctionIsNil,omitempty"`
+	DigestFunctionNotNil       bool     `json:"digestFunctionNotNil,omitempty"`
+	DigestFunctionEqualFold    *string  `json:"digestFunctionEqualFold,omitempty"`
+	DigestFunctionContainsFold *string  `json:"digestFunctionContainsFold,omitempty"`
+
+	// "tool_invocation_id" field predicates.
+	ToolInvocationID             *string  `json:"toolInvocationID,omitempty"`
+	ToolInvocationIDNEQ          *string  `json:"toolInvocationIDNEQ,omitempty"`
+	ToolInvocationIDIn           []string `json:"toolInvocationIDIn,omitempty"`
+	ToolInvocationIDNotIn        []string `json:"toolInvocationIDNotIn,omitempty"`
+	ToolInvocationIDGT           *string  `json:"toolInvocationIDGT,omitempty"`
+	ToolInvocationIDGTE          *string  `json:"toolInvocationIDGTE,omitempty"`
+	ToolInvocationIDLT           *string  `json:"toolInvocationIDLT,omitempty"`
+	ToolInvocationIDLTE          *string  `json:"toolInvocationIDLTE,omitempty"`
+	ToolInvocationIDContains     *string  `json:"toolInvocationIDContains,omitempty"`
+	ToolInvocationIDHasPrefix    *string  `json:"toolInvocationIDHasPrefix,omitempty"`
+	ToolInvocationIDHasSuffix    *string  `json:"toolInvocationIDHasSuffix,omitempty"`
+	ToolInvocationIDIsNil        bool     `json:"toolInvocationIDIsNil,omitempty"`
+	ToolInvocationIDNotNil       bool     `json:"toolInvocationIDNotNil,omitempty"`
+	ToolInvocationIDEqualFold    *string  `json:"toolInvocationIDEqualFold,omitempty"`
+	ToolInvocationIDContainsFold *string  `json:"toolInvocationIDContainsFold,omitempty"`
+
+	// "correlated_invocations_id" field predicates.
+	CorrelatedInvocationsID             *string  `json:"correlatedInvocationsID,omitempty"`
+	CorrelatedInvocationsIDNEQ          *string  `json:"correlatedInvocationsIDNEQ,omitempty"`
+	CorrelatedInvocationsIDIn           []string `json:"correlatedInvocationsIDIn,omitempty"`
+	CorrelatedInvocationsIDNotIn        []string `json:"correlatedInvocationsIDNotIn,omitempty"`
+	CorrelatedInvocationsIDGT           *string  `json:"correlatedInvocationsIDGT,omitempty"`
+	CorrelatedInvocationsIDGTE          *string  `json:"correlatedInvocationsIDGTE,omitempty"`
+	CorrelatedInvocationsIDLT           *string  `json:"correlatedInvocationsIDLT,omitempty"`
+	CorrelatedInvocationsIDLTE          *string  `json:"correlatedInvocationsIDLTE,omitempty"`
+	CorrelatedInvocationsIDContains     *string  `json:"correlatedInvocationsIDContains,omitempty"`
+	CorrelatedInvocationsIDHasPrefix    *string  `json:"correlatedInvocationsIDHasPrefix,omitempty"`
+	CorrelatedInvocationsIDHasSuffix    *string  `json:"correlatedInvocationsIDHasSuffix,omitempty"`
+	CorrelatedInvocationsIDIsNil        bool     `json:"correlatedInvocationsIDIsNil,omitempty"`
+	CorrelatedInvocationsIDNotNil       bool     `json:"correlatedInvocationsIDNotNil,omitempty"`
+	CorrelatedInvocationsIDEqualFold    *string  `json:"correlatedInvocationsIDEqualFold,omitempty"`
+	CorrelatedInvocationsIDContainsFold *string  `json:"correlatedInvocationsIDContainsFold,omitempty"`
+
+	// "target_id" field predicates.
+	TargetID             *string  `json:"targetID,omitempty"`
+	TargetIDNEQ          *string  `json:"targetIDNEQ,omitempty"`
+	TargetIDIn           []string `json:"targetIDIn,omitempty"`
+	TargetIDNotIn        []string `json:"targetIDNotIn,omitempty"`
+	TargetIDGT           *string  `json:"targetIDGT,omitempty"`
+	TargetIDGTE          *string  `json:"targetIDGTE,omitempty"`
+	TargetIDLT           *string  `json:"targetIDLT,omitempty"`
+	TargetIDLTE          *string  `json:"targetIDLTE,omitempty"`
+	TargetIDContains     *string  `json:"targetIDContains,omitempty"`
+	TargetIDHasPrefix    *string  `json:"targetIDHasPrefix,omitempty"`
+	TargetIDHasSuffix    *string  `json:"targetIDHasSuffix,omitempty"`
+	TargetIDIsNil        bool     `json:"targetIDIsNil,omitempty"`
+	TargetIDNotNil       bool     `json:"targetIDNotNil,omitempty"`
+	TargetIDEqualFold    *string  `json:"targetIDEqualFold,omitempty"`
+	TargetIDContainsFold *string  `json:"targetIDContainsFold,omitempty"`
+
+	// "action_mnemonic" field predicates.
+	ActionMnemonic             *string  `json:"actionMnemonic,omitempty"`
+	ActionMnemonicNEQ          *string  `json:"actionMnemonicNEQ,omitempty"`
+	ActionMnemonicIn           []string `json:"actionMnemonicIn,omitempty"`
+	ActionMnemonicNotIn        []string `json:"actionMnemonicNotIn,omitempty"`
+	ActionMnemonicGT           *string  `json:"actionMnemonicGT,omitempty"`
+	ActionMnemonicGTE          *string  `json:"actionMnemonicGTE,omitempty"`
+	ActionMnemonicLT           *string  `json:"actionMnemonicLT,omitempty"`
+	ActionMnemonicLTE          *string  `json:"actionMnemonicLTE,omitempty"`
+	ActionMnemonicContains     *string  `json:"actionMnemonicContains,omitempty"`
+	ActionMnemonicHasPrefix    *string  `json:"actionMnemonicHasPrefix,omitempty"`
+	ActionMnemonicHasSuffix    *string  `json:"actionMnemonicHasSuffix,omitempty"`
+	ActionMnemonicIsNil        bool     `json:"actionMnemonicIsNil,omitempty"`
+	ActionMnemonicNotNil       bool     `json:"actionMnemonicNotNil,omitempty"`
+	ActionMnemonicEqualFold    *string  `json:"actionMnemonicEqualFold,omitempty"`
+	ActionMnemonicContainsFold *string  `json:"actionMnemonicContainsFold,omitempty"`
+
+	// "cache_hit" field predicates.
+	CacheHit       *bool `json:"cacheHit,omitempty"`
+	CacheHitNEQ    *bool `json:"cacheHitNEQ,omitempty"`
+	CacheHitIsNil  bool  `json:"cacheHitIsNil,omitempty"`
+	CacheHitNotNil bool  `json:"cacheHitNotNil,omitempty"`
+
+	// "exit_code" field predicates.
+	ExitCode       *int32  `json:"exitCode,omitempty"`
+	ExitCodeNEQ    *int32  `json:"exitCodeNEQ,omitempty"`
+	ExitCodeIn     []int32 `json:"exitCodeIn,omitempty"`
+	ExitCodeNotIn  []int32 `json:"exitCodeNotIn,omitempty"`
+	ExitCodeGT     *int32  `json:"exitCodeGT,omitempty"`
+	ExitCodeGTE    *int32  `json:"exitCodeGTE,omitempty"`
+	ExitCodeLT     *int32  `json:"exitCodeLT,omitempty"`
+	ExitCodeLTE    *int32  `json:"exitCodeLTE,omitempty"`
+	ExitCodeIsNil  bool    `json:"exitCodeIsNil,omitempty"`
+	ExitCodeNotNil bool    `json:"exitCodeNotNil,omitempty"`
+
+	// "status_code" field predicates.
+	StatusCode       *int32  `json:"statusCode,omitempty"`
+	StatusCodeNEQ    *int32  `json:"statusCodeNEQ,omitempty"`
+	StatusCodeIn     []int32 `json:"statusCodeIn,omitempty"`
+	StatusCodeNotIn  []int32 `json:"statusCodeNotIn,omitempty"`
+	StatusCodeGT     *int32  `json:"statusCodeGT,omitempty"`
+	StatusCodeGTE    *int32  `json:"statusCodeGTE,omitempty"`
+	StatusCodeLT     *int32  `json:"statusCodeLT,omitempty"`
+	StatusCodeLTE    *int32  `json:"statusCodeLTE,omitempty"`
+	StatusCodeIsNil  bool    `json:"statusCodeIsNil,omitempty"`
+	StatusCodeNotNil bool    `json:"statusCodeNotNil,omitempty"`
+
+	// "status_message" field predicates.
+	StatusMessage             *string  `json:"statusMessage,omitempty"`
+	StatusMessageNEQ          *string  `json:"statusMessageNEQ,omitempty"`
+	StatusMessageIn           []string `json:"statusMessageIn,omitempty"`
+	StatusMessageNotIn        []string `json:"statusMessageNotIn,omitempty"`
+	StatusMessageGT           *string  `json:"statusMessageGT,omitempty"`
+	StatusMessageGTE          *string  `json:"statusMessageGTE,omitempty"`
+	StatusMessageLT           *string  `json:"statusMessageLT,omitempty"`
+	StatusMessageLTE          *string  `json:"statusMessageLTE,omitempty"`
+	StatusMessageContains     *string  `json:"statusMessageContains,omitempty"`
+	StatusMessageHasPrefix    *string  `json:"statusMessageHasPrefix,omitempty"`
+	StatusMessageHasSuffix    *string  `json:"statusMessageHasSuffix,omitempty"`
+	StatusMessageIsNil        bool     `json:"statusMessageIsNil,omitempty"`
+	StatusMessageNotNil       bool     `json:"statusMessageNotNil,omitempty"`
+	StatusMessageEqualFold    *string  `json:"statusMessageEqualFold,omitempty"`
+	StatusMessageContainsFold *string  `json:"statusMessageContainsFold,omitempty"`
+
+	// "queued_at" field predicates.
+	QueuedAt       *time.Time  `json:"queuedAt,omitempty"`
+	QueuedAtNEQ    *time.Time  `json:"queuedAtNEQ,omitempty"`
+	QueuedAtIn     []time.Time `json:"queuedAtIn,omitempty"`
+	QueuedAtNotIn  []time.Time `json:"queuedAtNotIn,omitempty"`
+	QueuedAtGT     *time.Time  `json:"queuedAtGT,omitempty"`
+	QueuedAtGTE    *time.Time  `json:"queuedAtGTE,omitempty"`
+	QueuedAtLT     *time.Time  `json:"queuedAtLT,omitempty"`
+	QueuedAtLTE    *time.Time  `json:"queuedAtLTE,omitempty"`
+	QueuedAtIsNil  bool        `json:"queuedAtIsNil,omitempty"`
+	QueuedAtNotNil bool        `json:"queuedAtNotNil,omitempty"`
+
+	// "worker_start_at" field predicates.
+	WorkerStartAt       *time.Time  `json:"workerStartAt,omitempty"`
+	WorkerStartAtNEQ    *time.Time  `json:"workerStartAtNEQ,omitempty"`
+	WorkerStartAtIn     []time.Time `json:"workerStartAtIn,omitempty"`
+	WorkerStartAtNotIn  []time.Time `json:"workerStartAtNotIn,omitempty"`
+	WorkerStartAtGT     *time.Time  `json:"workerStartAtGT,omitempty"`
+	WorkerStartAtGTE    *time.Time  `json:"workerStartAtGTE,omitempty"`
+	WorkerStartAtLT     *time.Time  `json:"workerStartAtLT,omitempty"`
+	WorkerStartAtLTE    *time.Time  `json:"workerStartAtLTE,omitempty"`
+	WorkerStartAtIsNil  bool        `json:"workerStartAtIsNil,omitempty"`
+	WorkerStartAtNotNil bool        `json:"workerStartAtNotNil,omitempty"`
+
+	// "worker_completed_at" field predicates.
+	WorkerCompletedAt       *time.Time  `json:"workerCompletedAt,omitempty"`
+	WorkerCompletedAtNEQ    *time.Time  `json:"workerCompletedAtNEQ,omitempty"`
+	WorkerCompletedAtIn     []time.Time `json:"workerCompletedAtIn,omitempty"`
+	WorkerCompletedAtNotIn  []time.Time `json:"workerCompletedAtNotIn,omitempty"`
+	WorkerCompletedAtGT     *time.Time  `json:"workerCompletedAtGT,omitempty"`
+	WorkerCompletedAtGTE    *time.Time  `json:"workerCompletedAtGTE,omitempty"`
+	WorkerCompletedAtLT     *time.Time  `json:"workerCompletedAtLT,omitempty"`
+	WorkerCompletedAtLTE    *time.Time  `json:"workerCompletedAtLTE,omitempty"`
+	WorkerCompletedAtIsNil  bool        `json:"workerCompletedAtIsNil,omitempty"`
+	WorkerCompletedAtNotNil bool        `json:"workerCompletedAtNotNil,omitempty"`
+
+	// "uploaded_at" field predicates.
+	UploadedAt      *time.Time  `json:"uploadedAt,omitempty"`
+	UploadedAtNEQ   *time.Time  `json:"uploadedAtNEQ,omitempty"`
+	UploadedAtIn    []time.Time `json:"uploadedAtIn,omitempty"`
+	UploadedAtNotIn []time.Time `json:"uploadedAtNotIn,omitempty"`
+	UploadedAtGT    *time.Time  `json:"uploadedAtGT,omitempty"`
+	UploadedAtGTE   *time.Time  `json:"uploadedAtGTE,omitempty"`
+	UploadedAtLT    *time.Time  `json:"uploadedAtLT,omitempty"`
+	UploadedAtLTE   *time.Time  `json:"uploadedAtLTE,omitempty"`
+
+	// "stdout_hash" field predicates.
+	StdoutHash             *string  `json:"stdoutHash,omitempty"`
+	StdoutHashNEQ          *string  `json:"stdoutHashNEQ,omitempty"`
+	StdoutHashIn           []string `json:"stdoutHashIn,omitempty"`
+	StdoutHashNotIn        []string `json:"stdoutHashNotIn,omitempty"`
+	StdoutHashGT           *string  `json:"stdoutHashGT,omitempty"`
+	StdoutHashGTE          *string  `json:"stdoutHashGTE,omitempty"`
+	StdoutHashLT           *string  `json:"stdoutHashLT,omitempty"`
+	StdoutHashLTE          *string  `json:"stdoutHashLTE,omitempty"`
+	StdoutHashContains     *string  `json:"stdoutHashContains,omitempty"`
+	StdoutHashHasPrefix    *string  `json:"stdoutHashHasPrefix,omitempty"`
+	StdoutHashHasSuffix    *string  `json:"stdoutHashHasSuffix,omitempty"`
+	StdoutHashIsNil        bool     `json:"stdoutHashIsNil,omitempty"`
+	StdoutHashNotNil       bool     `json:"stdoutHashNotNil,omitempty"`
+	StdoutHashEqualFold    *string  `json:"stdoutHashEqualFold,omitempty"`
+	StdoutHashContainsFold *string  `json:"stdoutHashContainsFold,omitempty"`
+
+	// "stdout_size_bytes" field predicates.
+	StdoutSizeBytes       *int64  `json:"stdoutSizeBytes,omitempty"`
+	StdoutSizeBytesNEQ    *int64  `json:"stdoutSizeBytesNEQ,omitempty"`
+	StdoutSizeBytesIn     []int64 `json:"stdoutSizeBytesIn,omitempty"`
+	StdoutSizeBytesNotIn  []int64 `json:"stdoutSizeBytesNotIn,omitempty"`
+	StdoutSizeBytesGT     *int64  `json:"stdoutSizeBytesGT,omitempty"`
+	StdoutSizeBytesGTE    *int64  `json:"stdoutSizeBytesGTE,omitempty"`
+	StdoutSizeBytesLT     *int64  `json:"stdoutSizeBytesLT,omitempty"`
+	StdoutSizeBytesLTE    *int64  `json:"stdoutSizeBytesLTE,omitempty"`
+	StdoutSizeBytesIsNil  bool    `json:"stdoutSizeBytesIsNil,omitempty"`
+	StdoutSizeBytesNotNil bool    `json:"stdoutSizeBytesNotNil,omitempty"`
+
+	// "stderr_hash" field predicates.
+	StderrHash             *string  `json:"stderrHash,omitempty"`
+	StderrHashNEQ          *string  `json:"stderrHashNEQ,omitempty"`
+	StderrHashIn           []string `json:"stderrHashIn,omitempty"`
+	StderrHashNotIn        []string `json:"stderrHashNotIn,omitempty"`
+	StderrHashGT           *string  `json:"stderrHashGT,omitempty"`
+	StderrHashGTE          *string  `json:"stderrHashGTE,omitempty"`
+	StderrHashLT           *string  `json:"stderrHashLT,omitempty"`
+	StderrHashLTE          *string  `json:"stderrHashLTE,omitempty"`
+	StderrHashContains     *string  `json:"stderrHashContains,omitempty"`
+	StderrHashHasPrefix    *string  `json:"stderrHashHasPrefix,omitempty"`
+	StderrHashHasSuffix    *string  `json:"stderrHashHasSuffix,omitempty"`
+	StderrHashIsNil        bool     `json:"stderrHashIsNil,omitempty"`
+	StderrHashNotNil       bool     `json:"stderrHashNotNil,omitempty"`
+	StderrHashEqualFold    *string  `json:"stderrHashEqualFold,omitempty"`
+	StderrHashContainsFold *string  `json:"stderrHashContainsFold,omitempty"`
+
+	// "stderr_size_bytes" field predicates.
+	StderrSizeBytes       *int64  `json:"stderrSizeBytes,omitempty"`
+	StderrSizeBytesNEQ    *int64  `json:"stderrSizeBytesNEQ,omitempty"`
+	StderrSizeBytesIn     []int64 `json:"stderrSizeBytesIn,omitempty"`
+	StderrSizeBytesNotIn  []int64 `json:"stderrSizeBytesNotIn,omitempty"`
+	StderrSizeBytesGT     *int64  `json:"stderrSizeBytesGT,omitempty"`
+	StderrSizeBytesGTE    *int64  `json:"stderrSizeBytesGTE,omitempty"`
+	StderrSizeBytesLT     *int64  `json:"stderrSizeBytesLT,omitempty"`
+	StderrSizeBytesLTE    *int64  `json:"stderrSizeBytesLTE,omitempty"`
+	StderrSizeBytesIsNil  bool    `json:"stderrSizeBytesIsNil,omitempty"`
+	StderrSizeBytesNotNil bool    `json:"stderrSizeBytesNotNil,omitempty"`
+
+	// "bazel_invocation" edge predicates.
+	HasBazelInvocation     *bool                        `json:"hasBazelInvocation,omitempty"`
+	HasBazelInvocationWith []*BazelInvocationWhereInput `json:"hasBazelInvocationWith,omitempty"`
+
+	// "action" edge predicates.
+	HasAction     *bool               `json:"hasAction,omitempty"`
+	HasActionWith []*ActionWhereInput `json:"hasActionWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *CompletedActionWhereInput) AddPredicates(predicates ...predicate.CompletedAction) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the CompletedActionWhereInput filter on the CompletedActionQuery builder.
+func (i *CompletedActionWhereInput) Filter(q *CompletedActionQuery) (*CompletedActionQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyCompletedActionWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyCompletedActionWhereInput is returned in case the CompletedActionWhereInput is empty.
+var ErrEmptyCompletedActionWhereInput = errors.New("ent: empty predicate CompletedActionWhereInput")
+
+// P returns a predicate for filtering completedactions.
+// An error is returned if the input is empty or invalid.
+func (i *CompletedActionWhereInput) P() (predicate.CompletedAction, error) {
+	var predicates []predicate.CompletedAction
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, completedaction.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.CompletedAction, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, completedaction.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.CompletedAction, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, completedaction.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, completedaction.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, completedaction.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, completedaction.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, completedaction.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, completedaction.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, completedaction.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, completedaction.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, completedaction.IDLTE(*i.IDLTE))
+	}
+	if i.UUID != nil {
+		predicates = append(predicates, completedaction.UUIDEQ(*i.UUID))
+	}
+	if i.UUIDNEQ != nil {
+		predicates = append(predicates, completedaction.UUIDNEQ(*i.UUIDNEQ))
+	}
+	if len(i.UUIDIn) > 0 {
+		predicates = append(predicates, completedaction.UUIDIn(i.UUIDIn...))
+	}
+	if len(i.UUIDNotIn) > 0 {
+		predicates = append(predicates, completedaction.UUIDNotIn(i.UUIDNotIn...))
+	}
+	if i.UUIDGT != nil {
+		predicates = append(predicates, completedaction.UUIDGT(*i.UUIDGT))
+	}
+	if i.UUIDGTE != nil {
+		predicates = append(predicates, completedaction.UUIDGTE(*i.UUIDGTE))
+	}
+	if i.UUIDLT != nil {
+		predicates = append(predicates, completedaction.UUIDLT(*i.UUIDLT))
+	}
+	if i.UUIDLTE != nil {
+		predicates = append(predicates, completedaction.UUIDLTE(*i.UUIDLTE))
+	}
+	if i.UUIDContains != nil {
+		predicates = append(predicates, completedaction.UUIDContains(*i.UUIDContains))
+	}
+	if i.UUIDHasPrefix != nil {
+		predicates = append(predicates, completedaction.UUIDHasPrefix(*i.UUIDHasPrefix))
+	}
+	if i.UUIDHasSuffix != nil {
+		predicates = append(predicates, completedaction.UUIDHasSuffix(*i.UUIDHasSuffix))
+	}
+	if i.UUIDEqualFold != nil {
+		predicates = append(predicates, completedaction.UUIDEqualFold(*i.UUIDEqualFold))
+	}
+	if i.UUIDContainsFold != nil {
+		predicates = append(predicates, completedaction.UUIDContainsFold(*i.UUIDContainsFold))
+	}
+	if i.InstanceName != nil {
+		predicates = append(predicates, completedaction.InstanceNameEQ(*i.InstanceName))
+	}
+	if i.InstanceNameNEQ != nil {
+		predicates = append(predicates, completedaction.InstanceNameNEQ(*i.InstanceNameNEQ))
+	}
+	if len(i.InstanceNameIn) > 0 {
+		predicates = append(predicates, completedaction.InstanceNameIn(i.InstanceNameIn...))
+	}
+	if len(i.InstanceNameNotIn) > 0 {
+		predicates = append(predicates, completedaction.InstanceNameNotIn(i.InstanceNameNotIn...))
+	}
+	if i.InstanceNameGT != nil {
+		predicates = append(predicates, completedaction.InstanceNameGT(*i.InstanceNameGT))
+	}
+	if i.InstanceNameGTE != nil {
+		predicates = append(predicates, completedaction.InstanceNameGTE(*i.InstanceNameGTE))
+	}
+	if i.InstanceNameLT != nil {
+		predicates = append(predicates, completedaction.InstanceNameLT(*i.InstanceNameLT))
+	}
+	if i.InstanceNameLTE != nil {
+		predicates = append(predicates, completedaction.InstanceNameLTE(*i.InstanceNameLTE))
+	}
+	if i.InstanceNameContains != nil {
+		predicates = append(predicates, completedaction.InstanceNameContains(*i.InstanceNameContains))
+	}
+	if i.InstanceNameHasPrefix != nil {
+		predicates = append(predicates, completedaction.InstanceNameHasPrefix(*i.InstanceNameHasPrefix))
+	}
+	if i.InstanceNameHasSuffix != nil {
+		predicates = append(predicates, completedaction.InstanceNameHasSuffix(*i.InstanceNameHasSuffix))
+	}
+	if i.InstanceNameEqualFold != nil {
+		predicates = append(predicates, completedaction.InstanceNameEqualFold(*i.InstanceNameEqualFold))
+	}
+	if i.InstanceNameContainsFold != nil {
+		predicates = append(predicates, completedaction.InstanceNameContainsFold(*i.InstanceNameContainsFold))
+	}
+	if i.ActionDigestHash != nil {
+		predicates = append(predicates, completedaction.ActionDigestHashEQ(*i.ActionDigestHash))
+	}
+	if i.ActionDigestHashNEQ != nil {
+		predicates = append(predicates, completedaction.ActionDigestHashNEQ(*i.ActionDigestHashNEQ))
+	}
+	if len(i.ActionDigestHashIn) > 0 {
+		predicates = append(predicates, completedaction.ActionDigestHashIn(i.ActionDigestHashIn...))
+	}
+	if len(i.ActionDigestHashNotIn) > 0 {
+		predicates = append(predicates, completedaction.ActionDigestHashNotIn(i.ActionDigestHashNotIn...))
+	}
+	if i.ActionDigestHashGT != nil {
+		predicates = append(predicates, completedaction.ActionDigestHashGT(*i.ActionDigestHashGT))
+	}
+	if i.ActionDigestHashGTE != nil {
+		predicates = append(predicates, completedaction.ActionDigestHashGTE(*i.ActionDigestHashGTE))
+	}
+	if i.ActionDigestHashLT != nil {
+		predicates = append(predicates, completedaction.ActionDigestHashLT(*i.ActionDigestHashLT))
+	}
+	if i.ActionDigestHashLTE != nil {
+		predicates = append(predicates, completedaction.ActionDigestHashLTE(*i.ActionDigestHashLTE))
+	}
+	if i.ActionDigestHashContains != nil {
+		predicates = append(predicates, completedaction.ActionDigestHashContains(*i.ActionDigestHashContains))
+	}
+	if i.ActionDigestHashHasPrefix != nil {
+		predicates = append(predicates, completedaction.ActionDigestHashHasPrefix(*i.ActionDigestHashHasPrefix))
+	}
+	if i.ActionDigestHashHasSuffix != nil {
+		predicates = append(predicates, completedaction.ActionDigestHashHasSuffix(*i.ActionDigestHashHasSuffix))
+	}
+	if i.ActionDigestHashEqualFold != nil {
+		predicates = append(predicates, completedaction.ActionDigestHashEqualFold(*i.ActionDigestHashEqualFold))
+	}
+	if i.ActionDigestHashContainsFold != nil {
+		predicates = append(predicates, completedaction.ActionDigestHashContainsFold(*i.ActionDigestHashContainsFold))
+	}
+	if i.ActionDigestSizeBytes != nil {
+		predicates = append(predicates, completedaction.ActionDigestSizeBytesEQ(*i.ActionDigestSizeBytes))
+	}
+	if i.ActionDigestSizeBytesNEQ != nil {
+		predicates = append(predicates, completedaction.ActionDigestSizeBytesNEQ(*i.ActionDigestSizeBytesNEQ))
+	}
+	if len(i.ActionDigestSizeBytesIn) > 0 {
+		predicates = append(predicates, completedaction.ActionDigestSizeBytesIn(i.ActionDigestSizeBytesIn...))
+	}
+	if len(i.ActionDigestSizeBytesNotIn) > 0 {
+		predicates = append(predicates, completedaction.ActionDigestSizeBytesNotIn(i.ActionDigestSizeBytesNotIn...))
+	}
+	if i.ActionDigestSizeBytesGT != nil {
+		predicates = append(predicates, completedaction.ActionDigestSizeBytesGT(*i.ActionDigestSizeBytesGT))
+	}
+	if i.ActionDigestSizeBytesGTE != nil {
+		predicates = append(predicates, completedaction.ActionDigestSizeBytesGTE(*i.ActionDigestSizeBytesGTE))
+	}
+	if i.ActionDigestSizeBytesLT != nil {
+		predicates = append(predicates, completedaction.ActionDigestSizeBytesLT(*i.ActionDigestSizeBytesLT))
+	}
+	if i.ActionDigestSizeBytesLTE != nil {
+		predicates = append(predicates, completedaction.ActionDigestSizeBytesLTE(*i.ActionDigestSizeBytesLTE))
+	}
+	if i.DigestFunction != nil {
+		predicates = append(predicates, completedaction.DigestFunctionEQ(*i.DigestFunction))
+	}
+	if i.DigestFunctionNEQ != nil {
+		predicates = append(predicates, completedaction.DigestFunctionNEQ(*i.DigestFunctionNEQ))
+	}
+	if len(i.DigestFunctionIn) > 0 {
+		predicates = append(predicates, completedaction.DigestFunctionIn(i.DigestFunctionIn...))
+	}
+	if len(i.DigestFunctionNotIn) > 0 {
+		predicates = append(predicates, completedaction.DigestFunctionNotIn(i.DigestFunctionNotIn...))
+	}
+	if i.DigestFunctionGT != nil {
+		predicates = append(predicates, completedaction.DigestFunctionGT(*i.DigestFunctionGT))
+	}
+	if i.DigestFunctionGTE != nil {
+		predicates = append(predicates, completedaction.DigestFunctionGTE(*i.DigestFunctionGTE))
+	}
+	if i.DigestFunctionLT != nil {
+		predicates = append(predicates, completedaction.DigestFunctionLT(*i.DigestFunctionLT))
+	}
+	if i.DigestFunctionLTE != nil {
+		predicates = append(predicates, completedaction.DigestFunctionLTE(*i.DigestFunctionLTE))
+	}
+	if i.DigestFunctionContains != nil {
+		predicates = append(predicates, completedaction.DigestFunctionContains(*i.DigestFunctionContains))
+	}
+	if i.DigestFunctionHasPrefix != nil {
+		predicates = append(predicates, completedaction.DigestFunctionHasPrefix(*i.DigestFunctionHasPrefix))
+	}
+	if i.DigestFunctionHasSuffix != nil {
+		predicates = append(predicates, completedaction.DigestFunctionHasSuffix(*i.DigestFunctionHasSuffix))
+	}
+	if i.DigestFunctionIsNil {
+		predicates = append(predicates, completedaction.DigestFunctionIsNil())
+	}
+	if i.DigestFunctionNotNil {
+		predicates = append(predicates, completedaction.DigestFunctionNotNil())
+	}
+	if i.DigestFunctionEqualFold != nil {
+		predicates = append(predicates, completedaction.DigestFunctionEqualFold(*i.DigestFunctionEqualFold))
+	}
+	if i.DigestFunctionContainsFold != nil {
+		predicates = append(predicates, completedaction.DigestFunctionContainsFold(*i.DigestFunctionContainsFold))
+	}
+	if i.ToolInvocationID != nil {
+		predicates = append(predicates, completedaction.ToolInvocationIDEQ(*i.ToolInvocationID))
+	}
+	if i.ToolInvocationIDNEQ != nil {
+		predicates = append(predicates, completedaction.ToolInvocationIDNEQ(*i.ToolInvocationIDNEQ))
+	}
+	if len(i.ToolInvocationIDIn) > 0 {
+		predicates = append(predicates, completedaction.ToolInvocationIDIn(i.ToolInvocationIDIn...))
+	}
+	if len(i.ToolInvocationIDNotIn) > 0 {
+		predicates = append(predicates, completedaction.ToolInvocationIDNotIn(i.ToolInvocationIDNotIn...))
+	}
+	if i.ToolInvocationIDGT != nil {
+		predicates = append(predicates, completedaction.ToolInvocationIDGT(*i.ToolInvocationIDGT))
+	}
+	if i.ToolInvocationIDGTE != nil {
+		predicates = append(predicates, completedaction.ToolInvocationIDGTE(*i.ToolInvocationIDGTE))
+	}
+	if i.ToolInvocationIDLT != nil {
+		predicates = append(predicates, completedaction.ToolInvocationIDLT(*i.ToolInvocationIDLT))
+	}
+	if i.ToolInvocationIDLTE != nil {
+		predicates = append(predicates, completedaction.ToolInvocationIDLTE(*i.ToolInvocationIDLTE))
+	}
+	if i.ToolInvocationIDContains != nil {
+		predicates = append(predicates, completedaction.ToolInvocationIDContains(*i.ToolInvocationIDContains))
+	}
+	if i.ToolInvocationIDHasPrefix != nil {
+		predicates = append(predicates, completedaction.ToolInvocationIDHasPrefix(*i.ToolInvocationIDHasPrefix))
+	}
+	if i.ToolInvocationIDHasSuffix != nil {
+		predicates = append(predicates, completedaction.ToolInvocationIDHasSuffix(*i.ToolInvocationIDHasSuffix))
+	}
+	if i.ToolInvocationIDIsNil {
+		predicates = append(predicates, completedaction.ToolInvocationIDIsNil())
+	}
+	if i.ToolInvocationIDNotNil {
+		predicates = append(predicates, completedaction.ToolInvocationIDNotNil())
+	}
+	if i.ToolInvocationIDEqualFold != nil {
+		predicates = append(predicates, completedaction.ToolInvocationIDEqualFold(*i.ToolInvocationIDEqualFold))
+	}
+	if i.ToolInvocationIDContainsFold != nil {
+		predicates = append(predicates, completedaction.ToolInvocationIDContainsFold(*i.ToolInvocationIDContainsFold))
+	}
+	if i.CorrelatedInvocationsID != nil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDEQ(*i.CorrelatedInvocationsID))
+	}
+	if i.CorrelatedInvocationsIDNEQ != nil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDNEQ(*i.CorrelatedInvocationsIDNEQ))
+	}
+	if len(i.CorrelatedInvocationsIDIn) > 0 {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDIn(i.CorrelatedInvocationsIDIn...))
+	}
+	if len(i.CorrelatedInvocationsIDNotIn) > 0 {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDNotIn(i.CorrelatedInvocationsIDNotIn...))
+	}
+	if i.CorrelatedInvocationsIDGT != nil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDGT(*i.CorrelatedInvocationsIDGT))
+	}
+	if i.CorrelatedInvocationsIDGTE != nil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDGTE(*i.CorrelatedInvocationsIDGTE))
+	}
+	if i.CorrelatedInvocationsIDLT != nil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDLT(*i.CorrelatedInvocationsIDLT))
+	}
+	if i.CorrelatedInvocationsIDLTE != nil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDLTE(*i.CorrelatedInvocationsIDLTE))
+	}
+	if i.CorrelatedInvocationsIDContains != nil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDContains(*i.CorrelatedInvocationsIDContains))
+	}
+	if i.CorrelatedInvocationsIDHasPrefix != nil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDHasPrefix(*i.CorrelatedInvocationsIDHasPrefix))
+	}
+	if i.CorrelatedInvocationsIDHasSuffix != nil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDHasSuffix(*i.CorrelatedInvocationsIDHasSuffix))
+	}
+	if i.CorrelatedInvocationsIDIsNil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDIsNil())
+	}
+	if i.CorrelatedInvocationsIDNotNil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDNotNil())
+	}
+	if i.CorrelatedInvocationsIDEqualFold != nil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDEqualFold(*i.CorrelatedInvocationsIDEqualFold))
+	}
+	if i.CorrelatedInvocationsIDContainsFold != nil {
+		predicates = append(predicates, completedaction.CorrelatedInvocationsIDContainsFold(*i.CorrelatedInvocationsIDContainsFold))
+	}
+	if i.TargetID != nil {
+		predicates = append(predicates, completedaction.TargetIDEQ(*i.TargetID))
+	}
+	if i.TargetIDNEQ != nil {
+		predicates = append(predicates, completedaction.TargetIDNEQ(*i.TargetIDNEQ))
+	}
+	if len(i.TargetIDIn) > 0 {
+		predicates = append(predicates, completedaction.TargetIDIn(i.TargetIDIn...))
+	}
+	if len(i.TargetIDNotIn) > 0 {
+		predicates = append(predicates, completedaction.TargetIDNotIn(i.TargetIDNotIn...))
+	}
+	if i.TargetIDGT != nil {
+		predicates = append(predicates, completedaction.TargetIDGT(*i.TargetIDGT))
+	}
+	if i.TargetIDGTE != nil {
+		predicates = append(predicates, completedaction.TargetIDGTE(*i.TargetIDGTE))
+	}
+	if i.TargetIDLT != nil {
+		predicates = append(predicates, completedaction.TargetIDLT(*i.TargetIDLT))
+	}
+	if i.TargetIDLTE != nil {
+		predicates = append(predicates, completedaction.TargetIDLTE(*i.TargetIDLTE))
+	}
+	if i.TargetIDContains != nil {
+		predicates = append(predicates, completedaction.TargetIDContains(*i.TargetIDContains))
+	}
+	if i.TargetIDHasPrefix != nil {
+		predicates = append(predicates, completedaction.TargetIDHasPrefix(*i.TargetIDHasPrefix))
+	}
+	if i.TargetIDHasSuffix != nil {
+		predicates = append(predicates, completedaction.TargetIDHasSuffix(*i.TargetIDHasSuffix))
+	}
+	if i.TargetIDIsNil {
+		predicates = append(predicates, completedaction.TargetIDIsNil())
+	}
+	if i.TargetIDNotNil {
+		predicates = append(predicates, completedaction.TargetIDNotNil())
+	}
+	if i.TargetIDEqualFold != nil {
+		predicates = append(predicates, completedaction.TargetIDEqualFold(*i.TargetIDEqualFold))
+	}
+	if i.TargetIDContainsFold != nil {
+		predicates = append(predicates, completedaction.TargetIDContainsFold(*i.TargetIDContainsFold))
+	}
+	if i.ActionMnemonic != nil {
+		predicates = append(predicates, completedaction.ActionMnemonicEQ(*i.ActionMnemonic))
+	}
+	if i.ActionMnemonicNEQ != nil {
+		predicates = append(predicates, completedaction.ActionMnemonicNEQ(*i.ActionMnemonicNEQ))
+	}
+	if len(i.ActionMnemonicIn) > 0 {
+		predicates = append(predicates, completedaction.ActionMnemonicIn(i.ActionMnemonicIn...))
+	}
+	if len(i.ActionMnemonicNotIn) > 0 {
+		predicates = append(predicates, completedaction.ActionMnemonicNotIn(i.ActionMnemonicNotIn...))
+	}
+	if i.ActionMnemonicGT != nil {
+		predicates = append(predicates, completedaction.ActionMnemonicGT(*i.ActionMnemonicGT))
+	}
+	if i.ActionMnemonicGTE != nil {
+		predicates = append(predicates, completedaction.ActionMnemonicGTE(*i.ActionMnemonicGTE))
+	}
+	if i.ActionMnemonicLT != nil {
+		predicates = append(predicates, completedaction.ActionMnemonicLT(*i.ActionMnemonicLT))
+	}
+	if i.ActionMnemonicLTE != nil {
+		predicates = append(predicates, completedaction.ActionMnemonicLTE(*i.ActionMnemonicLTE))
+	}
+	if i.ActionMnemonicContains != nil {
+		predicates = append(predicates, completedaction.ActionMnemonicContains(*i.ActionMnemonicContains))
+	}
+	if i.ActionMnemonicHasPrefix != nil {
+		predicates = append(predicates, completedaction.ActionMnemonicHasPrefix(*i.ActionMnemonicHasPrefix))
+	}
+	if i.ActionMnemonicHasSuffix != nil {
+		predicates = append(predicates, completedaction.ActionMnemonicHasSuffix(*i.ActionMnemonicHasSuffix))
+	}
+	if i.ActionMnemonicIsNil {
+		predicates = append(predicates, completedaction.ActionMnemonicIsNil())
+	}
+	if i.ActionMnemonicNotNil {
+		predicates = append(predicates, completedaction.ActionMnemonicNotNil())
+	}
+	if i.ActionMnemonicEqualFold != nil {
+		predicates = append(predicates, completedaction.ActionMnemonicEqualFold(*i.ActionMnemonicEqualFold))
+	}
+	if i.ActionMnemonicContainsFold != nil {
+		predicates = append(predicates, completedaction.ActionMnemonicContainsFold(*i.ActionMnemonicContainsFold))
+	}
+	if i.CacheHit != nil {
+		predicates = append(predicates, completedaction.CacheHitEQ(*i.CacheHit))
+	}
+	if i.CacheHitNEQ != nil {
+		predicates = append(predicates, completedaction.CacheHitNEQ(*i.CacheHitNEQ))
+	}
+	if i.CacheHitIsNil {
+		predicates = append(predicates, completedaction.CacheHitIsNil())
+	}
+	if i.CacheHitNotNil {
+		predicates = append(predicates, completedaction.CacheHitNotNil())
+	}
+	if i.ExitCode != nil {
+		predicates = append(predicates, completedaction.ExitCodeEQ(*i.ExitCode))
+	}
+	if i.ExitCodeNEQ != nil {
+		predicates = append(predicates, completedaction.ExitCodeNEQ(*i.ExitCodeNEQ))
+	}
+	if len(i.ExitCodeIn) > 0 {
+		predicates = append(predicates, completedaction.ExitCodeIn(i.ExitCodeIn...))
+	}
+	if len(i.ExitCodeNotIn) > 0 {
+		predicates = append(predicates, completedaction.ExitCodeNotIn(i.ExitCodeNotIn...))
+	}
+	if i.ExitCodeGT != nil {
+		predicates = append(predicates, completedaction.ExitCodeGT(*i.ExitCodeGT))
+	}
+	if i.ExitCodeGTE != nil {
+		predicates = append(predicates, completedaction.ExitCodeGTE(*i.ExitCodeGTE))
+	}
+	if i.ExitCodeLT != nil {
+		predicates = append(predicates, completedaction.ExitCodeLT(*i.ExitCodeLT))
+	}
+	if i.ExitCodeLTE != nil {
+		predicates = append(predicates, completedaction.ExitCodeLTE(*i.ExitCodeLTE))
+	}
+	if i.ExitCodeIsNil {
+		predicates = append(predicates, completedaction.ExitCodeIsNil())
+	}
+	if i.ExitCodeNotNil {
+		predicates = append(predicates, completedaction.ExitCodeNotNil())
+	}
+	if i.StatusCode != nil {
+		predicates = append(predicates, completedaction.StatusCodeEQ(*i.StatusCode))
+	}
+	if i.StatusCodeNEQ != nil {
+		predicates = append(predicates, completedaction.StatusCodeNEQ(*i.StatusCodeNEQ))
+	}
+	if len(i.StatusCodeIn) > 0 {
+		predicates = append(predicates, completedaction.StatusCodeIn(i.StatusCodeIn...))
+	}
+	if len(i.StatusCodeNotIn) > 0 {
+		predicates = append(predicates, completedaction.StatusCodeNotIn(i.StatusCodeNotIn...))
+	}
+	if i.StatusCodeGT != nil {
+		predicates = append(predicates, completedaction.StatusCodeGT(*i.StatusCodeGT))
+	}
+	if i.StatusCodeGTE != nil {
+		predicates = append(predicates, completedaction.StatusCodeGTE(*i.StatusCodeGTE))
+	}
+	if i.StatusCodeLT != nil {
+		predicates = append(predicates, completedaction.StatusCodeLT(*i.StatusCodeLT))
+	}
+	if i.StatusCodeLTE != nil {
+		predicates = append(predicates, completedaction.StatusCodeLTE(*i.StatusCodeLTE))
+	}
+	if i.StatusCodeIsNil {
+		predicates = append(predicates, completedaction.StatusCodeIsNil())
+	}
+	if i.StatusCodeNotNil {
+		predicates = append(predicates, completedaction.StatusCodeNotNil())
+	}
+	if i.StatusMessage != nil {
+		predicates = append(predicates, completedaction.StatusMessageEQ(*i.StatusMessage))
+	}
+	if i.StatusMessageNEQ != nil {
+		predicates = append(predicates, completedaction.StatusMessageNEQ(*i.StatusMessageNEQ))
+	}
+	if len(i.StatusMessageIn) > 0 {
+		predicates = append(predicates, completedaction.StatusMessageIn(i.StatusMessageIn...))
+	}
+	if len(i.StatusMessageNotIn) > 0 {
+		predicates = append(predicates, completedaction.StatusMessageNotIn(i.StatusMessageNotIn...))
+	}
+	if i.StatusMessageGT != nil {
+		predicates = append(predicates, completedaction.StatusMessageGT(*i.StatusMessageGT))
+	}
+	if i.StatusMessageGTE != nil {
+		predicates = append(predicates, completedaction.StatusMessageGTE(*i.StatusMessageGTE))
+	}
+	if i.StatusMessageLT != nil {
+		predicates = append(predicates, completedaction.StatusMessageLT(*i.StatusMessageLT))
+	}
+	if i.StatusMessageLTE != nil {
+		predicates = append(predicates, completedaction.StatusMessageLTE(*i.StatusMessageLTE))
+	}
+	if i.StatusMessageContains != nil {
+		predicates = append(predicates, completedaction.StatusMessageContains(*i.StatusMessageContains))
+	}
+	if i.StatusMessageHasPrefix != nil {
+		predicates = append(predicates, completedaction.StatusMessageHasPrefix(*i.StatusMessageHasPrefix))
+	}
+	if i.StatusMessageHasSuffix != nil {
+		predicates = append(predicates, completedaction.StatusMessageHasSuffix(*i.StatusMessageHasSuffix))
+	}
+	if i.StatusMessageIsNil {
+		predicates = append(predicates, completedaction.StatusMessageIsNil())
+	}
+	if i.StatusMessageNotNil {
+		predicates = append(predicates, completedaction.StatusMessageNotNil())
+	}
+	if i.StatusMessageEqualFold != nil {
+		predicates = append(predicates, completedaction.StatusMessageEqualFold(*i.StatusMessageEqualFold))
+	}
+	if i.StatusMessageContainsFold != nil {
+		predicates = append(predicates, completedaction.StatusMessageContainsFold(*i.StatusMessageContainsFold))
+	}
+	if i.QueuedAt != nil {
+		predicates = append(predicates, completedaction.QueuedAtEQ(*i.QueuedAt))
+	}
+	if i.QueuedAtNEQ != nil {
+		predicates = append(predicates, completedaction.QueuedAtNEQ(*i.QueuedAtNEQ))
+	}
+	if len(i.QueuedAtIn) > 0 {
+		predicates = append(predicates, completedaction.QueuedAtIn(i.QueuedAtIn...))
+	}
+	if len(i.QueuedAtNotIn) > 0 {
+		predicates = append(predicates, completedaction.QueuedAtNotIn(i.QueuedAtNotIn...))
+	}
+	if i.QueuedAtGT != nil {
+		predicates = append(predicates, completedaction.QueuedAtGT(*i.QueuedAtGT))
+	}
+	if i.QueuedAtGTE != nil {
+		predicates = append(predicates, completedaction.QueuedAtGTE(*i.QueuedAtGTE))
+	}
+	if i.QueuedAtLT != nil {
+		predicates = append(predicates, completedaction.QueuedAtLT(*i.QueuedAtLT))
+	}
+	if i.QueuedAtLTE != nil {
+		predicates = append(predicates, completedaction.QueuedAtLTE(*i.QueuedAtLTE))
+	}
+	if i.QueuedAtIsNil {
+		predicates = append(predicates, completedaction.QueuedAtIsNil())
+	}
+	if i.QueuedAtNotNil {
+		predicates = append(predicates, completedaction.QueuedAtNotNil())
+	}
+	if i.WorkerStartAt != nil {
+		predicates = append(predicates, completedaction.WorkerStartAtEQ(*i.WorkerStartAt))
+	}
+	if i.WorkerStartAtNEQ != nil {
+		predicates = append(predicates, completedaction.WorkerStartAtNEQ(*i.WorkerStartAtNEQ))
+	}
+	if len(i.WorkerStartAtIn) > 0 {
+		predicates = append(predicates, completedaction.WorkerStartAtIn(i.WorkerStartAtIn...))
+	}
+	if len(i.WorkerStartAtNotIn) > 0 {
+		predicates = append(predicates, completedaction.WorkerStartAtNotIn(i.WorkerStartAtNotIn...))
+	}
+	if i.WorkerStartAtGT != nil {
+		predicates = append(predicates, completedaction.WorkerStartAtGT(*i.WorkerStartAtGT))
+	}
+	if i.WorkerStartAtGTE != nil {
+		predicates = append(predicates, completedaction.WorkerStartAtGTE(*i.WorkerStartAtGTE))
+	}
+	if i.WorkerStartAtLT != nil {
+		predicates = append(predicates, completedaction.WorkerStartAtLT(*i.WorkerStartAtLT))
+	}
+	if i.WorkerStartAtLTE != nil {
+		predicates = append(predicates, completedaction.WorkerStartAtLTE(*i.WorkerStartAtLTE))
+	}
+	if i.WorkerStartAtIsNil {
+		predicates = append(predicates, completedaction.WorkerStartAtIsNil())
+	}
+	if i.WorkerStartAtNotNil {
+		predicates = append(predicates, completedaction.WorkerStartAtNotNil())
+	}
+	if i.WorkerCompletedAt != nil {
+		predicates = append(predicates, completedaction.WorkerCompletedAtEQ(*i.WorkerCompletedAt))
+	}
+	if i.WorkerCompletedAtNEQ != nil {
+		predicates = append(predicates, completedaction.WorkerCompletedAtNEQ(*i.WorkerCompletedAtNEQ))
+	}
+	if len(i.WorkerCompletedAtIn) > 0 {
+		predicates = append(predicates, completedaction.WorkerCompletedAtIn(i.WorkerCompletedAtIn...))
+	}
+	if len(i.WorkerCompletedAtNotIn) > 0 {
+		predicates = append(predicates, completedaction.WorkerCompletedAtNotIn(i.WorkerCompletedAtNotIn...))
+	}
+	if i.WorkerCompletedAtGT != nil {
+		predicates = append(predicates, completedaction.WorkerCompletedAtGT(*i.WorkerCompletedAtGT))
+	}
+	if i.WorkerCompletedAtGTE != nil {
+		predicates = append(predicates, completedaction.WorkerCompletedAtGTE(*i.WorkerCompletedAtGTE))
+	}
+	if i.WorkerCompletedAtLT != nil {
+		predicates = append(predicates, completedaction.WorkerCompletedAtLT(*i.WorkerCompletedAtLT))
+	}
+	if i.WorkerCompletedAtLTE != nil {
+		predicates = append(predicates, completedaction.WorkerCompletedAtLTE(*i.WorkerCompletedAtLTE))
+	}
+	if i.WorkerCompletedAtIsNil {
+		predicates = append(predicates, completedaction.WorkerCompletedAtIsNil())
+	}
+	if i.WorkerCompletedAtNotNil {
+		predicates = append(predicates, completedaction.WorkerCompletedAtNotNil())
+	}
+	if i.UploadedAt != nil {
+		predicates = append(predicates, completedaction.UploadedAtEQ(*i.UploadedAt))
+	}
+	if i.UploadedAtNEQ != nil {
+		predicates = append(predicates, completedaction.UploadedAtNEQ(*i.UploadedAtNEQ))
+	}
+	if len(i.UploadedAtIn) > 0 {
+		predicates = append(predicates, completedaction.UploadedAtIn(i.UploadedAtIn...))
+	}
+	if len(i.UploadedAtNotIn) > 0 {
+		predicates = append(predicates, completedaction.UploadedAtNotIn(i.UploadedAtNotIn...))
+	}
+	if i.UploadedAtGT != nil {
+		predicates = append(predicates, completedaction.UploadedAtGT(*i.UploadedAtGT))
+	}
+	if i.UploadedAtGTE != nil {
+		predicates = append(predicates, completedaction.UploadedAtGTE(*i.UploadedAtGTE))
+	}
+	if i.UploadedAtLT != nil {
+		predicates = append(predicates, completedaction.UploadedAtLT(*i.UploadedAtLT))
+	}
+	if i.UploadedAtLTE != nil {
+		predicates = append(predicates, completedaction.UploadedAtLTE(*i.UploadedAtLTE))
+	}
+	if i.StdoutHash != nil {
+		predicates = append(predicates, completedaction.StdoutHashEQ(*i.StdoutHash))
+	}
+	if i.StdoutHashNEQ != nil {
+		predicates = append(predicates, completedaction.StdoutHashNEQ(*i.StdoutHashNEQ))
+	}
+	if len(i.StdoutHashIn) > 0 {
+		predicates = append(predicates, completedaction.StdoutHashIn(i.StdoutHashIn...))
+	}
+	if len(i.StdoutHashNotIn) > 0 {
+		predicates = append(predicates, completedaction.StdoutHashNotIn(i.StdoutHashNotIn...))
+	}
+	if i.StdoutHashGT != nil {
+		predicates = append(predicates, completedaction.StdoutHashGT(*i.StdoutHashGT))
+	}
+	if i.StdoutHashGTE != nil {
+		predicates = append(predicates, completedaction.StdoutHashGTE(*i.StdoutHashGTE))
+	}
+	if i.StdoutHashLT != nil {
+		predicates = append(predicates, completedaction.StdoutHashLT(*i.StdoutHashLT))
+	}
+	if i.StdoutHashLTE != nil {
+		predicates = append(predicates, completedaction.StdoutHashLTE(*i.StdoutHashLTE))
+	}
+	if i.StdoutHashContains != nil {
+		predicates = append(predicates, completedaction.StdoutHashContains(*i.StdoutHashContains))
+	}
+	if i.StdoutHashHasPrefix != nil {
+		predicates = append(predicates, completedaction.StdoutHashHasPrefix(*i.StdoutHashHasPrefix))
+	}
+	if i.StdoutHashHasSuffix != nil {
+		predicates = append(predicates, completedaction.StdoutHashHasSuffix(*i.StdoutHashHasSuffix))
+	}
+	if i.StdoutHashIsNil {
+		predicates = append(predicates, completedaction.StdoutHashIsNil())
+	}
+	if i.StdoutHashNotNil {
+		predicates = append(predicates, completedaction.StdoutHashNotNil())
+	}
+	if i.StdoutHashEqualFold != nil {
+		predicates = append(predicates, completedaction.StdoutHashEqualFold(*i.StdoutHashEqualFold))
+	}
+	if i.StdoutHashContainsFold != nil {
+		predicates = append(predicates, completedaction.StdoutHashContainsFold(*i.StdoutHashContainsFold))
+	}
+	if i.StdoutSizeBytes != nil {
+		predicates = append(predicates, completedaction.StdoutSizeBytesEQ(*i.StdoutSizeBytes))
+	}
+	if i.StdoutSizeBytesNEQ != nil {
+		predicates = append(predicates, completedaction.StdoutSizeBytesNEQ(*i.StdoutSizeBytesNEQ))
+	}
+	if len(i.StdoutSizeBytesIn) > 0 {
+		predicates = append(predicates, completedaction.StdoutSizeBytesIn(i.StdoutSizeBytesIn...))
+	}
+	if len(i.StdoutSizeBytesNotIn) > 0 {
+		predicates = append(predicates, completedaction.StdoutSizeBytesNotIn(i.StdoutSizeBytesNotIn...))
+	}
+	if i.StdoutSizeBytesGT != nil {
+		predicates = append(predicates, completedaction.StdoutSizeBytesGT(*i.StdoutSizeBytesGT))
+	}
+	if i.StdoutSizeBytesGTE != nil {
+		predicates = append(predicates, completedaction.StdoutSizeBytesGTE(*i.StdoutSizeBytesGTE))
+	}
+	if i.StdoutSizeBytesLT != nil {
+		predicates = append(predicates, completedaction.StdoutSizeBytesLT(*i.StdoutSizeBytesLT))
+	}
+	if i.StdoutSizeBytesLTE != nil {
+		predicates = append(predicates, completedaction.StdoutSizeBytesLTE(*i.StdoutSizeBytesLTE))
+	}
+	if i.StdoutSizeBytesIsNil {
+		predicates = append(predicates, completedaction.StdoutSizeBytesIsNil())
+	}
+	if i.StdoutSizeBytesNotNil {
+		predicates = append(predicates, completedaction.StdoutSizeBytesNotNil())
+	}
+	if i.StderrHash != nil {
+		predicates = append(predicates, completedaction.StderrHashEQ(*i.StderrHash))
+	}
+	if i.StderrHashNEQ != nil {
+		predicates = append(predicates, completedaction.StderrHashNEQ(*i.StderrHashNEQ))
+	}
+	if len(i.StderrHashIn) > 0 {
+		predicates = append(predicates, completedaction.StderrHashIn(i.StderrHashIn...))
+	}
+	if len(i.StderrHashNotIn) > 0 {
+		predicates = append(predicates, completedaction.StderrHashNotIn(i.StderrHashNotIn...))
+	}
+	if i.StderrHashGT != nil {
+		predicates = append(predicates, completedaction.StderrHashGT(*i.StderrHashGT))
+	}
+	if i.StderrHashGTE != nil {
+		predicates = append(predicates, completedaction.StderrHashGTE(*i.StderrHashGTE))
+	}
+	if i.StderrHashLT != nil {
+		predicates = append(predicates, completedaction.StderrHashLT(*i.StderrHashLT))
+	}
+	if i.StderrHashLTE != nil {
+		predicates = append(predicates, completedaction.StderrHashLTE(*i.StderrHashLTE))
+	}
+	if i.StderrHashContains != nil {
+		predicates = append(predicates, completedaction.StderrHashContains(*i.StderrHashContains))
+	}
+	if i.StderrHashHasPrefix != nil {
+		predicates = append(predicates, completedaction.StderrHashHasPrefix(*i.StderrHashHasPrefix))
+	}
+	if i.StderrHashHasSuffix != nil {
+		predicates = append(predicates, completedaction.StderrHashHasSuffix(*i.StderrHashHasSuffix))
+	}
+	if i.StderrHashIsNil {
+		predicates = append(predicates, completedaction.StderrHashIsNil())
+	}
+	if i.StderrHashNotNil {
+		predicates = append(predicates, completedaction.StderrHashNotNil())
+	}
+	if i.StderrHashEqualFold != nil {
+		predicates = append(predicates, completedaction.StderrHashEqualFold(*i.StderrHashEqualFold))
+	}
+	if i.StderrHashContainsFold != nil {
+		predicates = append(predicates, completedaction.StderrHashContainsFold(*i.StderrHashContainsFold))
+	}
+	if i.StderrSizeBytes != nil {
+		predicates = append(predicates, completedaction.StderrSizeBytesEQ(*i.StderrSizeBytes))
+	}
+	if i.StderrSizeBytesNEQ != nil {
+		predicates = append(predicates, completedaction.StderrSizeBytesNEQ(*i.StderrSizeBytesNEQ))
+	}
+	if len(i.StderrSizeBytesIn) > 0 {
+		predicates = append(predicates, completedaction.StderrSizeBytesIn(i.StderrSizeBytesIn...))
+	}
+	if len(i.StderrSizeBytesNotIn) > 0 {
+		predicates = append(predicates, completedaction.StderrSizeBytesNotIn(i.StderrSizeBytesNotIn...))
+	}
+	if i.StderrSizeBytesGT != nil {
+		predicates = append(predicates, completedaction.StderrSizeBytesGT(*i.StderrSizeBytesGT))
+	}
+	if i.StderrSizeBytesGTE != nil {
+		predicates = append(predicates, completedaction.StderrSizeBytesGTE(*i.StderrSizeBytesGTE))
+	}
+	if i.StderrSizeBytesLT != nil {
+		predicates = append(predicates, completedaction.StderrSizeBytesLT(*i.StderrSizeBytesLT))
+	}
+	if i.StderrSizeBytesLTE != nil {
+		predicates = append(predicates, completedaction.StderrSizeBytesLTE(*i.StderrSizeBytesLTE))
+	}
+	if i.StderrSizeBytesIsNil {
+		predicates = append(predicates, completedaction.StderrSizeBytesIsNil())
+	}
+	if i.StderrSizeBytesNotNil {
+		predicates = append(predicates, completedaction.StderrSizeBytesNotNil())
+	}
+
+	if i.HasBazelInvocation != nil {
+		p := completedaction.HasBazelInvocation()
+		if !*i.HasBazelInvocation {
+			p = completedaction.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasBazelInvocationWith) > 0 {
+		with := make([]predicate.BazelInvocation, 0, len(i.HasBazelInvocationWith))
+		for _, w := range i.HasBazelInvocationWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasBazelInvocationWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, completedaction.HasBazelInvocationWith(with...))
+	}
+	if i.HasAction != nil {
+		p := completedaction.HasAction()
+		if !*i.HasAction {
+			p = completedaction.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasActionWith) > 0 {
+		with := make([]predicate.Action, 0, len(i.HasActionWith))
+		for _, w := range i.HasActionWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasActionWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, completedaction.HasActionWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyCompletedActionWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return completedaction.And(predicates...), nil
 	}
 }
 

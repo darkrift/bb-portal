@@ -18,7 +18,6 @@ go_library(
         "//ent/gen/ent/privacy",
         "//ent/gen/ent/target",
         "//ent/gen/ent/testresult",
-        "//ent/gen/ent/testresultfile",
         "//ent/gen/ent/testsummary",
         "//ent/gen/ent/testtarget",
         "//ent/schema",

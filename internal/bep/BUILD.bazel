@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//ent/gen/ent/migrate",
         "//internal/api/grpc/bes",
+        "//internal/api/grpc/completedactionlogger",
         "//internal/api/http/bepuploader",
         "//internal/api/http/loghandler",
         "//internal/database",

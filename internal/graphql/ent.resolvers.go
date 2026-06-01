@@ -119,6 +119,11 @@ func (r *buildTagResolver) ID(ctx context.Context, obj *ent.BuildTag) (string, e
 }
 
 // ID is the resolver for the id field.
+func (r *completedActionResolver) ID(ctx context.Context, obj *ent.CompletedAction) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// ID is the resolver for the id field.
 func (r *configurationResolver) ID(ctx context.Context, obj *ent.Configuration) (string, error) {
 	return helpers.GraphQLIDFromTypeAndID("Configuration", obj.ID), nil
 }
@@ -677,6 +682,46 @@ func (r *buildWhereInputResolver) IDLt(ctx context.Context, obj *ent.BuildWhereI
 
 // IDLte is the resolver for the idLTE field.
 func (r *buildWhereInputResolver) IDLte(ctx context.Context, obj *ent.BuildWhereInput, data *string) error {
+	panic(fmt.Errorf("not implemented: IDLte - idLTE"))
+}
+
+// ID is the resolver for the id field.
+func (r *completedActionWhereInputResolver) ID(ctx context.Context, obj *ent.CompletedActionWhereInput, data *string) error {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
+// IDNeq is the resolver for the idNEQ field.
+func (r *completedActionWhereInputResolver) IDNeq(ctx context.Context, obj *ent.CompletedActionWhereInput, data *string) error {
+	panic(fmt.Errorf("not implemented: IDNeq - idNEQ"))
+}
+
+// IDIn is the resolver for the idIn field.
+func (r *completedActionWhereInputResolver) IDIn(ctx context.Context, obj *ent.CompletedActionWhereInput, data []string) error {
+	panic(fmt.Errorf("not implemented: IDIn - idIn"))
+}
+
+// IDNotIn is the resolver for the idNotIn field.
+func (r *completedActionWhereInputResolver) IDNotIn(ctx context.Context, obj *ent.CompletedActionWhereInput, data []string) error {
+	panic(fmt.Errorf("not implemented: IDNotIn - idNotIn"))
+}
+
+// IDGt is the resolver for the idGT field.
+func (r *completedActionWhereInputResolver) IDGt(ctx context.Context, obj *ent.CompletedActionWhereInput, data *string) error {
+	panic(fmt.Errorf("not implemented: IDGt - idGT"))
+}
+
+// IDGte is the resolver for the idGTE field.
+func (r *completedActionWhereInputResolver) IDGte(ctx context.Context, obj *ent.CompletedActionWhereInput, data *string) error {
+	panic(fmt.Errorf("not implemented: IDGte - idGTE"))
+}
+
+// IDLt is the resolver for the idLT field.
+func (r *completedActionWhereInputResolver) IDLt(ctx context.Context, obj *ent.CompletedActionWhereInput, data *string) error {
+	panic(fmt.Errorf("not implemented: IDLt - idLT"))
+}
+
+// IDLte is the resolver for the idLTE field.
+func (r *completedActionWhereInputResolver) IDLte(ctx context.Context, obj *ent.CompletedActionWhereInput, data *string) error {
 	panic(fmt.Errorf("not implemented: IDLte - idLTE"))
 }
 
@@ -1587,6 +1632,9 @@ func (r *Resolver) BuildGraphMetrics() BuildGraphMetricsResolver {
 // BuildTag returns BuildTagResolver implementation.
 func (r *Resolver) BuildTag() BuildTagResolver { return &buildTagResolver{r} }
 
+// CompletedAction returns CompletedActionResolver implementation.
+func (r *Resolver) CompletedAction() CompletedActionResolver { return &completedActionResolver{r} }
+
 // Configuration returns ConfigurationResolver implementation.
 func (r *Resolver) Configuration() ConfigurationResolver { return &configurationResolver{r} }
 
@@ -1703,6 +1751,11 @@ func (r *Resolver) BuildTagWhereInput() BuildTagWhereInputResolver {
 // BuildWhereInput returns BuildWhereInputResolver implementation.
 func (r *Resolver) BuildWhereInput() BuildWhereInputResolver { return &buildWhereInputResolver{r} }
 
+// CompletedActionWhereInput returns CompletedActionWhereInputResolver implementation.
+func (r *Resolver) CompletedActionWhereInput() CompletedActionWhereInputResolver {
+	return &completedActionWhereInputResolver{r}
+}
+
 // ConfigurationWhereInput returns ConfigurationWhereInputResolver implementation.
 func (r *Resolver) ConfigurationWhereInput() ConfigurationWhereInputResolver {
 	return &configurationWhereInputResolver{r}
@@ -1816,6 +1869,7 @@ type bazelInvocationResolver struct{ *Resolver }
 type buildResolver struct{ *Resolver }
 type buildGraphMetricsResolver struct{ *Resolver }
 type buildTagResolver struct{ *Resolver }
+type completedActionResolver struct{ *Resolver }
 type configurationResolver struct{ *Resolver }
 type connectionMetadataResolver struct{ *Resolver }
 type garbageMetricsResolver struct{ *Resolver }
@@ -1848,6 +1902,7 @@ type bazelInvocationWhereInputResolver struct{ *Resolver }
 type buildGraphMetricsWhereInputResolver struct{ *Resolver }
 type buildTagWhereInputResolver struct{ *Resolver }
 type buildWhereInputResolver struct{ *Resolver }
+type completedActionWhereInputResolver struct{ *Resolver }
 type configurationWhereInputResolver struct{ *Resolver }
 type connectionMetadataWhereInputResolver struct{ *Resolver }
 type garbageMetricsWhereInputResolver struct{ *Resolver }

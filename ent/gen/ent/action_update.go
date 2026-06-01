@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/completedaction"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/predicate"
 )
@@ -358,6 +359,21 @@ func (au *ActionUpdate) AddActionFiles(i ...*InvocationFiles) *ActionUpdate {
 	return au.AddActionFileIDs(ids...)
 }
 
+// AddCompletedActionIDs adds the "completed_actions" edge to the CompletedAction entity by IDs.
+func (au *ActionUpdate) AddCompletedActionIDs(ids ...int64) *ActionUpdate {
+	au.mutation.AddCompletedActionIDs(ids...)
+	return au
+}
+
+// AddCompletedActions adds the "completed_actions" edges to the CompletedAction entity.
+func (au *ActionUpdate) AddCompletedActions(c ...*CompletedAction) *ActionUpdate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return au.AddCompletedActionIDs(ids...)
+}
+
 // Mutation returns the ActionMutation object of the builder.
 func (au *ActionUpdate) Mutation() *ActionMutation {
 	return au.mutation
@@ -382,6 +398,27 @@ func (au *ActionUpdate) RemoveActionFiles(i ...*InvocationFiles) *ActionUpdate {
 		ids[j] = i[j].ID
 	}
 	return au.RemoveActionFileIDs(ids...)
+}
+
+// ClearCompletedActions clears all "completed_actions" edges to the CompletedAction entity.
+func (au *ActionUpdate) ClearCompletedActions() *ActionUpdate {
+	au.mutation.ClearCompletedActions()
+	return au
+}
+
+// RemoveCompletedActionIDs removes the "completed_actions" edge to CompletedAction entities by IDs.
+func (au *ActionUpdate) RemoveCompletedActionIDs(ids ...int64) *ActionUpdate {
+	au.mutation.RemoveCompletedActionIDs(ids...)
+	return au
+}
+
+// RemoveCompletedActions removes "completed_actions" edges to CompletedAction entities.
+func (au *ActionUpdate) RemoveCompletedActions(c ...*CompletedAction) *ActionUpdate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return au.RemoveCompletedActionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -573,6 +610,51 @@ func (au *ActionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.CompletedActionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.CompletedActionsTable,
+			Columns: []string{action.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedCompletedActionsIDs(); len(nodes) > 0 && !au.mutation.CompletedActionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.CompletedActionsTable,
+			Columns: []string{action.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.CompletedActionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.CompletedActionsTable,
+			Columns: []string{action.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -928,6 +1010,21 @@ func (auo *ActionUpdateOne) AddActionFiles(i ...*InvocationFiles) *ActionUpdateO
 	return auo.AddActionFileIDs(ids...)
 }
 
+// AddCompletedActionIDs adds the "completed_actions" edge to the CompletedAction entity by IDs.
+func (auo *ActionUpdateOne) AddCompletedActionIDs(ids ...int64) *ActionUpdateOne {
+	auo.mutation.AddCompletedActionIDs(ids...)
+	return auo
+}
+
+// AddCompletedActions adds the "completed_actions" edges to the CompletedAction entity.
+func (auo *ActionUpdateOne) AddCompletedActions(c ...*CompletedAction) *ActionUpdateOne {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return auo.AddCompletedActionIDs(ids...)
+}
+
 // Mutation returns the ActionMutation object of the builder.
 func (auo *ActionUpdateOne) Mutation() *ActionMutation {
 	return auo.mutation
@@ -952,6 +1049,27 @@ func (auo *ActionUpdateOne) RemoveActionFiles(i ...*InvocationFiles) *ActionUpda
 		ids[j] = i[j].ID
 	}
 	return auo.RemoveActionFileIDs(ids...)
+}
+
+// ClearCompletedActions clears all "completed_actions" edges to the CompletedAction entity.
+func (auo *ActionUpdateOne) ClearCompletedActions() *ActionUpdateOne {
+	auo.mutation.ClearCompletedActions()
+	return auo
+}
+
+// RemoveCompletedActionIDs removes the "completed_actions" edge to CompletedAction entities by IDs.
+func (auo *ActionUpdateOne) RemoveCompletedActionIDs(ids ...int64) *ActionUpdateOne {
+	auo.mutation.RemoveCompletedActionIDs(ids...)
+	return auo
+}
+
+// RemoveCompletedActions removes "completed_actions" edges to CompletedAction entities.
+func (auo *ActionUpdateOne) RemoveCompletedActions(c ...*CompletedAction) *ActionUpdateOne {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return auo.RemoveCompletedActionIDs(ids...)
 }
 
 // Where appends a list predicates to the ActionUpdate builder.
@@ -1173,6 +1291,51 @@ func (auo *ActionUpdateOne) sqlSave(ctx context.Context) (_node *Action, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.CompletedActionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.CompletedActionsTable,
+			Columns: []string{action.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedCompletedActionsIDs(); len(nodes) > 0 && !auo.mutation.CompletedActionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.CompletedActionsTable,
+			Columns: []string{action.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.CompletedActionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.CompletedActionsTable,
+			Columns: []string{action.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

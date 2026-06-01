@@ -1,0 +1,28 @@
+services:
+  completed-action-relay:
+    image: bb-portal/grpc-tcp-relay:local
+    command:
+      - -listen=0.0.0.0:8981
+      - -listen=0.0.0.0:8982
+      - -connect=host.docker.internal:8982
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - "8981:8981"
+    restart: unless-stopped
+
+  worker-fuse-ubuntu22-04:
+    depends_on:
+      - completed-action-relay
+    command:
+      - /config/worker-fuse-ubuntu22-04.completed-actions.jsonnet
+    volumes:
+      - ${BB_PORTAL_CHECKOUT:?Set BB_PORTAL_CHECKOUT to the bb-portal checkout path}/examples/buildbarn-completed-actions/worker-fuse-ubuntu22-04.completed-actions.jsonnet:/config/worker-fuse-ubuntu22-04.completed-actions.jsonnet:ro
+
+  worker-hardlinking-ubuntu22-04:
+    depends_on:
+      - completed-action-relay
+    command:
+      - /config/worker-hardlinking-ubuntu22-04.completed-actions.jsonnet
+    volumes:
+      - ${BB_PORTAL_CHECKOUT:?Set BB_PORTAL_CHECKOUT to the bb-portal checkout path}/examples/buildbarn-completed-actions/worker-hardlinking-ubuntu22-04.completed-actions.jsonnet:/config/worker-hardlinking-ubuntu22-04.completed-actions.jsonnet:ro

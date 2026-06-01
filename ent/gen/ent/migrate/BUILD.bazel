@@ -10,6 +10,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "@io_entgo_ent//dialect",
+        "@io_entgo_ent//dialect/entsql",
         "@io_entgo_ent//dialect/sql/schema",
         "@io_entgo_ent//schema/field",
     ],

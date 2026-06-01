@@ -131,6 +131,11 @@ func (BazelInvocation) Edges() []ent.Edge {
 				entsql.OnDelete(entsql.Cascade),
 			),
 
+		edge.To("completed_actions", CompletedAction.Type).
+			Annotations(
+				entsql.OnDelete(entsql.Cascade),
+			),
+
 		// Build Metrics for the Completed Invocation
 		edge.To("metrics", Metrics.Type).
 			Annotations(

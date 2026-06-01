@@ -78,6 +78,8 @@ func (Action) Edges() []ent.Edge {
 			Annotations(
 				entsql.OnDelete(entsql.Cascade),
 			),
+
+		edge.To("completed_actions", CompletedAction.Type),
 	}
 }
 

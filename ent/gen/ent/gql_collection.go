@@ -20,6 +20,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/build"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildgraphmetrics"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildtag"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/completedaction"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/connectionmetadata"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/garbagemetrics"
@@ -103,6 +104,19 @@ func (a *ActionQuery) collectField(ctx context.Context, oneNode bool, opCtx *gra
 				return err
 			}
 			a.WithNamedActionFiles(alias, func(wq *InvocationFilesQuery) {
+				*wq = *query
+			})
+
+		case "completedActions":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CompletedActionClient{config: a.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, completedactionImplementors)...); err != nil {
+				return err
+			}
+			a.WithNamedCompletedActions(alias, func(wq *CompletedActionQuery) {
 				*wq = *query
 			})
 		case "label":
@@ -1035,6 +1049,19 @@ func (bi *BazelInvocationQuery) collectField(ctx context.Context, oneNode bool, 
 				*wq = *query
 			})
 
+		case "completedActions":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CompletedActionClient{config: bi.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, completedactionImplementors)...); err != nil {
+				return err
+			}
+			bi.WithNamedCompletedActions(alias, func(wq *CompletedActionQuery) {
+				*wq = *query
+			})
+
 		case "metrics":
 			var (
 				alias = field.Alias
@@ -1102,10 +1129,10 @@ func (bi *BazelInvocationQuery) collectField(ctx context.Context, oneNode bool, 
 						}
 						for i := range nodes {
 							n := m[nodes[i].ID]
-							if nodes[i].Edges.totalCount[9] == nil {
-								nodes[i].Edges.totalCount[9] = make(map[string]int)
+							if nodes[i].Edges.totalCount[10] == nil {
+								nodes[i].Edges.totalCount[10] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[9][alias] = n
+							nodes[i].Edges.totalCount[10][alias] = n
 						}
 						return nil
 					})
@@ -1113,10 +1140,10 @@ func (bi *BazelInvocationQuery) collectField(ctx context.Context, oneNode bool, 
 					bi.loadTotal = append(bi.loadTotal, func(_ context.Context, nodes []*BazelInvocation) error {
 						for i := range nodes {
 							n := len(nodes[i].Edges.InvocationTargets)
-							if nodes[i].Edges.totalCount[9] == nil {
-								nodes[i].Edges.totalCount[9] = make(map[string]int)
+							if nodes[i].Edges.totalCount[10] == nil {
+								nodes[i].Edges.totalCount[10] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[9][alias] = n
+							nodes[i].Edges.totalCount[10][alias] = n
 						}
 						return nil
 					})
@@ -1799,6 +1826,195 @@ func newBuildTagPaginateArgs(rv map[string]any) *buildtagPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*BuildTagWhereInput); ok {
 		args.opts = append(args.opts, WithBuildTagFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (ca *CompletedActionQuery) CollectFields(ctx context.Context, satisfies ...string) (*CompletedActionQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return ca, nil
+	}
+	if err := ca.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return ca, nil
+}
+
+func (ca *CompletedActionQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(completedaction.Columns))
+		selectedFields = []string{completedaction.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "bazelInvocation":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&BazelInvocationClient{config: ca.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, bazelinvocationImplementors)...); err != nil {
+				return err
+			}
+			ca.withBazelInvocation = query
+
+		case "action":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ActionClient{config: ca.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, actionImplementors)...); err != nil {
+				return err
+			}
+			ca.withAction = query
+		case "uuid":
+			if _, ok := fieldSeen[completedaction.FieldUUID]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldUUID)
+				fieldSeen[completedaction.FieldUUID] = struct{}{}
+			}
+		case "instanceName":
+			if _, ok := fieldSeen[completedaction.FieldInstanceName]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldInstanceName)
+				fieldSeen[completedaction.FieldInstanceName] = struct{}{}
+			}
+		case "actionDigestHash":
+			if _, ok := fieldSeen[completedaction.FieldActionDigestHash]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldActionDigestHash)
+				fieldSeen[completedaction.FieldActionDigestHash] = struct{}{}
+			}
+		case "actionDigestSizeBytes":
+			if _, ok := fieldSeen[completedaction.FieldActionDigestSizeBytes]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldActionDigestSizeBytes)
+				fieldSeen[completedaction.FieldActionDigestSizeBytes] = struct{}{}
+			}
+		case "digestFunction":
+			if _, ok := fieldSeen[completedaction.FieldDigestFunction]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldDigestFunction)
+				fieldSeen[completedaction.FieldDigestFunction] = struct{}{}
+			}
+		case "toolInvocationID":
+			if _, ok := fieldSeen[completedaction.FieldToolInvocationID]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldToolInvocationID)
+				fieldSeen[completedaction.FieldToolInvocationID] = struct{}{}
+			}
+		case "correlatedInvocationsID":
+			if _, ok := fieldSeen[completedaction.FieldCorrelatedInvocationsID]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldCorrelatedInvocationsID)
+				fieldSeen[completedaction.FieldCorrelatedInvocationsID] = struct{}{}
+			}
+		case "targetID":
+			if _, ok := fieldSeen[completedaction.FieldTargetID]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldTargetID)
+				fieldSeen[completedaction.FieldTargetID] = struct{}{}
+			}
+		case "actionMnemonic":
+			if _, ok := fieldSeen[completedaction.FieldActionMnemonic]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldActionMnemonic)
+				fieldSeen[completedaction.FieldActionMnemonic] = struct{}{}
+			}
+		case "cacheHit":
+			if _, ok := fieldSeen[completedaction.FieldCacheHit]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldCacheHit)
+				fieldSeen[completedaction.FieldCacheHit] = struct{}{}
+			}
+		case "exitCode":
+			if _, ok := fieldSeen[completedaction.FieldExitCode]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldExitCode)
+				fieldSeen[completedaction.FieldExitCode] = struct{}{}
+			}
+		case "statusCode":
+			if _, ok := fieldSeen[completedaction.FieldStatusCode]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldStatusCode)
+				fieldSeen[completedaction.FieldStatusCode] = struct{}{}
+			}
+		case "statusMessage":
+			if _, ok := fieldSeen[completedaction.FieldStatusMessage]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldStatusMessage)
+				fieldSeen[completedaction.FieldStatusMessage] = struct{}{}
+			}
+		case "queuedAt":
+			if _, ok := fieldSeen[completedaction.FieldQueuedAt]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldQueuedAt)
+				fieldSeen[completedaction.FieldQueuedAt] = struct{}{}
+			}
+		case "workerStartAt":
+			if _, ok := fieldSeen[completedaction.FieldWorkerStartAt]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldWorkerStartAt)
+				fieldSeen[completedaction.FieldWorkerStartAt] = struct{}{}
+			}
+		case "workerCompletedAt":
+			if _, ok := fieldSeen[completedaction.FieldWorkerCompletedAt]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldWorkerCompletedAt)
+				fieldSeen[completedaction.FieldWorkerCompletedAt] = struct{}{}
+			}
+		case "uploadedAt":
+			if _, ok := fieldSeen[completedaction.FieldUploadedAt]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldUploadedAt)
+				fieldSeen[completedaction.FieldUploadedAt] = struct{}{}
+			}
+		case "stdoutHash":
+			if _, ok := fieldSeen[completedaction.FieldStdoutHash]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldStdoutHash)
+				fieldSeen[completedaction.FieldStdoutHash] = struct{}{}
+			}
+		case "stdoutSizeBytes":
+			if _, ok := fieldSeen[completedaction.FieldStdoutSizeBytes]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldStdoutSizeBytes)
+				fieldSeen[completedaction.FieldStdoutSizeBytes] = struct{}{}
+			}
+		case "stderrHash":
+			if _, ok := fieldSeen[completedaction.FieldStderrHash]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldStderrHash)
+				fieldSeen[completedaction.FieldStderrHash] = struct{}{}
+			}
+		case "stderrSizeBytes":
+			if _, ok := fieldSeen[completedaction.FieldStderrSizeBytes]; !ok {
+				selectedFields = append(selectedFields, completedaction.FieldStderrSizeBytes)
+				fieldSeen[completedaction.FieldStderrSizeBytes] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		ca.Select(selectedFields...)
+	}
+	return nil
+}
+
+type completedactionPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []CompletedActionPaginateOption
+}
+
+func newCompletedActionPaginateArgs(rv map[string]any) *completedactionPaginateArgs {
+	args := &completedactionPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*CompletedActionWhereInput); ok {
+		args.opts = append(args.opts, WithCompletedActionFilter(v.Filter))
 	}
 	return args
 }

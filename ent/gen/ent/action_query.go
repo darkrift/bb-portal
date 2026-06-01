@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/completedaction"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/predicate"
@@ -22,16 +23,18 @@ import (
 // ActionQuery is the builder for querying Action entities.
 type ActionQuery struct {
 	config
-	ctx                  *QueryContext
-	order                []action.OrderOption
-	inters               []Interceptor
-	predicates           []predicate.Action
-	withBazelInvocation  *BazelInvocationQuery
-	withConfiguration    *ConfigurationQuery
-	withActionFiles      *InvocationFilesQuery
-	modifiers            []func(*sql.Selector)
-	loadTotal            []func(context.Context, []*Action) error
-	withNamedActionFiles map[string]*InvocationFilesQuery
+	ctx                       *QueryContext
+	order                     []action.OrderOption
+	inters                    []Interceptor
+	predicates                []predicate.Action
+	withBazelInvocation       *BazelInvocationQuery
+	withConfiguration         *ConfigurationQuery
+	withActionFiles           *InvocationFilesQuery
+	withCompletedActions      *CompletedActionQuery
+	modifiers                 []func(*sql.Selector)
+	loadTotal                 []func(context.Context, []*Action) error
+	withNamedActionFiles      map[string]*InvocationFilesQuery
+	withNamedCompletedActions map[string]*CompletedActionQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -127,6 +130,28 @@ func (aq *ActionQuery) QueryActionFiles() *InvocationFilesQuery {
 			sqlgraph.From(action.Table, action.FieldID, selector),
 			sqlgraph.To(invocationfiles.Table, invocationfiles.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, action.ActionFilesTable, action.ActionFilesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCompletedActions chains the current query on the "completed_actions" edge.
+func (aq *ActionQuery) QueryCompletedActions() *CompletedActionQuery {
+	query := (&CompletedActionClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(action.Table, action.FieldID, selector),
+			sqlgraph.To(completedaction.Table, completedaction.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, action.CompletedActionsTable, action.CompletedActionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -321,14 +346,15 @@ func (aq *ActionQuery) Clone() *ActionQuery {
 		return nil
 	}
 	return &ActionQuery{
-		config:              aq.config,
-		ctx:                 aq.ctx.Clone(),
-		order:               append([]action.OrderOption{}, aq.order...),
-		inters:              append([]Interceptor{}, aq.inters...),
-		predicates:          append([]predicate.Action{}, aq.predicates...),
-		withBazelInvocation: aq.withBazelInvocation.Clone(),
-		withConfiguration:   aq.withConfiguration.Clone(),
-		withActionFiles:     aq.withActionFiles.Clone(),
+		config:               aq.config,
+		ctx:                  aq.ctx.Clone(),
+		order:                append([]action.OrderOption{}, aq.order...),
+		inters:               append([]Interceptor{}, aq.inters...),
+		predicates:           append([]predicate.Action{}, aq.predicates...),
+		withBazelInvocation:  aq.withBazelInvocation.Clone(),
+		withConfiguration:    aq.withConfiguration.Clone(),
+		withActionFiles:      aq.withActionFiles.Clone(),
+		withCompletedActions: aq.withCompletedActions.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -365,6 +391,17 @@ func (aq *ActionQuery) WithActionFiles(opts ...func(*InvocationFilesQuery)) *Act
 		opt(query)
 	}
 	aq.withActionFiles = query
+	return aq
+}
+
+// WithCompletedActions tells the query-builder to eager-load the nodes that are connected to
+// the "completed_actions" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *ActionQuery) WithCompletedActions(opts ...func(*CompletedActionQuery)) *ActionQuery {
+	query := (&CompletedActionClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withCompletedActions = query
 	return aq
 }
 
@@ -446,10 +483,11 @@ func (aq *ActionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Actio
 	var (
 		nodes       = []*Action{}
 		_spec       = aq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			aq.withBazelInvocation != nil,
 			aq.withConfiguration != nil,
 			aq.withActionFiles != nil,
+			aq.withCompletedActions != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -492,10 +530,24 @@ func (aq *ActionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Actio
 			return nil, err
 		}
 	}
+	if query := aq.withCompletedActions; query != nil {
+		if err := aq.loadCompletedActions(ctx, query, nodes,
+			func(n *Action) { n.Edges.CompletedActions = []*CompletedAction{} },
+			func(n *Action, e *CompletedAction) { n.Edges.CompletedActions = append(n.Edges.CompletedActions, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range aq.withNamedActionFiles {
 		if err := aq.loadActionFiles(ctx, query, nodes,
 			func(n *Action) { n.appendNamedActionFiles(name) },
 			func(n *Action, e *InvocationFiles) { n.appendNamedActionFiles(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range aq.withNamedCompletedActions {
+		if err := aq.loadCompletedActions(ctx, query, nodes,
+			func(n *Action) { n.appendNamedCompletedActions(name) },
+			func(n *Action, e *CompletedAction) { n.appendNamedCompletedActions(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -591,6 +643,37 @@ func (aq *ActionQuery) loadActionFiles(ctx context.Context, query *InvocationFil
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "action_action_files" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *ActionQuery) loadCompletedActions(ctx context.Context, query *CompletedActionQuery, nodes []*Action, init func(*Action), assign func(*Action, *CompletedAction)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*Action)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.CompletedAction(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(action.CompletedActionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.action_completed_actions
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "action_completed_actions" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "action_completed_actions" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -698,6 +781,20 @@ func (aq *ActionQuery) WithNamedActionFiles(name string, opts ...func(*Invocatio
 		aq.withNamedActionFiles = make(map[string]*InvocationFilesQuery)
 	}
 	aq.withNamedActionFiles[name] = query
+	return aq
+}
+
+// WithNamedCompletedActions tells the query-builder to eager-load the nodes that are connected to the "completed_actions"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (aq *ActionQuery) WithNamedCompletedActions(name string, opts ...func(*CompletedActionQuery)) *ActionQuery {
+	query := (&CompletedActionClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if aq.withNamedCompletedActions == nil {
+		aq.withNamedCompletedActions = make(map[string]*CompletedActionQuery)
+	}
+	aq.withNamedCompletedActions[name] = query
 	return aq
 }
 

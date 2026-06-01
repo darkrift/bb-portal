@@ -8,6 +8,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/migrate"
 	"github.com/buildbarn/bb-portal/internal/api/grpc/bes"
+	completedactionloggerapi "github.com/buildbarn/bb-portal/internal/api/grpc/completedactionlogger"
 	"github.com/buildbarn/bb-portal/internal/api/http/bepuploader"
 	"github.com/buildbarn/bb-portal/internal/api/http/loghandler"
 	"github.com/buildbarn/bb-portal/internal/database"
@@ -41,27 +42,27 @@ func NewBuildEventProtocolService(
 	instanceNameAuthorizer auth.Authorizer,
 	router *mux.Router,
 	tracerProvider trace.TracerProvider,
-) error {
+) (database.Client, error) {
 	dialect, connection, err := common.NewSQLConnectionFromConfiguration(configuration.Database, tracerProvider)
 	if err != nil {
-		return util.StatusWrap(err, "Failed to connect to database for BuildEventStreamService")
+		return nil, util.StatusWrap(err, "Failed to connect to database for BuildEventStreamService")
 	}
 
 	dbClient, err := database.New(dialect, connection)
 	if err != nil {
-		return util.StatusWrap(err, "Failed to create database client from connection")
+		return nil, util.StatusWrap(err, "Failed to create database client from connection")
 	}
 
 	// Attempt to migrate towards ents model.
 	if err = dbClient.Ent().Schema.Create(context.Background(), migrate.WithDropIndex(true)); err != nil {
-		return util.StatusWrap(err, "Could not automatically migrate to desired schema")
+		return nil, util.StatusWrap(err, "Could not automatically migrate to desired schema")
 	}
 
 	prometheusmetrics.SyncMetrics(dbClient.Ent())
 
 	// Configure the database cleanup service.
 	if configuration.DatabaseCleanupConfiguration == nil {
-		return status.Error(codes.InvalidArgument, "No databaseCleanupConfiguration configured for BuildEventStreamService")
+		return nil, status.Error(codes.InvalidArgument, "No databaseCleanupConfiguration configured for BuildEventStreamService")
 	}
 	databaseCleanupService, err := dbcleanupservice.NewDbCleanupService(
 		dbClient,
@@ -70,7 +71,7 @@ func NewBuildEventProtocolService(
 		tracerProvider,
 	)
 	if err != nil {
-		return util.StatusWrap(err, "Failed to create DatabaseCleanupService")
+		return nil, util.StatusWrap(err, "Failed to create DatabaseCleanupService")
 	}
 	databaseCleanupService.StartDbCleanupService(context.Background(), dependenciesGroup)
 
@@ -94,7 +95,7 @@ func NewBuildEventProtocolService(
 	if configuration.EnableBepFileUpload {
 		bepUploader, err := bepuploader.NewBepUploader(dbClient, configuration, instanceNameAuthorizer, dependenciesGroup, grpcClientFactory, tracerProvider)
 		if err != nil {
-			return util.StatusWrap(err, "Failed to create BEP file upload handler")
+			return nil, util.StatusWrap(err, "Failed to create BEP file upload handler")
 		}
 		router.Path("/api/v1/bep/upload").Methods("POST").Handler(bepUploader)
 	}
@@ -102,7 +103,7 @@ func NewBuildEventProtocolService(
 	// Handle the Build Event gRPC Stream.
 	buildEventServer, err := bes.NewBuildEventServer(dbClient, configuration, instanceNameAuthorizer, dependenciesGroup, grpcClientFactory, tracerProvider)
 	if err != nil {
-		return util.StatusWrap(err, "Failed to create BuildEventServer")
+		return nil, util.StatusWrap(err, "Failed to create BuildEventServer")
 	}
 	if err := bb_grpc.NewServersFromConfigurationAndServe(
 		configuration.GrpcServers,
@@ -112,7 +113,31 @@ func NewBuildEventProtocolService(
 		siblingsGroup,
 		grpcClientFactory,
 	); err != nil {
-		return util.StatusWrap(err, "gRPC server failure")
+		return nil, util.StatusWrap(err, "gRPC server failure")
+	}
+	return dbClient, nil
+}
+
+// NewCompletedActionLoggerService creates a gRPC service that accepts
+// Buildbarn CompletedActionLogger streams. The database client must be the one
+// created by NewBuildEventProtocolService, because completed actions are stored
+// in the BES schema and linked to BES invocations.
+func NewCompletedActionLoggerService(
+	configuration *bb_portal.CompletedActionLoggerService,
+	dbClient database.Client,
+	siblingsGroup program.Group,
+	grpcClientFactory bb_grpc.ClientFactory,
+) error {
+	completedActionLoggerServer := completedactionloggerapi.NewServer(dbClient)
+	if err := bb_grpc.NewServersFromConfigurationAndServe(
+		configuration.GrpcServers,
+		func(s go_grpc.ServiceRegistrar) {
+			completedactionloggerapi.RegisterServer(s, completedActionLoggerServer)
+		},
+		siblingsGroup,
+		grpcClientFactory,
+	); err != nil {
+		return util.StatusWrap(err, "CompletedActionLogger gRPC server failure")
 	}
 	return nil
 }

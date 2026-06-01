@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/completedaction"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 )
@@ -262,6 +263,21 @@ func (ac *ActionCreate) AddActionFiles(i ...*InvocationFiles) *ActionCreate {
 	return ac.AddActionFileIDs(ids...)
 }
 
+// AddCompletedActionIDs adds the "completed_actions" edge to the CompletedAction entity by IDs.
+func (ac *ActionCreate) AddCompletedActionIDs(ids ...int64) *ActionCreate {
+	ac.mutation.AddCompletedActionIDs(ids...)
+	return ac
+}
+
+// AddCompletedActions adds the "completed_actions" edges to the CompletedAction entity.
+func (ac *ActionCreate) AddCompletedActions(c ...*CompletedAction) *ActionCreate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ac.AddCompletedActionIDs(ids...)
+}
+
 // Mutation returns the ActionMutation object of the builder.
 func (ac *ActionCreate) Mutation() *ActionMutation {
 	return ac.mutation
@@ -447,6 +463,22 @@ func (ac *ActionCreate) createSpec() (*Action, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(invocationfiles.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.CompletedActionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   action.CompletedActionsTable,
+			Columns: []string{action.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

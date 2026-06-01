@@ -26,6 +26,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildgraphmetrics"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildlogchunk"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildtag"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/completedaction"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/connectionmetadata"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/eventmetadata"
@@ -81,6 +82,8 @@ type Client struct {
 	BuildLogChunk *BuildLogChunkClient
 	// BuildTag is the client for interacting with the BuildTag builders.
 	BuildTag *BuildTagClient
+	// CompletedAction is the client for interacting with the CompletedAction builders.
+	CompletedAction *CompletedActionClient
 	// Configuration is the client for interacting with the Configuration builders.
 	Configuration *ConfigurationClient
 	// ConnectionMetadata is the client for interacting with the ConnectionMetadata builders.
@@ -153,6 +156,7 @@ func (c *Client) init() {
 	c.BuildGraphMetrics = NewBuildGraphMetricsClient(c.config)
 	c.BuildLogChunk = NewBuildLogChunkClient(c.config)
 	c.BuildTag = NewBuildTagClient(c.config)
+	c.CompletedAction = NewCompletedActionClient(c.config)
 	c.Configuration = NewConfigurationClient(c.config)
 	c.ConnectionMetadata = NewConnectionMetadataClient(c.config)
 	c.EventMetadata = NewEventMetadataClient(c.config)
@@ -280,6 +284,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		BuildGraphMetrics:     NewBuildGraphMetricsClient(cfg),
 		BuildLogChunk:         NewBuildLogChunkClient(cfg),
 		BuildTag:              NewBuildTagClient(cfg),
+		CompletedAction:       NewCompletedActionClient(cfg),
 		Configuration:         NewConfigurationClient(cfg),
 		ConnectionMetadata:    NewConnectionMetadataClient(cfg),
 		EventMetadata:         NewEventMetadataClient(cfg),
@@ -334,6 +339,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		BuildGraphMetrics:     NewBuildGraphMetricsClient(cfg),
 		BuildLogChunk:         NewBuildLogChunkClient(cfg),
 		BuildTag:              NewBuildTagClient(cfg),
+		CompletedAction:       NewCompletedActionClient(cfg),
 		Configuration:         NewConfigurationClient(cfg),
 		ConnectionMetadata:    NewConnectionMetadataClient(cfg),
 		EventMetadata:         NewEventMetadataClient(cfg),
@@ -389,13 +395,13 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Action, c.ActionCacheStatistics, c.ActionData, c.ActionSummary,
 		c.ArtifactMetrics, c.AuthenticatedUser, c.BazelInvocation, c.Build,
-		c.BuildGraphMetrics, c.BuildLogChunk, c.BuildTag, c.Configuration,
-		c.ConnectionMetadata, c.EventMetadata, c.GarbageMetrics, c.IncompleteBuildLog,
-		c.InstanceName, c.InvocationFiles, c.InvocationTag, c.InvocationTarget,
-		c.MemoryMetrics, c.Metrics, c.MissDetail, c.NetworkMetrics, c.RunnerCount,
-		c.SourceControl, c.SystemNetworkStats, c.Target, c.TargetKindMapping,
-		c.TargetMetrics, c.TestResult, c.TestResultFile, c.TestSummary, c.TestTarget,
-		c.TimingMetrics,
+		c.BuildGraphMetrics, c.BuildLogChunk, c.BuildTag, c.CompletedAction,
+		c.Configuration, c.ConnectionMetadata, c.EventMetadata, c.GarbageMetrics,
+		c.IncompleteBuildLog, c.InstanceName, c.InvocationFiles, c.InvocationTag,
+		c.InvocationTarget, c.MemoryMetrics, c.Metrics, c.MissDetail, c.NetworkMetrics,
+		c.RunnerCount, c.SourceControl, c.SystemNetworkStats, c.Target,
+		c.TargetKindMapping, c.TargetMetrics, c.TestResult, c.TestResultFile,
+		c.TestSummary, c.TestTarget, c.TimingMetrics,
 	} {
 		n.Use(hooks...)
 	}
@@ -407,13 +413,13 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Action, c.ActionCacheStatistics, c.ActionData, c.ActionSummary,
 		c.ArtifactMetrics, c.AuthenticatedUser, c.BazelInvocation, c.Build,
-		c.BuildGraphMetrics, c.BuildLogChunk, c.BuildTag, c.Configuration,
-		c.ConnectionMetadata, c.EventMetadata, c.GarbageMetrics, c.IncompleteBuildLog,
-		c.InstanceName, c.InvocationFiles, c.InvocationTag, c.InvocationTarget,
-		c.MemoryMetrics, c.Metrics, c.MissDetail, c.NetworkMetrics, c.RunnerCount,
-		c.SourceControl, c.SystemNetworkStats, c.Target, c.TargetKindMapping,
-		c.TargetMetrics, c.TestResult, c.TestResultFile, c.TestSummary, c.TestTarget,
-		c.TimingMetrics,
+		c.BuildGraphMetrics, c.BuildLogChunk, c.BuildTag, c.CompletedAction,
+		c.Configuration, c.ConnectionMetadata, c.EventMetadata, c.GarbageMetrics,
+		c.IncompleteBuildLog, c.InstanceName, c.InvocationFiles, c.InvocationTag,
+		c.InvocationTarget, c.MemoryMetrics, c.Metrics, c.MissDetail, c.NetworkMetrics,
+		c.RunnerCount, c.SourceControl, c.SystemNetworkStats, c.Target,
+		c.TargetKindMapping, c.TargetMetrics, c.TestResult, c.TestResultFile,
+		c.TestSummary, c.TestTarget, c.TimingMetrics,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -444,6 +450,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.BuildLogChunk.mutate(ctx, m)
 	case *BuildTagMutation:
 		return c.BuildTag.mutate(ctx, m)
+	case *CompletedActionMutation:
+		return c.CompletedAction.mutate(ctx, m)
 	case *ConfigurationMutation:
 		return c.Configuration.mutate(ctx, m)
 	case *ConnectionMetadataMutation:
@@ -646,6 +654,22 @@ func (c *ActionClient) QueryActionFiles(a *Action) *InvocationFilesQuery {
 			sqlgraph.From(action.Table, action.FieldID, id),
 			sqlgraph.To(invocationfiles.Table, invocationfiles.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, action.ActionFilesTable, action.ActionFilesColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCompletedActions queries the completed_actions edge of a Action.
+func (c *ActionClient) QueryCompletedActions(a *Action) *CompletedActionQuery {
+	query := (&CompletedActionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(action.Table, action.FieldID, id),
+			sqlgraph.To(completedaction.Table, completedaction.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, action.CompletedActionsTable, action.CompletedActionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -1724,6 +1748,22 @@ func (c *BazelInvocationClient) QueryActions(bi *BazelInvocation) *ActionQuery {
 	return query
 }
 
+// QueryCompletedActions queries the completed_actions edge of a BazelInvocation.
+func (c *BazelInvocationClient) QueryCompletedActions(bi *BazelInvocation) *CompletedActionQuery {
+	query := (&CompletedActionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := bi.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bazelinvocation.Table, bazelinvocation.FieldID, id),
+			sqlgraph.To(completedaction.Table, completedaction.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, bazelinvocation.CompletedActionsTable, bazelinvocation.CompletedActionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(bi.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryMetrics queries the metrics edge of a BazelInvocation.
 func (c *BazelInvocationClient) QueryMetrics(bi *BazelInvocation) *MetricsQuery {
 	query := (&MetricsClient{config: c.config}).Query()
@@ -2488,6 +2528,171 @@ func (c *BuildTagClient) mutate(ctx context.Context, m *BuildTagMutation) (Value
 		return (&BuildTagDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown BuildTag mutation op: %q", m.Op())
+	}
+}
+
+// CompletedActionClient is a client for the CompletedAction schema.
+type CompletedActionClient struct {
+	config
+}
+
+// NewCompletedActionClient returns a client for the CompletedAction from the given config.
+func NewCompletedActionClient(c config) *CompletedActionClient {
+	return &CompletedActionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `completedaction.Hooks(f(g(h())))`.
+func (c *CompletedActionClient) Use(hooks ...Hook) {
+	c.hooks.CompletedAction = append(c.hooks.CompletedAction, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `completedaction.Intercept(f(g(h())))`.
+func (c *CompletedActionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CompletedAction = append(c.inters.CompletedAction, interceptors...)
+}
+
+// Create returns a builder for creating a CompletedAction entity.
+func (c *CompletedActionClient) Create() *CompletedActionCreate {
+	mutation := newCompletedActionMutation(c.config, OpCreate)
+	return &CompletedActionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CompletedAction entities.
+func (c *CompletedActionClient) CreateBulk(builders ...*CompletedActionCreate) *CompletedActionCreateBulk {
+	return &CompletedActionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CompletedActionClient) MapCreateBulk(slice any, setFunc func(*CompletedActionCreate, int)) *CompletedActionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CompletedActionCreateBulk{err: fmt.Errorf("calling to CompletedActionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CompletedActionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CompletedActionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CompletedAction.
+func (c *CompletedActionClient) Update() *CompletedActionUpdate {
+	mutation := newCompletedActionMutation(c.config, OpUpdate)
+	return &CompletedActionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CompletedActionClient) UpdateOne(ca *CompletedAction) *CompletedActionUpdateOne {
+	mutation := newCompletedActionMutation(c.config, OpUpdateOne, withCompletedAction(ca))
+	return &CompletedActionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CompletedActionClient) UpdateOneID(id int64) *CompletedActionUpdateOne {
+	mutation := newCompletedActionMutation(c.config, OpUpdateOne, withCompletedActionID(id))
+	return &CompletedActionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CompletedAction.
+func (c *CompletedActionClient) Delete() *CompletedActionDelete {
+	mutation := newCompletedActionMutation(c.config, OpDelete)
+	return &CompletedActionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CompletedActionClient) DeleteOne(ca *CompletedAction) *CompletedActionDeleteOne {
+	return c.DeleteOneID(ca.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CompletedActionClient) DeleteOneID(id int64) *CompletedActionDeleteOne {
+	builder := c.Delete().Where(completedaction.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CompletedActionDeleteOne{builder}
+}
+
+// Query returns a query builder for CompletedAction.
+func (c *CompletedActionClient) Query() *CompletedActionQuery {
+	return &CompletedActionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCompletedAction},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a CompletedAction entity by its id.
+func (c *CompletedActionClient) Get(ctx context.Context, id int64) (*CompletedAction, error) {
+	return c.Query().Where(completedaction.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CompletedActionClient) GetX(ctx context.Context, id int64) *CompletedAction {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryBazelInvocation queries the bazel_invocation edge of a CompletedAction.
+func (c *CompletedActionClient) QueryBazelInvocation(ca *CompletedAction) *BazelInvocationQuery {
+	query := (&BazelInvocationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(completedaction.Table, completedaction.FieldID, id),
+			sqlgraph.To(bazelinvocation.Table, bazelinvocation.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, completedaction.BazelInvocationTable, completedaction.BazelInvocationColumn),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAction queries the action edge of a CompletedAction.
+func (c *CompletedActionClient) QueryAction(ca *CompletedAction) *ActionQuery {
+	query := (&ActionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(completedaction.Table, completedaction.FieldID, id),
+			sqlgraph.To(action.Table, action.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, completedaction.ActionTable, completedaction.ActionColumn),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CompletedActionClient) Hooks() []Hook {
+	return c.hooks.CompletedAction
+}
+
+// Interceptors returns the client interceptors.
+func (c *CompletedActionClient) Interceptors() []Interceptor {
+	return c.inters.CompletedAction
+}
+
+func (c *CompletedActionClient) mutate(ctx context.Context, m *CompletedActionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CompletedActionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CompletedActionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CompletedActionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CompletedActionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CompletedAction mutation op: %q", m.Op())
 	}
 }
 
@@ -6460,22 +6665,22 @@ type (
 	hooks struct {
 		Action, ActionCacheStatistics, ActionData, ActionSummary, ArtifactMetrics,
 		AuthenticatedUser, BazelInvocation, Build, BuildGraphMetrics, BuildLogChunk,
-		BuildTag, Configuration, ConnectionMetadata, EventMetadata, GarbageMetrics,
-		IncompleteBuildLog, InstanceName, InvocationFiles, InvocationTag,
-		InvocationTarget, MemoryMetrics, Metrics, MissDetail, NetworkMetrics,
-		RunnerCount, SourceControl, SystemNetworkStats, Target, TargetKindMapping,
-		TargetMetrics, TestResult, TestResultFile, TestSummary, TestTarget,
-		TimingMetrics []ent.Hook
+		BuildTag, CompletedAction, Configuration, ConnectionMetadata, EventMetadata,
+		GarbageMetrics, IncompleteBuildLog, InstanceName, InvocationFiles,
+		InvocationTag, InvocationTarget, MemoryMetrics, Metrics, MissDetail,
+		NetworkMetrics, RunnerCount, SourceControl, SystemNetworkStats, Target,
+		TargetKindMapping, TargetMetrics, TestResult, TestResultFile, TestSummary,
+		TestTarget, TimingMetrics []ent.Hook
 	}
 	inters struct {
 		Action, ActionCacheStatistics, ActionData, ActionSummary, ArtifactMetrics,
 		AuthenticatedUser, BazelInvocation, Build, BuildGraphMetrics, BuildLogChunk,
-		BuildTag, Configuration, ConnectionMetadata, EventMetadata, GarbageMetrics,
-		IncompleteBuildLog, InstanceName, InvocationFiles, InvocationTag,
-		InvocationTarget, MemoryMetrics, Metrics, MissDetail, NetworkMetrics,
-		RunnerCount, SourceControl, SystemNetworkStats, Target, TargetKindMapping,
-		TargetMetrics, TestResult, TestResultFile, TestSummary, TestTarget,
-		TimingMetrics []ent.Interceptor
+		BuildTag, CompletedAction, Configuration, ConnectionMetadata, EventMetadata,
+		GarbageMetrics, IncompleteBuildLog, InstanceName, InvocationFiles,
+		InvocationTag, InvocationTarget, MemoryMetrics, Metrics, MissDetail,
+		NetworkMetrics, RunnerCount, SourceControl, SystemNetworkStats, Target,
+		TargetKindMapping, TargetMetrics, TestResult, TestResultFile, TestSummary,
+		TestTarget, TimingMetrics []ent.Interceptor
 	}
 )
 

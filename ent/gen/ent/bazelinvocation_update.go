@@ -16,6 +16,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/build"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildlogchunk"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/completedaction"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/connectionmetadata"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/eventmetadata"
@@ -488,6 +489,21 @@ func (biu *BazelInvocationUpdate) AddActions(a ...*Action) *BazelInvocationUpdat
 	return biu.AddActionIDs(ids...)
 }
 
+// AddCompletedActionIDs adds the "completed_actions" edge to the CompletedAction entity by IDs.
+func (biu *BazelInvocationUpdate) AddCompletedActionIDs(ids ...int64) *BazelInvocationUpdate {
+	biu.mutation.AddCompletedActionIDs(ids...)
+	return biu
+}
+
+// AddCompletedActions adds the "completed_actions" edges to the CompletedAction entity.
+func (biu *BazelInvocationUpdate) AddCompletedActions(c ...*CompletedAction) *BazelInvocationUpdate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return biu.AddCompletedActionIDs(ids...)
+}
+
 // SetMetricsID sets the "metrics" edge to the Metrics entity by ID.
 func (biu *BazelInvocationUpdate) SetMetricsID(id int64) *BazelInvocationUpdate {
 	biu.mutation.SetMetricsID(id)
@@ -693,6 +709,27 @@ func (biu *BazelInvocationUpdate) RemoveActions(a ...*Action) *BazelInvocationUp
 		ids[i] = a[i].ID
 	}
 	return biu.RemoveActionIDs(ids...)
+}
+
+// ClearCompletedActions clears all "completed_actions" edges to the CompletedAction entity.
+func (biu *BazelInvocationUpdate) ClearCompletedActions() *BazelInvocationUpdate {
+	biu.mutation.ClearCompletedActions()
+	return biu
+}
+
+// RemoveCompletedActionIDs removes the "completed_actions" edge to CompletedAction entities by IDs.
+func (biu *BazelInvocationUpdate) RemoveCompletedActionIDs(ids ...int64) *BazelInvocationUpdate {
+	biu.mutation.RemoveCompletedActionIDs(ids...)
+	return biu
+}
+
+// RemoveCompletedActions removes "completed_actions" edges to CompletedAction entities.
+func (biu *BazelInvocationUpdate) RemoveCompletedActions(c ...*CompletedAction) *BazelInvocationUpdate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return biu.RemoveCompletedActionIDs(ids...)
 }
 
 // ClearMetrics clears the "metrics" edge to the Metrics entity.
@@ -1246,6 +1283,51 @@ func (biu *BazelInvocationUpdate) sqlSave(ctx context.Context) (n int, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(action.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if biu.mutation.CompletedActionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   bazelinvocation.CompletedActionsTable,
+			Columns: []string{bazelinvocation.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := biu.mutation.RemovedCompletedActionsIDs(); len(nodes) > 0 && !biu.mutation.CompletedActionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   bazelinvocation.CompletedActionsTable,
+			Columns: []string{bazelinvocation.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := biu.mutation.CompletedActionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   bazelinvocation.CompletedActionsTable,
+			Columns: []string{bazelinvocation.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -2016,6 +2098,21 @@ func (biuo *BazelInvocationUpdateOne) AddActions(a ...*Action) *BazelInvocationU
 	return biuo.AddActionIDs(ids...)
 }
 
+// AddCompletedActionIDs adds the "completed_actions" edge to the CompletedAction entity by IDs.
+func (biuo *BazelInvocationUpdateOne) AddCompletedActionIDs(ids ...int64) *BazelInvocationUpdateOne {
+	biuo.mutation.AddCompletedActionIDs(ids...)
+	return biuo
+}
+
+// AddCompletedActions adds the "completed_actions" edges to the CompletedAction entity.
+func (biuo *BazelInvocationUpdateOne) AddCompletedActions(c ...*CompletedAction) *BazelInvocationUpdateOne {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return biuo.AddCompletedActionIDs(ids...)
+}
+
 // SetMetricsID sets the "metrics" edge to the Metrics entity by ID.
 func (biuo *BazelInvocationUpdateOne) SetMetricsID(id int64) *BazelInvocationUpdateOne {
 	biuo.mutation.SetMetricsID(id)
@@ -2221,6 +2318,27 @@ func (biuo *BazelInvocationUpdateOne) RemoveActions(a ...*Action) *BazelInvocati
 		ids[i] = a[i].ID
 	}
 	return biuo.RemoveActionIDs(ids...)
+}
+
+// ClearCompletedActions clears all "completed_actions" edges to the CompletedAction entity.
+func (biuo *BazelInvocationUpdateOne) ClearCompletedActions() *BazelInvocationUpdateOne {
+	biuo.mutation.ClearCompletedActions()
+	return biuo
+}
+
+// RemoveCompletedActionIDs removes the "completed_actions" edge to CompletedAction entities by IDs.
+func (biuo *BazelInvocationUpdateOne) RemoveCompletedActionIDs(ids ...int64) *BazelInvocationUpdateOne {
+	biuo.mutation.RemoveCompletedActionIDs(ids...)
+	return biuo
+}
+
+// RemoveCompletedActions removes "completed_actions" edges to CompletedAction entities.
+func (biuo *BazelInvocationUpdateOne) RemoveCompletedActions(c ...*CompletedAction) *BazelInvocationUpdateOne {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return biuo.RemoveCompletedActionIDs(ids...)
 }
 
 // ClearMetrics clears the "metrics" edge to the Metrics entity.
@@ -2804,6 +2922,51 @@ func (biuo *BazelInvocationUpdateOne) sqlSave(ctx context.Context) (_node *Bazel
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(action.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if biuo.mutation.CompletedActionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   bazelinvocation.CompletedActionsTable,
+			Columns: []string{bazelinvocation.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := biuo.mutation.RemovedCompletedActionsIDs(); len(nodes) > 0 && !biuo.mutation.CompletedActionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   bazelinvocation.CompletedActionsTable,
+			Columns: []string{bazelinvocation.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := biuo.mutation.CompletedActionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   bazelinvocation.CompletedActionsTable,
+			Columns: []string{bazelinvocation.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

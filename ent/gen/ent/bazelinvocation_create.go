@@ -16,6 +16,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/build"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildlogchunk"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/completedaction"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/connectionmetadata"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/eventmetadata"
@@ -407,6 +408,21 @@ func (bic *BazelInvocationCreate) AddActions(a ...*Action) *BazelInvocationCreat
 		ids[i] = a[i].ID
 	}
 	return bic.AddActionIDs(ids...)
+}
+
+// AddCompletedActionIDs adds the "completed_actions" edge to the CompletedAction entity by IDs.
+func (bic *BazelInvocationCreate) AddCompletedActionIDs(ids ...int64) *BazelInvocationCreate {
+	bic.mutation.AddCompletedActionIDs(ids...)
+	return bic
+}
+
+// AddCompletedActions adds the "completed_actions" edges to the CompletedAction entity.
+func (bic *BazelInvocationCreate) AddCompletedActions(c ...*CompletedAction) *BazelInvocationCreate {
+	ids := make([]int64, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return bic.AddCompletedActionIDs(ids...)
 }
 
 // SetMetricsID sets the "metrics" edge to the Metrics entity by ID.
@@ -841,6 +857,22 @@ func (bic *BazelInvocationCreate) createSpec() (*BazelInvocation, *sqlgraph.Crea
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(action.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := bic.mutation.CompletedActionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   bazelinvocation.CompletedActionsTable,
+			Columns: []string{bazelinvocation.CompletedActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(completedaction.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

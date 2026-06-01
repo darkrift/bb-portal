@@ -23,6 +23,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildgraphmetrics"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildlogchunk"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/buildtag"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/completedaction"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/configuration"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/connectionmetadata"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/eventmetadata"
@@ -118,6 +119,7 @@ func checkColumn(table, column string) error {
 			buildgraphmetrics.Table:     buildgraphmetrics.ValidColumn,
 			buildlogchunk.Table:         buildlogchunk.ValidColumn,
 			buildtag.Table:              buildtag.ValidColumn,
+			completedaction.Table:       completedaction.ValidColumn,
 			configuration.Table:         configuration.ValidColumn,
 			connectionmetadata.Table:    connectionmetadata.ValidColumn,
 			eventmetadata.Table:         eventmetadata.ValidColumn,

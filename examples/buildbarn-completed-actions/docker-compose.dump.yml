@@ -1,0 +1,19 @@
+services:
+  completed-action-relay:
+    command:
+      - -listen=0.0.0.0:8981
+      - -listen=0.0.0.0:8982
+      - -connect=completed-action-dump:8982
+    depends_on:
+      - completed-action-dump
+
+  completed-action-dump:
+    image: bb-portal/completed-action-logger-dump:local
+    command:
+      - -listen=0.0.0.0:8982
+      - -output=/out/completed-actions.ndjson
+    ports:
+      - "8982:8982"
+    volumes:
+      - ${BB_PORTAL_COMPLETED_ACTION_OUT:-./completed-action-events}:/out
+    restart: unless-stopped
