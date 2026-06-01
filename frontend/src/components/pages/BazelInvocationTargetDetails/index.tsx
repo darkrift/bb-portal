@@ -351,21 +351,21 @@ export const BazelInvocationTargetDetailsPage: React.FC<Props> = ({
           },
         ]
       : []),
-    ...(target.testSummary?.length
-      ? [
-          {
-            key: "test-summary",
-            icon: <ExperimentOutlined />,
-            label: <Link to="/bazel-invocations/$invocationID/targets/$targetID/test-summary" params={{ invocationID, targetID: target.target.id }}>Test Summary</Link>,
-          },
-        ]
-      : []),
     ...(actions?.some((action) => action.label === target.target.label)
       ? [
           {
             key: "actions",
             icon: <DatabaseOutlined />,
             label: <Link to="/bazel-invocations/$invocationID/targets/$targetID/actions" params={{ invocationID, targetID: target.target.id }}>Actions</Link>,
+          },
+        ]
+      : []),
+    ...(target.testSummary?.length
+      ? [
+          {
+            key: "test-summary",
+            icon: <ExperimentOutlined />,
+            label: <Link to="/bazel-invocations/$invocationID/targets/$targetID/test-summary" params={{ invocationID, targetID: target.target.id }}>Test Summary</Link>,
           },
         ]
       : []),

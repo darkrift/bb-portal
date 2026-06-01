@@ -1,0 +1,7 @@
+.actionTypeTag {
+  margin-inline-end: 0;
+}
+
+:global(:root:not([data-theme="dark"])) .actionTypeTag {
+  border-color: #8c8c8c;
+}

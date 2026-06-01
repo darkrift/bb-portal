@@ -1,6 +1,15 @@
 import { WarningOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Descriptions, Flex, Space, Tooltip, Typography } from "antd";
+import {
+  Button,
+  Descriptions,
+  Divider,
+  Flex,
+  Space,
+  Tag,
+  Tooltip,
+  Typography,
+} from "antd";
 import type { BazelInvocationActionsFragment } from "@/graphql/__generated__/graphql";
 import { casByteStreamClient } from "@/grpc/casByteStreamClient";
 import { digestFunction_ValueFromJSON } from "@/lib/grpc-client/build/bazel/remote/execution/v2/remote_execution";
@@ -76,6 +85,50 @@ const renderActionFileLink = (
   );
 };
 
+const renderValue = (value: unknown) => {
+  if (value === null || value === undefined || value === "") {
+    return "-";
+  }
+  if (typeof value === "boolean") {
+    return value ? "Yes" : "No";
+  }
+  return `${value}`;
+};
+
+const renderDigest = (
+  digestFunction: string | undefined | null,
+  hash: string | undefined | null,
+  sizeBytes: number | undefined | null,
+  fileName: string,
+  instanceName: string,
+) => {
+  if (!digestFunction || !hash || !sizeBytes) {
+    return "-";
+  }
+  return (
+    <Space direction="vertical" size={0}>
+      <Typography.Text code copyable={{ text: hash }}>
+        {hash}
+      </Typography.Text>
+      <a
+        href={generateFileUrl(
+          instanceName,
+          digestFunctionValueFromString(digestFunction),
+          {
+            hash,
+            sizeBytes: sizeBytes.toString(),
+          },
+          fileName,
+        )}
+        target="_self"
+        rel="noreferrer"
+      >
+        {digestFunction} / {readableFileSize(sizeBytes)}
+      </a>
+    </Space>
+  );
+};
+
 interface Props {
   instanceName: string;
   action: BazelInvocationActionsFragment;
@@ -121,11 +174,22 @@ export const ActionDetails: React.FC<Props> = ({ instanceName, action }) => {
   return (
     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
       <Descriptions
+        title="Action"
         bordered
         column={1}
         size="small"
         styles={{ label: { width: "20%" }, content: { width: "90%" } }}
       >
+        <Descriptions.Item label="ID">
+          <Typography.Text copyable={{ text: action.id }}>
+            {action.id}
+          </Typography.Text>
+        </Descriptions.Item>
+        <Descriptions.Item label="Label">
+          <Typography.Text copyable={{ text: action.label }}>
+            {action.label}
+          </Typography.Text>
+        </Descriptions.Item>
         {action.type && (
           <Descriptions.Item label="Type">{action.type}</Descriptions.Item>
         )}
@@ -149,12 +213,18 @@ export const ActionDetails: React.FC<Props> = ({ instanceName, action }) => {
             {action.failureMessage}
           </Descriptions.Item>
         )}
+        {action.startTime && (
+          <Descriptions.Item label="Started">{action.startTime}</Descriptions.Item>
+        )}
+        {action.endTime && (
+          <Descriptions.Item label="Finished">{action.endTime}</Descriptions.Item>
+        )}
         {action.commandLine && (
           <Descriptions.Item label="Command Line">
             <Flex wrap>
               {action.commandLine.map((arg, index) => (
                 <pre
-                  // biome-ignore lint/suspicious/noArrayIndexKey: Since there are dupliate args, we need to use index
+                  // biome-ignore lint/suspicious/noArrayIndexKey: Since there are duplicate args, use the index.
                   key={`${arg}-${index}`}
                   style={{ textWrap: "wrap", paddingRight: "0.7em" }}
                 >
@@ -164,6 +234,35 @@ export const ActionDetails: React.FC<Props> = ({ instanceName, action }) => {
             </Flex>
           </Descriptions.Item>
         )}
+        <Descriptions.Item label="Stdout Digest">
+          {renderDigest(
+            action.stdoutHashFunction,
+            action.stdoutHash,
+            action.stdoutSizeBytes,
+            "standard_output",
+            instanceName,
+          )}
+        </Descriptions.Item>
+        <Descriptions.Item label="Stderr Digest">
+          {renderDigest(
+            action.stderrHashFunction,
+            action.stderrHash,
+            action.stderrSizeBytes,
+            "error_output",
+            instanceName,
+          )}
+        </Descriptions.Item>
+      </Descriptions>
+      <Descriptions
+        title="Configuration"
+        bordered
+        column={1}
+        size="small"
+        styles={{ label: { width: "20%" }, content: { width: "90%" } }}
+      >
+        <Descriptions.Item label="Configuration ID">
+          {action.configuration?.configurationID ?? "-"}
+        </Descriptions.Item>
         {action.configuration?.cpu && (
           <Descriptions.Item label="Configuration CPU">
             {action.configuration.cpu}
@@ -195,6 +294,107 @@ export const ActionDetails: React.FC<Props> = ({ instanceName, action }) => {
             </Descriptions.Item>
           )}
       </Descriptions>
+      {Array.isArray(action.completedActions) &&
+        action.completedActions.length > 0 && (
+          <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+            <Divider orientation="left">Completed Actions</Divider>
+            {action.completedActions.map((completedAction) => (
+              <Descriptions
+                key={completedAction.id}
+                bordered
+                column={1}
+                size="small"
+                styles={{ label: { width: "20%" }, content: { width: "90%" } }}
+                title={
+                  <Space size="small" wrap>
+                    <Typography.Text copyable={{ text: completedAction.uuid }}>
+                      {completedAction.uuid}
+                    </Typography.Text>
+                    {completedAction.cacheHit !== null &&
+                      completedAction.cacheHit !== undefined && (
+                        <Tag color={completedAction.cacheHit ? "blue" : "orange"}>
+                          {completedAction.cacheHit ? "Cache hit" : "Executed"}
+                        </Tag>
+                      )}
+                    {completedAction.exitCode !== null &&
+                      completedAction.exitCode !== undefined && (
+                        <Tag color={completedAction.exitCode === 0 ? "green" : "red"}>
+                          Exit {completedAction.exitCode}
+                        </Tag>
+                      )}
+                  </Space>
+                }
+              >
+                <Descriptions.Item label="Instance Name">
+                  {renderValue(completedAction.instanceName)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Action Digest">
+                  {renderDigest(
+                    completedAction.digestFunction,
+                    completedAction.actionDigestHash,
+                    completedAction.actionDigestSizeBytes,
+                    "action",
+                    instanceName,
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item label="Tool Invocation ID">
+                  {renderValue(completedAction.toolInvocationID)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Correlated Invocations ID">
+                  {renderValue(completedAction.correlatedInvocationsID)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Target ID">
+                  {renderValue(completedAction.targetID)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Action Mnemonic">
+                  {renderValue(completedAction.actionMnemonic)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Cache Hit">
+                  {renderValue(completedAction.cacheHit)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Exit Code">
+                  {renderValue(completedAction.exitCode)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Status Code">
+                  {renderValue(completedAction.statusCode)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Status Message">
+                  {renderValue(completedAction.statusMessage)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Queued At">
+                  {renderValue(completedAction.queuedAt)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Worker Started At">
+                  {renderValue(completedAction.workerStartAt)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Worker Completed At">
+                  {renderValue(completedAction.workerCompletedAt)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Uploaded At">
+                  {renderValue(completedAction.uploadedAt)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Stdout Digest">
+                  {renderDigest(
+                    completedAction.digestFunction,
+                    completedAction.stdoutHash,
+                    completedAction.stdoutSizeBytes,
+                    "completed_action_stdout",
+                    instanceName,
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item label="Stderr Digest">
+                  {renderDigest(
+                    completedAction.digestFunction,
+                    completedAction.stderrHash,
+                    completedAction.stderrSizeBytes,
+                    "completed_action_stderr",
+                    instanceName,
+                  )}
+                </Descriptions.Item>
+              </Descriptions>
+            ))}
+          </Space>
+        )}
       <LogViewerCard
         log={data?.stdout}
         title="Standard output"

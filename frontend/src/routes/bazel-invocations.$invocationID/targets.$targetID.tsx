@@ -119,6 +119,30 @@ const BAZEL_INVOCATION_ACTIONS_FRAGMENT = gql(/* GraphQL */ `
       name
       uri
     }
+    completedActions {
+      id
+      uuid
+      instanceName
+      actionDigestHash
+      actionDigestSizeBytes
+      digestFunction
+      toolInvocationID
+      correlatedInvocationsID
+      targetID
+      actionMnemonic
+      cacheHit
+      exitCode
+      statusCode
+      statusMessage
+      queuedAt
+      workerStartAt
+      workerCompletedAt
+      uploadedAt
+      stdoutHash
+      stdoutSizeBytes
+      stderrHash
+      stderrSizeBytes
+    }
     configuration {
       id
       configurationID
