@@ -98,7 +98,7 @@ export const Route = createFileRoute(
     const actions = getFragmentData(
       BAZEL_INVOCATION_ACTIONS_FRAGMENT,
       data.getBazelInvocation?.actions,
-    );
+    ).filter((action) => action.success === false);
     return { instanceName: data.getBazelInvocation.instanceName.name, actions };
   },
   head: (_ctx) => ({

@@ -18,7 +18,7 @@ import { env } from "@/utils/env";
 
 interface BazelInvocationLike {
   invocationID: string;
-  actions?: Array<unknown> | null;
+  actions?: Array<{ success?: boolean | null } | null> | null;
   metrics?: unknown | null;
   sourceControl?: Array<unknown> | null;
   tags?: { totalCount?: number | null } | null;
@@ -29,7 +29,9 @@ const getMenuItems = (
 ): ItemType[] => {
   const { invocationID } = invocation;
 
-  const showActionsTab = !!invocation.actions?.length;
+  const showFailedActionsTab = !!invocation.actions?.some(
+    (action) => action?.success === false,
+  );
   const showMetricsTab = !!invocation.metrics;
   const showSourceControlTab = !!invocation.sourceControl?.length;
   const showTagsTab = !!invocation.tags?.totalCount;
@@ -132,7 +134,7 @@ const getMenuItems = (
         </Link>
       ),
     });
-  if (showActionsTab)
+  if (showFailedActionsTab)
     items.push({
       key: "actions",
       icon: <DatabaseOutlined />,

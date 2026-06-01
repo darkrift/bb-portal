@@ -20,6 +20,7 @@ const BAZEL_INVOCATION_OVERVIEW_FRAGMENT = gql(/* GraphQL */ `
     invocationID
     actions {
       id
+      success
     }
     metrics {
       id
