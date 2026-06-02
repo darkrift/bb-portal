@@ -135,7 +135,24 @@ interface Props {
 }
 
 export const ActionDetails: React.FC<Props> = ({ instanceName, action }) => {
-  const { data } = useQuery({
+  const hasActionOutputLink = Boolean(
+    action.stdoutHash &&
+      action.stdoutHashFunction &&
+      action.stdoutSizeBytes &&
+      action.stdoutSizeBytes > 0,
+  );
+  const hasErrorOutputLink = Boolean(
+    action.stderrHash &&
+      action.stderrHashFunction &&
+      action.stderrSizeBytes &&
+      action.stderrSizeBytes > 0,
+  );
+
+  const {
+    data,
+    error: logFetchError,
+    isLoading: logsLoading,
+  } = useQuery({
     queryKey: ["actionLogs", action.id],
     queryFn: async () => {
       const stdoutPromise = fetchLog(
@@ -164,12 +181,8 @@ export const ActionDetails: React.FC<Props> = ({ instanceName, action }) => {
 
       return { stdout, stderr, historicalUrl };
     },
+    enabled: hasActionOutputLink || hasErrorOutputLink,
   });
-
-  const validActionOutputLink =
-    action.stdoutHash && action.stdoutHashFunction && action.stdoutSizeBytes;
-  const validErrorOutputLink =
-    action.stderrHash && action.stderrHashFunction && action.stderrSizeBytes;
 
   return (
     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
@@ -395,68 +408,76 @@ export const ActionDetails: React.FC<Props> = ({ instanceName, action }) => {
             ))}
           </Space>
         )}
-      <LogViewerCard
-        log={data?.stdout}
-        title="Standard output"
-        logDownloadUrl={
-          action.stdoutHashFunction &&
-          action.stdoutHash &&
-          action.stdoutSizeBytes
-            ? generateFileUrl(
-                instanceName,
-                digestFunctionValueFromString(action.stdoutHashFunction),
-                {
-                  hash: action.stdoutHash,
-                  sizeBytes: action.stdoutSizeBytes.toString(),
-                },
-                "standard_output",
-              )
-            : undefined
-        }
-        fileName="standard_output.txt"
-        error={
-          !data?.stdout &&
-          action.stdoutSizeBytes &&
-          action.stdoutSizeBytes > SIZE_BYTE_LIMIT
-            ? Error("Standard output is too large to display.", {
-                cause: `The standard output is ${readableFileSize(
-                  action.stdoutSizeBytes,
-                )}. ${validActionOutputLink && "Please download the output to view it."}`,
-              })
-            : undefined
-        }
-      />
-      <LogViewerCard
-        log={data?.stderr}
-        title="Standard error"
-        logDownloadUrl={
-          action.stderrHashFunction &&
-          action.stderrHash &&
-          action.stderrSizeBytes
-            ? generateFileUrl(
-                instanceName,
-                digestFunctionValueFromString(action.stderrHashFunction),
-                {
-                  hash: action.stderrHash,
-                  sizeBytes: action.stderrSizeBytes.toString(),
-                },
-                "error_output",
-              )
-            : undefined
-        }
-        fileName="error_output.txt"
-        error={
-          !data?.stderr &&
-          action.stderrSizeBytes &&
-          action.stderrSizeBytes > SIZE_BYTE_LIMIT
-            ? Error("Standard error is too large to display.", {
-                cause: `The standard error output is ${readableFileSize(
-                  action.stderrSizeBytes,
-                )}. ${validErrorOutputLink && "Please download the output to view it."}`,
-              })
-            : undefined
-        }
-      />
+      {hasActionOutputLink && (
+        <LogViewerCard
+          log={data?.stdout}
+          loading={logsLoading}
+          title="Standard output"
+          logDownloadUrl={
+            action.stdoutHashFunction &&
+            action.stdoutHash &&
+            action.stdoutSizeBytes
+              ? generateFileUrl(
+                  instanceName,
+                  digestFunctionValueFromString(action.stdoutHashFunction),
+                  {
+                    hash: action.stdoutHash,
+                    sizeBytes: action.stdoutSizeBytes.toString(),
+                  },
+                  "standard_output",
+                )
+              : undefined
+          }
+          fileName="standard_output.txt"
+          error={
+            logFetchError ??
+            (!data?.stdout &&
+            action.stdoutSizeBytes &&
+            action.stdoutSizeBytes > SIZE_BYTE_LIMIT
+              ? Error("Standard output is too large to display.", {
+                  cause: `The standard output is ${readableFileSize(
+                    action.stdoutSizeBytes,
+                  )}. Please download the output to view it.`,
+                })
+              : undefined)
+          }
+        />
+      )}
+      {hasErrorOutputLink && (
+        <LogViewerCard
+          log={data?.stderr}
+          loading={logsLoading}
+          title="Standard error"
+          logDownloadUrl={
+            action.stderrHashFunction &&
+            action.stderrHash &&
+            action.stderrSizeBytes
+              ? generateFileUrl(
+                  instanceName,
+                  digestFunctionValueFromString(action.stderrHashFunction),
+                  {
+                    hash: action.stderrHash,
+                    sizeBytes: action.stderrSizeBytes.toString(),
+                  },
+                  "error_output",
+                )
+              : undefined
+          }
+          fileName="error_output.txt"
+          error={
+            logFetchError ??
+            (!data?.stderr &&
+            action.stderrSizeBytes &&
+            action.stderrSizeBytes > SIZE_BYTE_LIMIT
+              ? Error("Standard error is too large to display.", {
+                  cause: `The standard error output is ${readableFileSize(
+                    action.stderrSizeBytes,
+                  )}. Please download the output to view it.`,
+                })
+              : undefined)
+          }
+        />
+      )}
       {Array.isArray(action.actionFiles) && action.actionFiles.length > 0 && (
         <Space direction="vertical" size="small" style={{ width: "100%" }}>
           <Typography.Text strong>Files</Typography.Text>
