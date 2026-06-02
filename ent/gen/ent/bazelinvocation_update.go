@@ -289,6 +289,26 @@ func (biu *BazelInvocationUpdate) ClearOptionsParsed() *BazelInvocationUpdate {
 	return biu
 }
 
+// SetBuildEventPublishAllActions sets the "build_event_publish_all_actions" field.
+func (biu *BazelInvocationUpdate) SetBuildEventPublishAllActions(b bool) *BazelInvocationUpdate {
+	biu.mutation.SetBuildEventPublishAllActions(b)
+	return biu
+}
+
+// SetNillableBuildEventPublishAllActions sets the "build_event_publish_all_actions" field if the given value is not nil.
+func (biu *BazelInvocationUpdate) SetNillableBuildEventPublishAllActions(b *bool) *BazelInvocationUpdate {
+	if b != nil {
+		biu.SetBuildEventPublishAllActions(*b)
+	}
+	return biu
+}
+
+// ClearBuildEventPublishAllActions clears the value of the "build_event_publish_all_actions" field.
+func (biu *BazelInvocationUpdate) ClearBuildEventPublishAllActions() *BazelInvocationUpdate {
+	biu.mutation.ClearBuildEventPublishAllActions()
+	return biu
+}
+
 // SetEnvironmentVariables sets the "environment_variables" field.
 func (biu *BazelInvocationUpdate) SetEnvironmentVariables(m map[string]string) *BazelInvocationUpdate {
 	biu.mutation.SetEnvironmentVariables(m)
@@ -991,6 +1011,12 @@ func (biu *BazelInvocationUpdate) sqlSave(ctx context.Context) (n int, err error
 	}
 	if biu.mutation.OptionsParsedCleared() {
 		_spec.ClearField(bazelinvocation.FieldOptionsParsed, field.TypeJSON)
+	}
+	if value, ok := biu.mutation.BuildEventPublishAllActions(); ok {
+		_spec.SetField(bazelinvocation.FieldBuildEventPublishAllActions, field.TypeBool, value)
+	}
+	if biu.mutation.BuildEventPublishAllActionsCleared() {
+		_spec.ClearField(bazelinvocation.FieldBuildEventPublishAllActions, field.TypeBool)
 	}
 	if value, ok := biu.mutation.EnvironmentVariables(); ok {
 		_spec.SetField(bazelinvocation.FieldEnvironmentVariables, field.TypeJSON, value)
@@ -1898,6 +1924,26 @@ func (biuo *BazelInvocationUpdateOne) ClearOptionsParsed() *BazelInvocationUpdat
 	return biuo
 }
 
+// SetBuildEventPublishAllActions sets the "build_event_publish_all_actions" field.
+func (biuo *BazelInvocationUpdateOne) SetBuildEventPublishAllActions(b bool) *BazelInvocationUpdateOne {
+	biuo.mutation.SetBuildEventPublishAllActions(b)
+	return biuo
+}
+
+// SetNillableBuildEventPublishAllActions sets the "build_event_publish_all_actions" field if the given value is not nil.
+func (biuo *BazelInvocationUpdateOne) SetNillableBuildEventPublishAllActions(b *bool) *BazelInvocationUpdateOne {
+	if b != nil {
+		biuo.SetBuildEventPublishAllActions(*b)
+	}
+	return biuo
+}
+
+// ClearBuildEventPublishAllActions clears the value of the "build_event_publish_all_actions" field.
+func (biuo *BazelInvocationUpdateOne) ClearBuildEventPublishAllActions() *BazelInvocationUpdateOne {
+	biuo.mutation.ClearBuildEventPublishAllActions()
+	return biuo
+}
+
 // SetEnvironmentVariables sets the "environment_variables" field.
 func (biuo *BazelInvocationUpdateOne) SetEnvironmentVariables(m map[string]string) *BazelInvocationUpdateOne {
 	biuo.mutation.SetEnvironmentVariables(m)
@@ -2630,6 +2676,12 @@ func (biuo *BazelInvocationUpdateOne) sqlSave(ctx context.Context) (_node *Bazel
 	}
 	if biuo.mutation.OptionsParsedCleared() {
 		_spec.ClearField(bazelinvocation.FieldOptionsParsed, field.TypeJSON)
+	}
+	if value, ok := biuo.mutation.BuildEventPublishAllActions(); ok {
+		_spec.SetField(bazelinvocation.FieldBuildEventPublishAllActions, field.TypeBool, value)
+	}
+	if biuo.mutation.BuildEventPublishAllActionsCleared() {
+		_spec.ClearField(bazelinvocation.FieldBuildEventPublishAllActions, field.TypeBool)
 	}
 	if value, ok := biuo.mutation.EnvironmentVariables(); ok {
 		_spec.SetField(bazelinvocation.FieldEnvironmentVariables, field.TypeJSON, value)

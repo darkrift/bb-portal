@@ -56,6 +56,8 @@ type BazelInvocation struct {
 	OriginalCommandLine *invocation.CommandLineData `json:"original_command_line,omitempty"`
 	// JSON representation of the parsed command line options
 	OptionsParsed *invocation.ParsedCommandLineOptions `json:"options_parsed,omitempty"`
+	// BuildEventPublishAllActions holds the value of the "build_event_publish_all_actions" field.
+	BuildEventPublishAllActions bool `json:"build_event_publish_all_actions,omitempty"`
 	// EnvironmentVariables holds the value of the "environment_variables" field.
 	EnvironmentVariables map[string]string `json:"environment_variables,omitempty"`
 	// ProcessedEventStarted holds the value of the "processed_event_started" field.
@@ -290,7 +292,7 @@ func (*BazelInvocation) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case bazelinvocation.FieldCanonicalCommandLine, bazelinvocation.FieldOriginalCommandLine, bazelinvocation.FieldOptionsParsed, bazelinvocation.FieldEnvironmentVariables:
 			values[i] = new([]byte)
-		case bazelinvocation.FieldBepCompleted, bazelinvocation.FieldProcessedEventStarted, bazelinvocation.FieldProcessedEventBuildMetadata, bazelinvocation.FieldProcessedEventBuildFinished, bazelinvocation.FieldProcessedEventWorkspaceStatus:
+		case bazelinvocation.FieldBepCompleted, bazelinvocation.FieldBuildEventPublishAllActions, bazelinvocation.FieldProcessedEventStarted, bazelinvocation.FieldProcessedEventBuildMetadata, bazelinvocation.FieldProcessedEventBuildFinished, bazelinvocation.FieldProcessedEventWorkspaceStatus:
 			values[i] = new(sql.NullBool)
 		case bazelinvocation.FieldID, bazelinvocation.FieldNumFetches, bazelinvocation.FieldExitCodeCode:
 			values[i] = new(sql.NullInt64)
@@ -423,6 +425,12 @@ func (bi *BazelInvocation) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &bi.OptionsParsed); err != nil {
 					return fmt.Errorf("unmarshal field options_parsed: %w", err)
 				}
+			}
+		case bazelinvocation.FieldBuildEventPublishAllActions:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field build_event_publish_all_actions", values[i])
+			} else if value.Valid {
+				bi.BuildEventPublishAllActions = value.Bool
 			}
 		case bazelinvocation.FieldEnvironmentVariables:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -639,6 +647,9 @@ func (bi *BazelInvocation) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("options_parsed=")
 	builder.WriteString(fmt.Sprintf("%v", bi.OptionsParsed))
+	builder.WriteString(", ")
+	builder.WriteString("build_event_publish_all_actions=")
+	builder.WriteString(fmt.Sprintf("%v", bi.BuildEventPublishAllActions))
 	builder.WriteString(", ")
 	builder.WriteString("environment_variables=")
 	builder.WriteString(fmt.Sprintf("%v", bi.EnvironmentVariables))

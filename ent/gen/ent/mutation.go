@@ -6874,6 +6874,7 @@ type BazelInvocationMutation struct {
 	canonical_command_line           **invocation.CommandLineData
 	original_command_line            **invocation.CommandLineData
 	options_parsed                   **invocation.ParsedCommandLineOptions
+	build_event_publish_all_actions  *bool
 	environment_variables            *map[string]string
 	processed_event_started          *bool
 	processed_event_build_metadata   *bool
@@ -7767,6 +7768,55 @@ func (m *BazelInvocationMutation) OptionsParsedCleared() bool {
 func (m *BazelInvocationMutation) ResetOptionsParsed() {
 	m.options_parsed = nil
 	delete(m.clearedFields, bazelinvocation.FieldOptionsParsed)
+}
+
+// SetBuildEventPublishAllActions sets the "build_event_publish_all_actions" field.
+func (m *BazelInvocationMutation) SetBuildEventPublishAllActions(b bool) {
+	m.build_event_publish_all_actions = &b
+}
+
+// BuildEventPublishAllActions returns the value of the "build_event_publish_all_actions" field in the mutation.
+func (m *BazelInvocationMutation) BuildEventPublishAllActions() (r bool, exists bool) {
+	v := m.build_event_publish_all_actions
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBuildEventPublishAllActions returns the old "build_event_publish_all_actions" field's value of the BazelInvocation entity.
+// If the BazelInvocation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BazelInvocationMutation) OldBuildEventPublishAllActions(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBuildEventPublishAllActions is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBuildEventPublishAllActions requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBuildEventPublishAllActions: %w", err)
+	}
+	return oldValue.BuildEventPublishAllActions, nil
+}
+
+// ClearBuildEventPublishAllActions clears the value of the "build_event_publish_all_actions" field.
+func (m *BazelInvocationMutation) ClearBuildEventPublishAllActions() {
+	m.build_event_publish_all_actions = nil
+	m.clearedFields[bazelinvocation.FieldBuildEventPublishAllActions] = struct{}{}
+}
+
+// BuildEventPublishAllActionsCleared returns if the "build_event_publish_all_actions" field was cleared in this mutation.
+func (m *BazelInvocationMutation) BuildEventPublishAllActionsCleared() bool {
+	_, ok := m.clearedFields[bazelinvocation.FieldBuildEventPublishAllActions]
+	return ok
+}
+
+// ResetBuildEventPublishAllActions resets all changes to the "build_event_publish_all_actions" field.
+func (m *BazelInvocationMutation) ResetBuildEventPublishAllActions() {
+	m.build_event_publish_all_actions = nil
+	delete(m.clearedFields, bazelinvocation.FieldBuildEventPublishAllActions)
 }
 
 // SetEnvironmentVariables sets the "environment_variables" field.
@@ -8770,7 +8820,7 @@ func (m *BazelInvocationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BazelInvocationMutation) Fields() []string {
-	fields := make([]string, 0, 20)
+	fields := make([]string, 0, 21)
 	if m.invocation_id != nil {
 		fields = append(fields, bazelinvocation.FieldInvocationID)
 	}
@@ -8815,6 +8865,9 @@ func (m *BazelInvocationMutation) Fields() []string {
 	}
 	if m.options_parsed != nil {
 		fields = append(fields, bazelinvocation.FieldOptionsParsed)
+	}
+	if m.build_event_publish_all_actions != nil {
+		fields = append(fields, bazelinvocation.FieldBuildEventPublishAllActions)
 	}
 	if m.environment_variables != nil {
 		fields = append(fields, bazelinvocation.FieldEnvironmentVariables)
@@ -8869,6 +8922,8 @@ func (m *BazelInvocationMutation) Field(name string) (ent.Value, bool) {
 		return m.OriginalCommandLine()
 	case bazelinvocation.FieldOptionsParsed:
 		return m.OptionsParsed()
+	case bazelinvocation.FieldBuildEventPublishAllActions:
+		return m.BuildEventPublishAllActions()
 	case bazelinvocation.FieldEnvironmentVariables:
 		return m.EnvironmentVariables()
 	case bazelinvocation.FieldProcessedEventStarted:
@@ -8918,6 +8973,8 @@ func (m *BazelInvocationMutation) OldField(ctx context.Context, name string) (en
 		return m.OldOriginalCommandLine(ctx)
 	case bazelinvocation.FieldOptionsParsed:
 		return m.OldOptionsParsed(ctx)
+	case bazelinvocation.FieldBuildEventPublishAllActions:
+		return m.OldBuildEventPublishAllActions(ctx)
 	case bazelinvocation.FieldEnvironmentVariables:
 		return m.OldEnvironmentVariables(ctx)
 	case bazelinvocation.FieldProcessedEventStarted:
@@ -9041,6 +9098,13 @@ func (m *BazelInvocationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOptionsParsed(v)
+		return nil
+	case bazelinvocation.FieldBuildEventPublishAllActions:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBuildEventPublishAllActions(v)
 		return nil
 	case bazelinvocation.FieldEnvironmentVariables:
 		v, ok := value.(map[string]string)
@@ -9170,6 +9234,9 @@ func (m *BazelInvocationMutation) ClearedFields() []string {
 	if m.FieldCleared(bazelinvocation.FieldOptionsParsed) {
 		fields = append(fields, bazelinvocation.FieldOptionsParsed)
 	}
+	if m.FieldCleared(bazelinvocation.FieldBuildEventPublishAllActions) {
+		fields = append(fields, bazelinvocation.FieldBuildEventPublishAllActions)
+	}
 	if m.FieldCleared(bazelinvocation.FieldEnvironmentVariables) {
 		fields = append(fields, bazelinvocation.FieldEnvironmentVariables)
 	}
@@ -9222,6 +9289,9 @@ func (m *BazelInvocationMutation) ClearField(name string) error {
 		return nil
 	case bazelinvocation.FieldOptionsParsed:
 		m.ClearOptionsParsed()
+		return nil
+	case bazelinvocation.FieldBuildEventPublishAllActions:
+		m.ClearBuildEventPublishAllActions()
 		return nil
 	case bazelinvocation.FieldEnvironmentVariables:
 		m.ClearEnvironmentVariables()
@@ -9278,6 +9348,9 @@ func (m *BazelInvocationMutation) ResetField(name string) error {
 		return nil
 	case bazelinvocation.FieldOptionsParsed:
 		m.ResetOptionsParsed()
+		return nil
+	case bazelinvocation.FieldBuildEventPublishAllActions:
+		m.ResetBuildEventPublishAllActions()
 		return nil
 	case bazelinvocation.FieldEnvironmentVariables:
 		m.ResetEnvironmentVariables()

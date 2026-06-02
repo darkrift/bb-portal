@@ -213,6 +213,9 @@ func (r *buildEventRecorder) saveStructuredCommandLine(ctx context.Context, tx d
 			SetProfileName(profileName).
 			SetCanonicalCommandLine(&data).
 			SetEnvironmentVariables(censorEnvironmentVariables(envVars))
+		if enabled := commandLineEnablesBuildEventPublishAllActions(&data); enabled != nil {
+			update.SetBuildEventPublishAllActions(*enabled)
+		}
 
 		invocationMetadata := invocationmetadataextraction.ExtractInvocationMetadata(r.dataExtractors.InvocationMetadataExtractor, envVars)
 		if invocationMetadata != nil {
@@ -237,7 +240,11 @@ func (r *buildEventRecorder) saveStructuredCommandLine(ctx context.Context, tx d
 			return util.StatusWrapf(err, "Failed to update invocation with data from StructuredCommandLine event")
 		}
 	case "original":
-		_, err := tx.Ent().BazelInvocation.UpdateOneID(r.InvocationDbID).SetOriginalCommandLine(&data).Save(ctx)
+		update := tx.Ent().BazelInvocation.UpdateOneID(r.InvocationDbID).SetOriginalCommandLine(&data)
+		if enabled := commandLineEnablesBuildEventPublishAllActions(&data); enabled != nil {
+			update.SetBuildEventPublishAllActions(*enabled)
+		}
+		_, err := update.Save(ctx)
 		if err != nil {
 			return util.StatusWrapf(err, "Failed to save command line data")
 		}

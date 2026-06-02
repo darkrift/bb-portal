@@ -210,6 +210,20 @@ func (bic *BazelInvocationCreate) SetOptionsParsed(iclo *invocation.ParsedComman
 	return bic
 }
 
+// SetBuildEventPublishAllActions sets the "build_event_publish_all_actions" field.
+func (bic *BazelInvocationCreate) SetBuildEventPublishAllActions(b bool) *BazelInvocationCreate {
+	bic.mutation.SetBuildEventPublishAllActions(b)
+	return bic
+}
+
+// SetNillableBuildEventPublishAllActions sets the "build_event_publish_all_actions" field if the given value is not nil.
+func (bic *BazelInvocationCreate) SetNillableBuildEventPublishAllActions(b *bool) *BazelInvocationCreate {
+	if b != nil {
+		bic.SetBuildEventPublishAllActions(*b)
+	}
+	return bic
+}
+
 // SetEnvironmentVariables sets the "environment_variables" field.
 func (bic *BazelInvocationCreate) SetEnvironmentVariables(m map[string]string) *BazelInvocationCreate {
 	bic.mutation.SetEnvironmentVariables(m)
@@ -712,6 +726,10 @@ func (bic *BazelInvocationCreate) createSpec() (*BazelInvocation, *sqlgraph.Crea
 	if value, ok := bic.mutation.OptionsParsed(); ok {
 		_spec.SetField(bazelinvocation.FieldOptionsParsed, field.TypeJSON, value)
 		_node.OptionsParsed = value
+	}
+	if value, ok := bic.mutation.BuildEventPublishAllActions(); ok {
+		_spec.SetField(bazelinvocation.FieldBuildEventPublishAllActions, field.TypeBool, value)
+		_node.BuildEventPublishAllActions = value
 	}
 	if value, ok := bic.mutation.EnvironmentVariables(); ok {
 		_spec.SetField(bazelinvocation.FieldEnvironmentVariables, field.TypeJSON, value)
@@ -1284,6 +1302,24 @@ func (u *BazelInvocationUpsert) ClearOptionsParsed() *BazelInvocationUpsert {
 	return u
 }
 
+// SetBuildEventPublishAllActions sets the "build_event_publish_all_actions" field.
+func (u *BazelInvocationUpsert) SetBuildEventPublishAllActions(v bool) *BazelInvocationUpsert {
+	u.Set(bazelinvocation.FieldBuildEventPublishAllActions, v)
+	return u
+}
+
+// UpdateBuildEventPublishAllActions sets the "build_event_publish_all_actions" field to the value that was provided on create.
+func (u *BazelInvocationUpsert) UpdateBuildEventPublishAllActions() *BazelInvocationUpsert {
+	u.SetExcluded(bazelinvocation.FieldBuildEventPublishAllActions)
+	return u
+}
+
+// ClearBuildEventPublishAllActions clears the value of the "build_event_publish_all_actions" field.
+func (u *BazelInvocationUpsert) ClearBuildEventPublishAllActions() *BazelInvocationUpsert {
+	u.SetNull(bazelinvocation.FieldBuildEventPublishAllActions)
+	return u
+}
+
 // SetEnvironmentVariables sets the "environment_variables" field.
 func (u *BazelInvocationUpsert) SetEnvironmentVariables(v map[string]string) *BazelInvocationUpsert {
 	u.Set(bazelinvocation.FieldEnvironmentVariables, v)
@@ -1681,6 +1717,27 @@ func (u *BazelInvocationUpsertOne) UpdateOptionsParsed() *BazelInvocationUpsertO
 func (u *BazelInvocationUpsertOne) ClearOptionsParsed() *BazelInvocationUpsertOne {
 	return u.Update(func(s *BazelInvocationUpsert) {
 		s.ClearOptionsParsed()
+	})
+}
+
+// SetBuildEventPublishAllActions sets the "build_event_publish_all_actions" field.
+func (u *BazelInvocationUpsertOne) SetBuildEventPublishAllActions(v bool) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetBuildEventPublishAllActions(v)
+	})
+}
+
+// UpdateBuildEventPublishAllActions sets the "build_event_publish_all_actions" field to the value that was provided on create.
+func (u *BazelInvocationUpsertOne) UpdateBuildEventPublishAllActions() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateBuildEventPublishAllActions()
+	})
+}
+
+// ClearBuildEventPublishAllActions clears the value of the "build_event_publish_all_actions" field.
+func (u *BazelInvocationUpsertOne) ClearBuildEventPublishAllActions() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearBuildEventPublishAllActions()
 	})
 }
 
@@ -2258,6 +2315,27 @@ func (u *BazelInvocationUpsertBulk) UpdateOptionsParsed() *BazelInvocationUpsert
 func (u *BazelInvocationUpsertBulk) ClearOptionsParsed() *BazelInvocationUpsertBulk {
 	return u.Update(func(s *BazelInvocationUpsert) {
 		s.ClearOptionsParsed()
+	})
+}
+
+// SetBuildEventPublishAllActions sets the "build_event_publish_all_actions" field.
+func (u *BazelInvocationUpsertBulk) SetBuildEventPublishAllActions(v bool) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetBuildEventPublishAllActions(v)
+	})
+}
+
+// UpdateBuildEventPublishAllActions sets the "build_event_publish_all_actions" field to the value that was provided on create.
+func (u *BazelInvocationUpsertBulk) UpdateBuildEventPublishAllActions() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateBuildEventPublishAllActions()
+	})
+}
+
+// ClearBuildEventPublishAllActions clears the value of the "build_event_publish_all_actions" field.
+func (u *BazelInvocationUpsertBulk) ClearBuildEventPublishAllActions() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearBuildEventPublishAllActions()
 	})
 }
 

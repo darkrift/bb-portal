@@ -13,12 +13,17 @@ func (r *buildEventRecorder) saveOptionsParsed(ctx context.Context, tx *ent.Clie
 	if optionsParsed == nil {
 		return nil
 	}
-	err := tx.BazelInvocation.
+	parsedOptions := &invocation.ParsedCommandLineOptions{
+		ExplicitOptions: optionsParsed.ExplicitCmdLine,
+		Options:         optionsParsed.CmdLine,
+	}
+	update := tx.BazelInvocation.
 		UpdateOneID(r.InvocationDbID).
-		SetOptionsParsed(&invocation.ParsedCommandLineOptions{
-			ExplicitOptions: optionsParsed.ExplicitCmdLine,
-			Options:         optionsParsed.CmdLine,
-		}).Exec(ctx)
+		SetOptionsParsed(parsedOptions)
+	if enabled := parsedOptionsEnableBuildEventPublishAllActions(parsedOptions); enabled != nil {
+		update.SetBuildEventPublishAllActions(*enabled)
+	}
+	err := update.Exec(ctx)
 	if err != nil {
 		return util.StatusWrap(err, "Could not parse options")
 	}

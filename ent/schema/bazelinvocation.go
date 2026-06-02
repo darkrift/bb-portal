@@ -68,6 +68,8 @@ func (BazelInvocation) Fields() []ent.Field {
 			Annotations(entgql.Type("Map")).
 			Comment("JSON representation of the parsed command line options"),
 
+		field.Bool("build_event_publish_all_actions").Optional().Annotations(entgql.Skip()),
+
 		field.JSON("environment_variables", map[string]string{}).
 			Optional().
 			Annotations(entgql.Type("Map")),

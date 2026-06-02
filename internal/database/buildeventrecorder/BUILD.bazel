@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "batcher.go",
         "besfileutils.go",
+        "build_event_publish_all_actions.go",
         "build_event_recorder.go",
         "handled_events.go",
         "metrics_build_event_recorder.go",

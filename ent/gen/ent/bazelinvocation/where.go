@@ -116,6 +116,11 @@ func ExitCodeCode(v int32) predicate.BazelInvocation {
 	return predicate.BazelInvocation(sql.FieldEQ(FieldExitCodeCode, v))
 }
 
+// BuildEventPublishAllActions applies equality check predicate on the "build_event_publish_all_actions" field. It's identical to BuildEventPublishAllActionsEQ.
+func BuildEventPublishAllActions(v bool) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldBuildEventPublishAllActions, v))
+}
+
 // ProcessedEventStarted applies equality check predicate on the "processed_event_started" field. It's identical to ProcessedEventStartedEQ.
 func ProcessedEventStarted(v bool) predicate.BazelInvocation {
 	return predicate.BazelInvocation(sql.FieldEQ(FieldProcessedEventStarted, v))
@@ -829,6 +834,26 @@ func OptionsParsedIsNil() predicate.BazelInvocation {
 // OptionsParsedNotNil applies the NotNil predicate on the "options_parsed" field.
 func OptionsParsedNotNil() predicate.BazelInvocation {
 	return predicate.BazelInvocation(sql.FieldNotNull(FieldOptionsParsed))
+}
+
+// BuildEventPublishAllActionsEQ applies the EQ predicate on the "build_event_publish_all_actions" field.
+func BuildEventPublishAllActionsEQ(v bool) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldBuildEventPublishAllActions, v))
+}
+
+// BuildEventPublishAllActionsNEQ applies the NEQ predicate on the "build_event_publish_all_actions" field.
+func BuildEventPublishAllActionsNEQ(v bool) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNEQ(FieldBuildEventPublishAllActions, v))
+}
+
+// BuildEventPublishAllActionsIsNil applies the IsNil predicate on the "build_event_publish_all_actions" field.
+func BuildEventPublishAllActionsIsNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIsNull(FieldBuildEventPublishAllActions))
+}
+
+// BuildEventPublishAllActionsNotNil applies the NotNil predicate on the "build_event_publish_all_actions" field.
+func BuildEventPublishAllActionsNotNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotNull(FieldBuildEventPublishAllActions))
 }
 
 // EnvironmentVariablesIsNil applies the IsNil predicate on the "environment_variables" field.

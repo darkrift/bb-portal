@@ -43,6 +43,8 @@ const (
 	FieldOriginalCommandLine = "original_command_line"
 	// FieldOptionsParsed holds the string denoting the options_parsed field in the database.
 	FieldOptionsParsed = "options_parsed"
+	// FieldBuildEventPublishAllActions holds the string denoting the build_event_publish_all_actions field in the database.
+	FieldBuildEventPublishAllActions = "build_event_publish_all_actions"
 	// FieldEnvironmentVariables holds the string denoting the environment_variables field in the database.
 	FieldEnvironmentVariables = "environment_variables"
 	// FieldProcessedEventStarted holds the string denoting the processed_event_started field in the database.
@@ -219,6 +221,7 @@ var Columns = []string{
 	FieldCanonicalCommandLine,
 	FieldOriginalCommandLine,
 	FieldOptionsParsed,
+	FieldBuildEventPublishAllActions,
 	FieldEnvironmentVariables,
 	FieldProcessedEventStarted,
 	FieldProcessedEventBuildMetadata,
@@ -335,6 +338,11 @@ func ByExitCodeName(opts ...sql.OrderTermOption) OrderOption {
 // ByExitCodeCode orders the results by the exit_code_code field.
 func ByExitCodeCode(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldExitCodeCode, opts...).ToFunc()
+}
+
+// ByBuildEventPublishAllActions orders the results by the build_event_publish_all_actions field.
+func ByBuildEventPublishAllActions(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBuildEventPublishAllActions, opts...).ToFunc()
 }
 
 // ByProcessedEventStarted orders the results by the processed_event_started field.

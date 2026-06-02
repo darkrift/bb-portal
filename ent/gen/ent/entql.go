@@ -199,6 +199,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			bazelinvocation.FieldCanonicalCommandLine:          {Type: field.TypeJSON, Column: bazelinvocation.FieldCanonicalCommandLine},
 			bazelinvocation.FieldOriginalCommandLine:           {Type: field.TypeJSON, Column: bazelinvocation.FieldOriginalCommandLine},
 			bazelinvocation.FieldOptionsParsed:                 {Type: field.TypeJSON, Column: bazelinvocation.FieldOptionsParsed},
+			bazelinvocation.FieldBuildEventPublishAllActions:   {Type: field.TypeBool, Column: bazelinvocation.FieldBuildEventPublishAllActions},
 			bazelinvocation.FieldEnvironmentVariables:          {Type: field.TypeJSON, Column: bazelinvocation.FieldEnvironmentVariables},
 			bazelinvocation.FieldProcessedEventStarted:         {Type: field.TypeBool, Column: bazelinvocation.FieldProcessedEventStarted},
 			bazelinvocation.FieldProcessedEventBuildMetadata:   {Type: field.TypeBool, Column: bazelinvocation.FieldProcessedEventBuildMetadata},
@@ -2506,6 +2507,11 @@ func (f *BazelInvocationFilter) WhereOriginalCommandLine(p entql.BytesP) {
 // WhereOptionsParsed applies the entql json.RawMessage predicate on the options_parsed field.
 func (f *BazelInvocationFilter) WhereOptionsParsed(p entql.BytesP) {
 	f.Where(p.Field(bazelinvocation.FieldOptionsParsed))
+}
+
+// WhereBuildEventPublishAllActions applies the entql bool predicate on the build_event_publish_all_actions field.
+func (f *BazelInvocationFilter) WhereBuildEventPublishAllActions(p entql.BoolP) {
+	f.Where(p.Field(bazelinvocation.FieldBuildEventPublishAllActions))
 }
 
 // WhereEnvironmentVariables applies the entql json.RawMessage predicate on the environment_variables field.

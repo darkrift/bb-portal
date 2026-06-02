@@ -234,6 +234,7 @@ var (
 		{Name: "canonical_command_line", Type: field.TypeJSON, Nullable: true},
 		{Name: "original_command_line", Type: field.TypeJSON, Nullable: true},
 		{Name: "options_parsed", Type: field.TypeJSON, Nullable: true},
+		{Name: "build_event_publish_all_actions", Type: field.TypeBool, Nullable: true},
 		{Name: "environment_variables", Type: field.TypeJSON, Nullable: true},
 		{Name: "processed_event_started", Type: field.TypeBool, Default: false},
 		{Name: "processed_event_build_metadata", Type: field.TypeBool, Default: false},
@@ -251,19 +252,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "bazel_invocations_authenticated_users_bazel_invocations",
-				Columns:    []*schema.Column{BazelInvocationsColumns[21]},
+				Columns:    []*schema.Column{BazelInvocationsColumns[22]},
 				RefColumns: []*schema.Column{AuthenticatedUsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "bazel_invocations_builds_invocations",
-				Columns:    []*schema.Column{BazelInvocationsColumns[22]},
+				Columns:    []*schema.Column{BazelInvocationsColumns[23]},
 				RefColumns: []*schema.Column{BuildsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "bazel_invocations_instance_names_bazel_invocations",
-				Columns:    []*schema.Column{BazelInvocationsColumns[23]},
+				Columns:    []*schema.Column{BazelInvocationsColumns[24]},
 				RefColumns: []*schema.Column{InstanceNamesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -287,17 +288,17 @@ var (
 			{
 				Name:    "bazelinvocation_build_invocations",
 				Unique:  false,
-				Columns: []*schema.Column{BazelInvocationsColumns[22]},
+				Columns: []*schema.Column{BazelInvocationsColumns[23]},
 			},
 			{
 				Name:    "bazelinvocation_instance_name_bazel_invocations",
 				Unique:  false,
-				Columns: []*schema.Column{BazelInvocationsColumns[23]},
+				Columns: []*schema.Column{BazelInvocationsColumns[24]},
 			},
 			{
 				Name:    "bazelinvocation_authenticated_user_bazel_invocations",
 				Unique:  false,
-				Columns: []*schema.Column{BazelInvocationsColumns[21]},
+				Columns: []*schema.Column{BazelInvocationsColumns[22]},
 			},
 		},
 	}

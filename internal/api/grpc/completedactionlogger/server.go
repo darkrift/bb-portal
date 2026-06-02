@@ -151,27 +151,28 @@ func (links completedActionLinks) hasFields() bool {
 	return links.bazelInvocationID != nil || links.actionID != nil
 }
 
-func resolveInvocationLinks(ctx context.Context, tx *ent.Client, completedAction *cal_proto.CompletedAction, requestMetadata *remoteexecution.RequestMetadata) (completedActionLinks, error) {
+func resolveInvocationLinks(ctx context.Context, tx *ent.Client, completedAction *cal_proto.CompletedAction, requestMetadata *remoteexecution.RequestMetadata) (completedActionLinks, bool, error) {
 	var links completedActionLinks
 	if requestMetadata == nil || requestMetadata.GetToolInvocationId() == "" {
-		return links, nil
+		return links, false, nil
 	}
 	toolInvocationID, err := uuid.Parse(requestMetadata.GetToolInvocationId())
 	if err != nil {
-		return links, nil
+		return links, false, nil
 	}
-	invocationID, err := tx.BazelInvocation.Query().
+	bazelInvocation, err := tx.BazelInvocation.Query().
 		Where(
 			bazelinvocation.InvocationIDEQ(toolInvocationID),
 			bazelinvocation.HasInstanceNameWith(instancename.Name(completedAction.GetInstanceName())),
 		).
-		OnlyID(ctx)
+		Only(ctx)
 	if ent.IsNotFound(err) {
-		return links, status.Errorf(codes.Unavailable, "BazelInvocation %q for CompletedAction is not available yet", toolInvocationID)
+		return links, false, status.Errorf(codes.Unavailable, "BazelInvocation %q for CompletedAction is not available yet", toolInvocationID)
 	}
 	if err != nil {
-		return links, util.StatusWrap(err, "failed to query BazelInvocation for CompletedAction")
+		return links, false, util.StatusWrap(err, "failed to query BazelInvocation for CompletedAction")
 	}
+	invocationID := bazelInvocation.ID
 	links.bazelInvocationID = &invocationID
 
 	if targetID := requestMetadata.GetTargetId(); targetID != "" {
@@ -182,14 +183,25 @@ func resolveInvocationLinks(ctx context.Context, tx *ent.Client, completedAction
 			).
 			OnlyID(ctx)
 		if ent.IsNotFound(err) {
-			return links, status.Errorf(codes.Unavailable, "Action %q for CompletedAction is not available yet", targetID)
+			if bazelInvocation.BuildEventPublishAllActions {
+				return links, false, status.Errorf(codes.Unavailable, "Action %q for CompletedAction is not available yet", targetID)
+			}
+			slog.Info(
+				"Dropping CompletedAction because its Action is not available",
+				"uuid", completedAction.GetUuid(),
+				"instanceName", completedAction.GetInstanceName(),
+				"toolInvocationID", toolInvocationID,
+				"targetID", targetID,
+				"buildEventPublishAllActions", bazelInvocation.BuildEventPublishAllActions,
+			)
+			return links, true, nil
 		}
 		if err != nil {
-			return links, util.StatusWrap(err, "failed to query Action for CompletedAction")
+			return links, false, util.StatusWrap(err, "failed to query Action for CompletedAction")
 		}
 		links.actionID = &actionID
 	}
-	return links, nil
+	return links, false, nil
 }
 
 func setLinkFields(create *ent.CompletedActionCreate, links completedActionLinks) {
@@ -210,11 +222,11 @@ func updateLinkFields(update *ent.CompletedActionUpdate, links completedActionLi
 	}
 }
 
-func (s *Server) saveCompletedAction(ctx context.Context, completedAction *cal_proto.CompletedAction) error {
+func (s *Server) saveCompletedAction(ctx context.Context, completedAction *cal_proto.CompletedAction) (bool, error) {
 	ctx = dbauthservice.NewContextWithDbAuthServiceBypass(ctx)
 	actionDigest := completedAction.GetHistoricalExecuteResponse().GetActionDigest()
 	if actionDigest == nil || actionDigest.GetHash() == "" {
-		return status.Error(codes.InvalidArgument, "CompletedAction does not contain an action digest")
+		return false, status.Error(codes.InvalidArgument, "CompletedAction does not contain an action digest")
 	}
 	completedActionUUID := completedAction.GetUuid()
 	if completedActionUUID == "" {
@@ -222,12 +234,12 @@ func (s *Server) saveCompletedAction(ctx context.Context, completedAction *cal_p
 	}
 	historicalExecuteResponse, err := proto.Marshal(completedAction.GetHistoricalExecuteResponse())
 	if err != nil {
-		return util.StatusWrap(err, "failed to marshal HistoricalExecuteResponse")
+		return false, util.StatusWrap(err, "failed to marshal HistoricalExecuteResponse")
 	}
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return util.StatusWrap(err, "failed to create transaction")
+		return false, util.StatusWrap(err, "failed to create transaction")
 	}
 	defer tx.Rollback()
 
@@ -239,14 +251,17 @@ func (s *Server) saveCompletedAction(ctx context.Context, completedAction *cal_p
 	setDigestFields(create, completedAction)
 	setExecuteResponseFields(create, completedAction)
 	setRequestMetadataFields(create, requestMetadata)
-	links, err := resolveInvocationLinks(ctx, tx.Ent(), completedAction, requestMetadata)
+	links, drop, err := resolveInvocationLinks(ctx, tx.Ent(), completedAction, requestMetadata)
 	if err != nil {
-		return err
+		return false, err
+	}
+	if drop {
+		return false, nil
 	}
 	setLinkFields(create, links)
 
 	if err = create.OnConflict().DoNothing().Exec(ctx); err != nil {
-		return util.StatusWrap(err, "failed to save CompletedAction")
+		return false, util.StatusWrap(err, "failed to save CompletedAction")
 	}
 	if hasRequestMetadataFields(requestMetadata) || links.hasFields() {
 		update := tx.Ent().CompletedAction.Update().
@@ -254,13 +269,13 @@ func (s *Server) saveCompletedAction(ctx context.Context, completedAction *cal_p
 		setRequestMetadataUpdateFields(update, requestMetadata)
 		updateLinkFields(update, links)
 		if err = update.Exec(ctx); err != nil {
-			return util.StatusWrap(err, "failed to update CompletedAction")
+			return false, util.StatusWrap(err, "failed to update CompletedAction")
 		}
 	}
 	if err = tx.Commit(); err != nil {
-		return util.StatusWrap(err, "failed to commit CompletedAction")
+		return false, util.StatusWrap(err, "failed to commit CompletedAction")
 	}
-	return nil
+	return true, nil
 }
 
 // LogCompletedActions receives completed actions from workers.
@@ -281,7 +296,8 @@ func (s *Server) LogCompletedActions(stream grpc.BidiStreamingServer[cal_proto.C
 			"actionDigestHash", actionDigest.GetHash(),
 			"actionDigestSizeBytes", actionDigest.GetSizeBytes(),
 		)
-		if err = s.saveCompletedAction(stream.Context(), completedAction); err != nil {
+		stored, err := s.saveCompletedAction(stream.Context(), completedAction)
+		if err != nil {
 			slog.Warn(
 				"Failed to store CompletedAction; not acknowledging",
 				"uuid", completedAction.GetUuid(),
@@ -290,13 +306,23 @@ func (s *Server) LogCompletedActions(stream grpc.BidiStreamingServer[cal_proto.C
 			)
 			return err
 		}
-		slog.Info(
-			"Stored CompletedAction; acknowledging",
-			"uuid", completedAction.GetUuid(),
-			"instanceName", completedAction.GetInstanceName(),
-			"actionDigestHash", actionDigest.GetHash(),
-			"actionDigestSizeBytes", actionDigest.GetSizeBytes(),
-		)
+		if stored {
+			slog.Info(
+				"Stored CompletedAction; acknowledging",
+				"uuid", completedAction.GetUuid(),
+				"instanceName", completedAction.GetInstanceName(),
+				"actionDigestHash", actionDigest.GetHash(),
+				"actionDigestSizeBytes", actionDigest.GetSizeBytes(),
+			)
+		} else {
+			slog.Info(
+				"Dropped CompletedAction; acknowledging",
+				"uuid", completedAction.GetUuid(),
+				"instanceName", completedAction.GetInstanceName(),
+				"actionDigestHash", actionDigest.GetHash(),
+				"actionDigestSizeBytes", actionDigest.GetSizeBytes(),
+			)
+		}
 		if err = stream.Send(&emptypb.Empty{}); err != nil {
 			return err
 		}
