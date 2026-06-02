@@ -1,8 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { apolloClient } from "@/components/ApolloWrapper";
 import { BazelInvocationTargetDetailsPage } from "@/components/pages/BazelInvocationTargetDetails";
-import { getFragmentData, gql } from "@/graphql/__generated__";
-import type { BazelInvocationActionsFragment } from "@/graphql/__generated__/graphql";
+import { gql } from "@/graphql/__generated__";
 import { env } from "@/utils/env";
 import { requireFeature } from "@/utils/featureGuard";
 import { generatePageTitle } from "@/utils/generatePageTitle";
@@ -15,9 +14,7 @@ const GET_BAZEL_INVOCATION_TARGET_DETAILS = gql(/* GraphQL */ `
       instanceName {
         name
       }
-      actions {
-        ...BazelInvocationActions
-      }
+      hasActionsForTarget(targetID: $targetID)
       invocationTargets(
         first: 1
         where: {
@@ -97,63 +94,6 @@ const GET_BAZEL_INVOCATION_TARGET_DETAILS = gql(/* GraphQL */ `
   }
 `);
 
-const BAZEL_INVOCATION_ACTIONS_FRAGMENT = gql(/* GraphQL */ `
-  fragment BazelInvocationActions on Action {
-    id
-    label
-    type
-    success
-    exitCode
-    commandLine
-    startTime
-    endTime
-    failureCode
-    failureMessage
-    stdoutHash
-    stdoutSizeBytes
-    stdoutHashFunction
-    stderrHash
-    stderrSizeBytes
-    stderrHashFunction
-    actionFiles {
-      name
-      uri
-    }
-    completedActions {
-      id
-      uuid
-      instanceName
-      actionDigestHash
-      actionDigestSizeBytes
-      digestFunction
-      toolInvocationID
-      correlatedInvocationsID
-      targetID
-      actionMnemonic
-      cacheHit
-      exitCode
-      statusCode
-      statusMessage
-      queuedAt
-      workerStartAt
-      workerCompletedAt
-      uploadedAt
-      stdoutHash
-      stdoutSizeBytes
-      stderrHash
-      stderrSizeBytes
-    }
-    configuration {
-      id
-      configurationID
-      mnemonic
-      platformName
-      cpu
-      makeVariables
-    }
-  }
-`);
-
 export const Route = createFileRoute(
   "/bazel-invocations/$invocationID/targets/$targetID",
 )({
@@ -170,10 +110,6 @@ export const Route = createFileRoute(
     });
 
     const target = data?.getBazelInvocation?.invocationTargets?.edges?.[0]?.node;
-    const actions = getFragmentData(
-      BAZEL_INVOCATION_ACTIONS_FRAGMENT,
-      data?.getBazelInvocation?.actions ?? [],
-    ) as BazelInvocationActionsFragment[] | undefined;
     if (!data?.getBazelInvocation || !target) {
       throw notFound();
     }
@@ -182,7 +118,7 @@ export const Route = createFileRoute(
       invocationID: data.getBazelInvocation.invocationID,
       instanceName: data.getBazelInvocation.instanceName.name,
       target,
-      actions,
+      hasActions: data.getBazelInvocation.hasActionsForTarget,
     };
   },
   head: (_ctx) => ({
@@ -199,12 +135,12 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const { invocationID, target, actions } = Route.useLoaderData();
+  const { invocationID, target, hasActions } = Route.useLoaderData();
   return (
     <BazelInvocationTargetDetailsPage
       invocationID={invocationID}
       target={target}
-      actions={actions}
+      hasActions={hasActions}
     />
   );
 }

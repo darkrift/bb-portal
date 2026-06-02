@@ -198,6 +198,7 @@ type ComplexityRoot struct {
 
 	BazelInvocation struct {
 		Actions              func(childComplexity int) int
+		ActionsForTarget     func(childComplexity int, targetID string) int
 		AuthenticatedUser    func(childComplexity int) int
 		BazelVersion         func(childComplexity int) int
 		BepCompleted         func(childComplexity int) int
@@ -210,6 +211,8 @@ type ComplexityRoot struct {
 		EnvironmentVariables func(childComplexity int) int
 		ExitCodeCode         func(childComplexity int) int
 		ExitCodeName         func(childComplexity int) int
+		HasActionsForTarget  func(childComplexity int, targetID string) int
+		HasFailedActions     func(childComplexity int) int
 		Hostname             func(childComplexity int) int
 		ID                   func(childComplexity int) int
 		InstanceName         func(childComplexity int) int
@@ -652,6 +655,9 @@ type BazelInvocationResolver interface {
 	EnvironmentVariables(ctx context.Context, obj *ent.BazelInvocation) (map[string]any, error)
 
 	Profile(ctx context.Context, obj *ent.BazelInvocation) (*model.Profile, error)
+	HasFailedActions(ctx context.Context, obj *ent.BazelInvocation) (bool, error)
+	HasActionsForTarget(ctx context.Context, obj *ent.BazelInvocation, targetID string) (bool, error)
+	ActionsForTarget(ctx context.Context, obj *ent.BazelInvocation, targetID string) ([]*ent.Action, error)
 }
 type BuildResolver interface {
 	ID(ctx context.Context, obj *ent.Build) (string, error)
@@ -1538,6 +1544,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.BazelInvocation.Actions(childComplexity), true
 
+	case "BazelInvocation.actionsForTarget":
+		if e.complexity.BazelInvocation.ActionsForTarget == nil {
+			break
+		}
+
+		args, err := ec.field_BazelInvocation_actionsForTarget_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.BazelInvocation.ActionsForTarget(childComplexity, args["targetID"].(string)), true
+
 	case "BazelInvocation.authenticatedUser":
 		if e.complexity.BazelInvocation.AuthenticatedUser == nil {
 			break
@@ -1621,6 +1639,25 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.BazelInvocation.ExitCodeName(childComplexity), true
+
+	case "BazelInvocation.hasActionsForTarget":
+		if e.complexity.BazelInvocation.HasActionsForTarget == nil {
+			break
+		}
+
+		args, err := ec.field_BazelInvocation_hasActionsForTarget_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.BazelInvocation.HasActionsForTarget(childComplexity, args["targetID"].(string)), true
+
+	case "BazelInvocation.hasFailedActions":
+		if e.complexity.BazelInvocation.HasFailedActions == nil {
+			break
+		}
+
+		return e.complexity.BazelInvocation.HasFailedActions(childComplexity), true
 
 	case "BazelInvocation.hostname":
 		if e.complexity.BazelInvocation.Hostname == nil {
@@ -3904,6 +3941,62 @@ func (ec *executionContext) field_AuthenticatedUser_bazelInvocations_argsWhere(
 	}
 
 	var zeroVal *ent.BazelInvocationWhereInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_BazelInvocation_actionsForTarget_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_BazelInvocation_actionsForTarget_argsTargetID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["targetID"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_BazelInvocation_actionsForTarget_argsTargetID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["targetID"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("targetID"))
+	if tmp, ok := rawArgs["targetID"]; ok {
+		return ec.unmarshalNID2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_BazelInvocation_hasActionsForTarget_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_BazelInvocation_hasActionsForTarget_argsTargetID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["targetID"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_BazelInvocation_hasActionsForTarget_argsTargetID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["targetID"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("targetID"))
+	if tmp, ok := rawArgs["targetID"]; ok {
+		return ec.unmarshalNID2string(ctx, tmp)
+	}
+
+	var zeroVal string
 	return zeroVal, nil
 }
 
@@ -6313,6 +6406,12 @@ func (ec *executionContext) fieldContext_Action_bazelInvocation(_ context.Contex
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -9882,6 +9981,202 @@ func (ec *executionContext) fieldContext_BazelInvocation_profile(_ context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _BazelInvocation_hasFailedActions(ctx context.Context, field graphql.CollectedField, obj *ent.BazelInvocation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.BazelInvocation().HasFailedActions(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BazelInvocation_hasFailedActions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BazelInvocation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BazelInvocation_hasActionsForTarget(ctx context.Context, field graphql.CollectedField, obj *ent.BazelInvocation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.BazelInvocation().HasActionsForTarget(rctx, obj, fc.Args["targetID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BazelInvocation_hasActionsForTarget(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BazelInvocation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_BazelInvocation_hasActionsForTarget_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BazelInvocation_actionsForTarget(ctx context.Context, field graphql.CollectedField, obj *ent.BazelInvocation) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.BazelInvocation().ActionsForTarget(rctx, obj, fc.Args["targetID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Action)
+	fc.Result = res
+	return ec.marshalNAction2ᚕᚖgithubᚗcomᚋbuildbarnᚋbbᚑportalᚋentᚋgenᚋentᚐActionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BazelInvocation_actionsForTarget(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BazelInvocation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Action_id(ctx, field)
+			case "label":
+				return ec.fieldContext_Action_label(ctx, field)
+			case "type":
+				return ec.fieldContext_Action_type(ctx, field)
+			case "success":
+				return ec.fieldContext_Action_success(ctx, field)
+			case "exitCode":
+				return ec.fieldContext_Action_exitCode(ctx, field)
+			case "commandLine":
+				return ec.fieldContext_Action_commandLine(ctx, field)
+			case "startTime":
+				return ec.fieldContext_Action_startTime(ctx, field)
+			case "endTime":
+				return ec.fieldContext_Action_endTime(ctx, field)
+			case "failureCode":
+				return ec.fieldContext_Action_failureCode(ctx, field)
+			case "failureMessage":
+				return ec.fieldContext_Action_failureMessage(ctx, field)
+			case "stdoutHash":
+				return ec.fieldContext_Action_stdoutHash(ctx, field)
+			case "stdoutSizeBytes":
+				return ec.fieldContext_Action_stdoutSizeBytes(ctx, field)
+			case "stdoutHashFunction":
+				return ec.fieldContext_Action_stdoutHashFunction(ctx, field)
+			case "stderrHash":
+				return ec.fieldContext_Action_stderrHash(ctx, field)
+			case "stderrSizeBytes":
+				return ec.fieldContext_Action_stderrSizeBytes(ctx, field)
+			case "stderrHashFunction":
+				return ec.fieldContext_Action_stderrHashFunction(ctx, field)
+			case "bazelInvocation":
+				return ec.fieldContext_Action_bazelInvocation(ctx, field)
+			case "configuration":
+				return ec.fieldContext_Action_configuration(ctx, field)
+			case "actionFiles":
+				return ec.fieldContext_Action_actionFiles(ctx, field)
+			case "completedActions":
+				return ec.fieldContext_Action_completedActions(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Action", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_BazelInvocation_actionsForTarget_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _BazelInvocationConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.BazelInvocationConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_BazelInvocationConnection_edges(ctx, field)
 	if err != nil {
@@ -10119,6 +10414,12 @@ func (ec *executionContext) fieldContext_BazelInvocationEdge_node(_ context.Cont
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -12644,6 +12945,12 @@ func (ec *executionContext) fieldContext_CompletedAction_bazelInvocation(_ conte
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -13122,6 +13429,12 @@ func (ec *executionContext) fieldContext_Configuration_bazelInvocation(_ context
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -13464,6 +13777,12 @@ func (ec *executionContext) fieldContext_ConnectionMetadata_bazelInvocation(_ co
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -13876,6 +14195,12 @@ func (ec *executionContext) fieldContext_InstanceName_bazelInvocations(_ context
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -14382,6 +14707,12 @@ func (ec *executionContext) fieldContext_InvocationFiles_bazelInvocation(_ conte
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -15020,6 +15351,12 @@ func (ec *executionContext) fieldContext_InvocationTag_bazelInvocation(_ context
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -15699,6 +16036,12 @@ func (ec *executionContext) fieldContext_InvocationTarget_bazelInvocation(_ cont
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -16634,6 +16977,12 @@ func (ec *executionContext) fieldContext_Metrics_bazelInvocation(_ context.Conte
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -18307,6 +18656,12 @@ func (ec *executionContext) fieldContext_Query_getBazelInvocation(ctx context.Co
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -19202,6 +19557,12 @@ func (ec *executionContext) fieldContext_SourceControl_bazelInvocation(_ context
 				return ec.fieldContext_BazelInvocation_sourceControl(ctx, field)
 			case "profile":
 				return ec.fieldContext_BazelInvocation_profile(ctx, field)
+			case "hasFailedActions":
+				return ec.fieldContext_BazelInvocation_hasFailedActions(ctx, field)
+			case "hasActionsForTarget":
+				return ec.fieldContext_BazelInvocation_hasActionsForTarget(ctx, field)
+			case "actionsForTarget":
+				return ec.fieldContext_BazelInvocation_actionsForTarget(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BazelInvocation", field.Name)
 		},
@@ -44503,6 +44864,114 @@ func (ec *executionContext) _BazelInvocation(ctx context.Context, sel ast.Select
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "hasFailedActions":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._BazelInvocation_hasFailedActions(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "hasActionsForTarget":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._BazelInvocation_hasActionsForTarget(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "actionsForTarget":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._BazelInvocation_actionsForTarget(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -49898,6 +50367,50 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
+
+func (ec *executionContext) marshalNAction2ᚕᚖgithubᚗcomᚋbuildbarnᚋbbᚑportalᚋentᚋgenᚋentᚐActionᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Action) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAction2ᚖgithubᚗcomᚋbuildbarnᚋbbᚑportalᚋentᚋgenᚋentᚐAction(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
 
 func (ec *executionContext) marshalNAction2ᚖgithubᚗcomᚋbuildbarnᚋbbᚑportalᚋentᚋgenᚋentᚐAction(ctx context.Context, sel ast.SelectionSet, v *ent.Action) graphql.Marshaler {
 	if v == nil {

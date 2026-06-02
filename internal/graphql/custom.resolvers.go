@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/buildbarn/bb-portal/ent/gen/ent"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/action"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/authenticateduser"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/build"
@@ -37,6 +38,35 @@ func (r *bazelInvocationResolver) Profile(ctx context.Context, obj *ent.BazelInv
 		SizeInBytes:    int(profile.SizeBytes),
 		DigestFunction: profile.DigestFunction,
 	}, nil
+}
+
+// HasFailedActions is the resolver for the hasFailedActions field.
+func (r *bazelInvocationResolver) HasFailedActions(ctx context.Context, obj *ent.BazelInvocation) (bool, error) {
+	return obj.QueryActions().
+		Where(action.Success(false)).
+		Exist(ctx)
+}
+
+// HasActionsForTarget is the resolver for the hasActionsForTarget field.
+func (r *bazelInvocationResolver) HasActionsForTarget(ctx context.Context, obj *ent.BazelInvocation, targetID string) (bool, error) {
+	targetLabel, err := targetLabelForID(ctx, r.db.Ent(), targetID)
+	if err != nil {
+		return false, err
+	}
+	return obj.QueryActions().
+		Where(action.LabelEQ(targetLabel)).
+		Exist(ctx)
+}
+
+// ActionsForTarget is the resolver for the actionsForTarget field.
+func (r *bazelInvocationResolver) ActionsForTarget(ctx context.Context, obj *ent.BazelInvocation, targetID string) ([]*ent.Action, error) {
+	targetLabel, err := targetLabelForID(ctx, r.db.Ent(), targetID)
+	if err != nil {
+		return nil, err
+	}
+	return obj.QueryActions().
+		Where(action.LabelEQ(targetLabel)).
+		All(ctx)
 }
 
 // TimeSinceLastConnectionMillis is the resolver for the timeSinceLastConnectionMillis field.

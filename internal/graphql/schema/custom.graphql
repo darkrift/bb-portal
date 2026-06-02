@@ -20,6 +20,9 @@ type Profile {
 
 extend type BazelInvocation {
   profile: Profile
+  hasFailedActions: Boolean! @goField(forceResolver: true)
+  hasActionsForTarget(targetID: ID!): Boolean! @goField(forceResolver: true)
+  actionsForTarget(targetID: ID!): [Action!]! @goField(forceResolver: true)
 }
 
 extend type ConnectionMetadata {

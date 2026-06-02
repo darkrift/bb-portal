@@ -22,10 +22,7 @@ import {
   BazelInvocationTestRunsPanel,
   BazelInvocationTestSummaryPanel,
 } from "@/components/pages/BazelInvocationTestDetails";
-import type {
-  BazelInvocationActionsFragment,
-  InvocationTargetAbortReason,
-} from "@/graphql/__generated__/graphql";
+import type { InvocationTargetAbortReason } from "@/graphql/__generated__/graphql";
 import { digestFunctionValueToString } from "@/utils/digestFunctionUtils";
 import { parseBytestreamUri } from "@/utils/bytestreamUri";
 import { generateFileUrl } from "@/utils/urlGenerator";
@@ -59,7 +56,7 @@ interface InvocationTargetDetails {
 interface Props {
   invocationID: string;
   target: InvocationTargetDetails;
-  actions?: BazelInvocationActionsFragment[] | null;
+  hasActions?: boolean | null;
 }
 
 const renderFileLink = (file: { name: string; uri?: string | null }) => {
@@ -300,14 +297,12 @@ export const BazelInvocationTargetLogsPanel: React.FC<{
 
 export const BazelInvocationTargetActionsPanel: React.FC<{
   instanceName: string;
-  actions: BazelInvocationActionsFragment[];
-  targetLabel: string;
-}> = ({ instanceName, actions, targetLabel }) => {
-  const targetActions = actions.filter((action) => action.label === targetLabel);
-  if (targetActions.length === 0) {
+  actions: React.ComponentProps<typeof ActionsTab>["actions"];
+}> = ({ instanceName, actions }) => {
+  if (actions.length === 0) {
     return <Alert type="info" showIcon message="No actions were recorded." />;
   }
-  return <ActionsTab instanceName={instanceName} actions={targetActions} />;
+  return <ActionsTab instanceName={instanceName} actions={actions} />;
 };
 
 export const BazelInvocationTargetFilesPanel: React.FC<{
@@ -325,7 +320,7 @@ export const BazelInvocationTargetFilesPanel: React.FC<{
 export const BazelInvocationTargetDetailsPage: React.FC<Props> = ({
   invocationID,
   target,
-  actions,
+  hasActions,
 }) => {
   const matchRoute = useMatchRoute();
   const start =
@@ -351,7 +346,7 @@ export const BazelInvocationTargetDetailsPage: React.FC<Props> = ({
           },
         ]
       : []),
-    ...(actions?.some((action) => action.label === target.target.label)
+    ...(hasActions
       ? [
           {
             key: "actions",

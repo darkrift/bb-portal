@@ -18,10 +18,7 @@ const BAZEL_INVOCATION_OVERVIEW_FRAGMENT = gql(/* GraphQL */ `
   fragment BazelInvocationOverview on BazelInvocation {
     id
     invocationID
-    actions {
-      id
-      success
-    }
+    hasFailedActions
     metrics {
       id
     }

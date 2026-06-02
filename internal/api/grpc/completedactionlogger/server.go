@@ -176,22 +176,38 @@ func resolveInvocationLinks(ctx context.Context, tx *ent.Client, completedAction
 	links.bazelInvocationID = &invocationID
 
 	if targetID := requestMetadata.GetTargetId(); targetID != "" {
-		actionID, err := tx.Action.Query().
-			Where(
-				action.BazelInvocationID(invocationID),
-				action.LabelEQ(targetID),
-			).
-			OnlyID(ctx)
-		if ent.IsNotFound(err) {
+		actionIDsQuery := tx.Action.Query().Where(
+			action.BazelInvocationID(invocationID),
+			action.LabelEQ(targetID),
+		)
+		if actionMnemonic := requestMetadata.GetActionMnemonic(); actionMnemonic != "" {
+			actionIDsQuery = actionIDsQuery.Where(action.TypeEQ(actionMnemonic))
+		}
+		actionIDs, err := actionIDsQuery.Limit(2).IDs(ctx)
+		if err != nil {
+			return links, false, util.StatusWrap(err, "failed to query Action for CompletedAction")
+		}
+		if len(actionIDs) == 0 && requestMetadata.GetActionMnemonic() != "" {
+			actionIDs, err = tx.Action.Query().
+				Where(
+					action.BazelInvocationID(invocationID),
+					action.LabelEQ(targetID),
+				).
+				Limit(2).
+				IDs(ctx)
+			if err != nil {
+				return links, false, util.StatusWrap(err, "failed to query Action for CompletedAction")
+			}
+		}
+		if len(actionIDs) == 0 {
 			if bazelInvocation.BuildEventPublishAllActions {
 				return links, false, status.Errorf(codes.Unavailable, "Action %q for CompletedAction is not available yet", targetID)
 			}
 			return links, true, nil
 		}
-		if err != nil {
-			return links, false, util.StatusWrap(err, "failed to query Action for CompletedAction")
+		if len(actionIDs) == 1 {
+			links.actionID = &actionIDs[0]
 		}
-		links.actionID = &actionID
 	}
 	return links, false, nil
 }
