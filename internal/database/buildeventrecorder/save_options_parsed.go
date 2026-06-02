@@ -2,6 +2,7 @@ package buildeventrecorder
 
 import (
 	"context"
+	"log/slog"
 
 	bes "github.com/bazelbuild/bazel/src/main/java/com/google/devtools/build/lib/buildeventstream/proto"
 	"github.com/buildbarn/bb-portal/ent/gen/ent"
@@ -22,6 +23,19 @@ func (r *buildEventRecorder) saveOptionsParsed(ctx context.Context, tx *ent.Clie
 		SetOptionsParsed(parsedOptions)
 	if enabled := parsedOptionsEnableBuildEventPublishAllActions(parsedOptions); enabled != nil {
 		update.SetBuildEventPublishAllActions(*enabled)
+		if !*enabled {
+			slog.Warn(
+				"build_event_publish_all_actions is disabled; CAL events for this invocation ID will be dropped",
+				"invocationID", r.InvocationID,
+				"instanceName", r.InstanceName,
+			)
+		}
+	} else {
+		slog.Warn(
+			"build_event_publish_all_actions is unset; CAL events for this invocation ID will be dropped",
+			"invocationID", r.InvocationID,
+			"instanceName", r.InstanceName,
+		)
 	}
 	err := update.Exec(ctx)
 	if err != nil {

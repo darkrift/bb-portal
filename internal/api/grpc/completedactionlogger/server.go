@@ -186,14 +186,6 @@ func resolveInvocationLinks(ctx context.Context, tx *ent.Client, completedAction
 			if bazelInvocation.BuildEventPublishAllActions {
 				return links, false, status.Errorf(codes.Unavailable, "Action %q for CompletedAction is not available yet", targetID)
 			}
-			slog.Info(
-				"Dropping CompletedAction because its Action is not available",
-				"uuid", completedAction.GetUuid(),
-				"instanceName", completedAction.GetInstanceName(),
-				"toolInvocationID", toolInvocationID,
-				"targetID", targetID,
-				"buildEventPublishAllActions", bazelInvocation.BuildEventPublishAllActions,
-			)
 			return links, true, nil
 		}
 		if err != nil {
@@ -289,13 +281,6 @@ func (s *Server) LogCompletedActions(stream grpc.BidiStreamingServer[cal_proto.C
 			return err
 		}
 		actionDigest := completedAction.GetHistoricalExecuteResponse().GetActionDigest()
-		slog.Info(
-			"Received CompletedAction",
-			"uuid", completedAction.GetUuid(),
-			"instanceName", completedAction.GetInstanceName(),
-			"actionDigestHash", actionDigest.GetHash(),
-			"actionDigestSizeBytes", actionDigest.GetSizeBytes(),
-		)
 		stored, err := s.saveCompletedAction(stream.Context(), completedAction)
 		if err != nil {
 			slog.Warn(
@@ -309,14 +294,6 @@ func (s *Server) LogCompletedActions(stream grpc.BidiStreamingServer[cal_proto.C
 		if stored {
 			slog.Info(
 				"Stored CompletedAction; acknowledging",
-				"uuid", completedAction.GetUuid(),
-				"instanceName", completedAction.GetInstanceName(),
-				"actionDigestHash", actionDigest.GetHash(),
-				"actionDigestSizeBytes", actionDigest.GetSizeBytes(),
-			)
-		} else {
-			slog.Info(
-				"Dropped CompletedAction; acknowledging",
 				"uuid", completedAction.GetUuid(),
 				"instanceName", completedAction.GetInstanceName(),
 				"actionDigestHash", actionDigest.GetHash(),
