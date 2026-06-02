@@ -53,7 +53,8 @@ export function generateFileUrl(
   digest: Digest,
   fileName: string,
 ): string {
-  return `${BACKEND_SERVE_FILE_URL}/${generateBrowserSplat(instanceName, digestFunction, digest, BrowserPageType.File)}/${fileName}`;
+  const encodedFileName = fileName.split("/").map(encodeURIComponent).join("/");
+  return `${BACKEND_SERVE_FILE_URL}/${generateBrowserSplat(instanceName, digestFunction, digest, BrowserPageType.File)}/${encodedFileName}`;
 }
 
 export function generateCommandShellScriptUrl(

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"log"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -73,6 +74,7 @@ func NewFileServerService(blobAccess blobstore.BlobAccess, maximumMessageSizeByt
 func (s FileServerService) HandleFile(w http.ResponseWriter, req *http.Request) {
 	digest, err := getDigestFromRequest(req)
 	if err != nil {
+		slog.Warn("Failed to parse servefile digest", "path", req.URL.Path, "err", err)
 		http.Error(w, "Digest not found", http.StatusNotFound)
 		return
 	}
@@ -87,7 +89,21 @@ func (s FileServerService) HandleFile(w http.ResponseWriter, req *http.Request) 
 	var first [4096]byte
 	n, err := r.Read(first[:])
 	if err != nil && err != io.EOF {
-		http.Error(w, "Could not send file", http.StatusInternalServerError)
+		slog.Warn(
+			"Failed to read servefile blob",
+			"path", req.URL.Path,
+			"hash", digest.GetHashString(),
+			"sizeBytes", digest.GetSizeBytes(),
+			"err", err,
+		)
+		switch status.Code(err) {
+		case codes.NotFound:
+			http.Error(w, "File not found", http.StatusNotFound)
+		case codes.PermissionDenied:
+			http.Error(w, "Permission denied", http.StatusForbidden)
+		default:
+			http.Error(w, "Could not send file", http.StatusInternalServerError)
+		}
 		return
 	}
 
