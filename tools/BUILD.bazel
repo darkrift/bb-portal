@@ -2,6 +2,18 @@
 load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 
 sh_binary(
+    name = "gqlgen",
+    srcs = ["gqlgen.sh"],
+    args = ["$(rlocationpath @com_github_99designs_gqlgen//:gqlgen)"],
+    data = [
+        "//:gqlgen.yml",
+        "@com_github_99designs_gqlgen//:gqlgen",
+    ],
+    visibility = ["//visibility:public"],
+    deps = ["@rules_shell//shell/runfiles"],
+)
+
+sh_binary(
     name = "reformat",
     srcs = ["reformat.sh"],
     args = [

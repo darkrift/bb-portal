@@ -9,6 +9,17 @@ export const GET_TESTS_FOR_INVOCATION = gql(/* GraphQl */ `
     $orderBy: TestSummaryOrder
     $where: TestSummaryWhereInput
   ) {
+    testSummaryStats(where: $where) {
+      tests
+      passed
+      flaky
+      failed
+      incomplete
+      noStatus
+      runs
+      attempts
+      cached
+    }
     findTestSummaries(
       after: $after
       first: $first

@@ -17,6 +17,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationfiles"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/invocationtarget"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/target"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/testsummary"
 	"github.com/buildbarn/bb-portal/internal/graphql/model"
 	"github.com/google/uuid"
 )
@@ -105,6 +106,54 @@ func (r *queryResolver) GetBuild(ctx context.Context, buildUUID uuid.UUID) (*ent
 		return nil, err
 	}
 	return query.First(ctx)
+}
+
+// TestSummaryStats is the resolver for the testSummaryStats field.
+func (r *queryResolver) TestSummaryStats(ctx context.Context, where *ent.TestSummaryWhereInput) (*model.TestSummaryStats, error) {
+	query := r.db.Ent().TestSummary.Query()
+	var err error
+	if where != nil {
+		query, err = where.Filter(query)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	stats := &model.TestSummaryStats{}
+	if stats.Tests, err = query.Clone().Count(ctx); err != nil {
+		return nil, err
+	}
+	if stats.Passed, err = query.Clone().Where(testsummary.OverallStatus("PASSED")).Count(ctx); err != nil {
+		return nil, err
+	}
+	if stats.Flaky, err = query.Clone().Where(testsummary.OverallStatus("FLAKY")).Count(ctx); err != nil {
+		return nil, err
+	}
+	if stats.Incomplete, err = query.Clone().Where(testsummary.OverallStatus("INCOMPLETE")).Count(ctx); err != nil {
+		return nil, err
+	}
+	if stats.Failed, err = query.Clone().
+		Where(testsummary.OverallStatusIn("FAILED", "TIMEOUT", "REMOTE_FAILURE", "FAILED_TO_BUILD")).
+		Count(ctx); err != nil {
+		return nil, err
+	}
+
+	statusBuckets := stats.Passed + stats.Flaky + stats.Incomplete + stats.Failed
+	stats.NoStatus = stats.Tests - statusBuckets
+	if stats.NoStatus < 0 {
+		stats.NoStatus = 0
+	}
+
+	if stats.Runs, err = sumTestSummaryInt32Field(ctx, query, testsummary.FieldRunCount); err != nil {
+		return nil, err
+	}
+	if stats.Attempts, err = sumTestSummaryInt32Field(ctx, query, testsummary.FieldAttemptCount); err != nil {
+		return nil, err
+	}
+	if stats.Cached, err = sumTestSummaryInt32Field(ctx, query, testsummary.FieldTotalNumCached); err != nil {
+		return nil, err
+	}
+	return stats, nil
 }
 
 // GetTarget is the resolver for the getTarget field.

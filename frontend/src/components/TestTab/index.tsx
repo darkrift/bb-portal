@@ -131,51 +131,17 @@ export const TestTab: React.FC<Props> = ({ invocationId }) => {
     });
   }, [data]);
 
-  const summaryStats = useMemo(() => {
-    const totals = {
-      tests: parsedData.length,
-      passed: 0,
-      flaky: 0,
-      failed: 0,
-      incomplete: 0,
-      noStatus: 0,
-      runs: 0,
-      attempts: 0,
-      cached: 0,
-    };
-
-    parsedData.forEach((item) => {
-      const summary = item as Partial<TestTabRowType> & {
-        runCount?: number | null;
-        attemptCount?: number | null;
-        totalNumCached?: number | null;
-      };
-      totals.runs += summary.runCount ?? 0;
-      totals.attempts += summary.attemptCount ?? 0;
-      totals.cached += summary.totalNumCached ?? 0;
-      switch (item.overallStatus) {
-        case "PASSED":
-          totals.passed += 1;
-          break;
-        case "FLAKY":
-          totals.flaky += 1;
-          break;
-        case "INCOMPLETE":
-          totals.incomplete += 1;
-          break;
-        case "NO_STATUS":
-          totals.noStatus += 1;
-          break;
-        default:
-          if (item.overallStatus !== null && item.overallStatus !== undefined) {
-            totals.failed += 1;
-          }
-          break;
-      }
-    });
-
-    return totals;
-  }, [parsedData]);
+  const summaryStats = data?.testSummaryStats ?? {
+    tests: 0,
+    passed: 0,
+    flaky: 0,
+    failed: 0,
+    incomplete: 0,
+    noStatus: 0,
+    runs: 0,
+    attempts: 0,
+    cached: 0,
+  };
 
   if (error) {
     return (

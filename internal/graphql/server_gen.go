@@ -484,6 +484,7 @@ type ComplexityRoot struct {
 		GetTarget            func(childComplexity int, instanceName string, label string, aspect string, targetKind string) int
 		Node                 func(childComplexity int, id string) int
 		Nodes                func(childComplexity int, ids []string) int
+		TestSummaryStats     func(childComplexity int, where *ent.TestSummaryWhereInput) int
 	}
 
 	RunnerCount struct {
@@ -611,6 +612,18 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	TestSummaryStats struct {
+		Attempts   func(childComplexity int) int
+		Cached     func(childComplexity int) int
+		Failed     func(childComplexity int) int
+		Flaky      func(childComplexity int) int
+		Incomplete func(childComplexity int) int
+		NoStatus   func(childComplexity int) int
+		Passed     func(childComplexity int) int
+		Runs       func(childComplexity int) int
+		Tests      func(childComplexity int) int
+	}
+
 	TestTarget struct {
 		ID       func(childComplexity int) int
 		Target   func(childComplexity int) int
@@ -718,6 +731,7 @@ type QueryResolver interface {
 	GetAuthenticatedUser(ctx context.Context, userUUID uuid.UUID) (*ent.AuthenticatedUser, error)
 	GetBazelInvocation(ctx context.Context, invocationID uuid.UUID) (*ent.BazelInvocation, error)
 	GetBuild(ctx context.Context, buildUUID uuid.UUID) (*ent.Build, error)
+	TestSummaryStats(ctx context.Context, where *ent.TestSummaryWhereInput) (*model.TestSummaryStats, error)
 	GetTarget(ctx context.Context, instanceName string, label string, aspect string, targetKind string) (*ent.Target, error)
 }
 type RunnerCountResolver interface {
@@ -2996,6 +3010,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.Nodes(childComplexity, args["ids"].([]string)), true
 
+	case "Query.testSummaryStats":
+		if e.complexity.Query.TestSummaryStats == nil {
+			break
+		}
+
+		args, err := ec.field_Query_testSummaryStats_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TestSummaryStats(childComplexity, args["where"].(*ent.TestSummaryWhereInput)), true
+
 	case "RunnerCount.actionSummary":
 		if e.complexity.RunnerCount.ActionSummary == nil {
 			break
@@ -3581,6 +3607,69 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.TestSummaryEdge.Node(childComplexity), true
+
+	case "TestSummaryStats.attempts":
+		if e.complexity.TestSummaryStats.Attempts == nil {
+			break
+		}
+
+		return e.complexity.TestSummaryStats.Attempts(childComplexity), true
+
+	case "TestSummaryStats.cached":
+		if e.complexity.TestSummaryStats.Cached == nil {
+			break
+		}
+
+		return e.complexity.TestSummaryStats.Cached(childComplexity), true
+
+	case "TestSummaryStats.failed":
+		if e.complexity.TestSummaryStats.Failed == nil {
+			break
+		}
+
+		return e.complexity.TestSummaryStats.Failed(childComplexity), true
+
+	case "TestSummaryStats.flaky":
+		if e.complexity.TestSummaryStats.Flaky == nil {
+			break
+		}
+
+		return e.complexity.TestSummaryStats.Flaky(childComplexity), true
+
+	case "TestSummaryStats.incomplete":
+		if e.complexity.TestSummaryStats.Incomplete == nil {
+			break
+		}
+
+		return e.complexity.TestSummaryStats.Incomplete(childComplexity), true
+
+	case "TestSummaryStats.noStatus":
+		if e.complexity.TestSummaryStats.NoStatus == nil {
+			break
+		}
+
+		return e.complexity.TestSummaryStats.NoStatus(childComplexity), true
+
+	case "TestSummaryStats.passed":
+		if e.complexity.TestSummaryStats.Passed == nil {
+			break
+		}
+
+		return e.complexity.TestSummaryStats.Passed(childComplexity), true
+
+	case "TestSummaryStats.runs":
+		if e.complexity.TestSummaryStats.Runs == nil {
+			break
+		}
+
+		return e.complexity.TestSummaryStats.Runs(childComplexity), true
+
+	case "TestSummaryStats.tests":
+		if e.complexity.TestSummaryStats.Tests == nil {
+			break
+		}
+
+		return e.complexity.TestSummaryStats.Tests(childComplexity), true
 
 	case "TestTarget.id":
 		if e.complexity.TestTarget.ID == nil {
@@ -5383,6 +5472,34 @@ func (ec *executionContext) field_Query_nodes_argsIds(
 	}
 
 	var zeroVal []string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_testSummaryStats_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_testSummaryStats_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_testSummaryStats_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*ent.TestSummaryWhereInput, error) {
+	if _, ok := rawArgs["where"]; !ok {
+		var zeroVal *ent.TestSummaryWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOTestSummaryWhereInput2ᚖgithubᚗcomᚋbuildbarnᚋbbᚑportalᚋentᚋgenᚋentᚐTestSummaryWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.TestSummaryWhereInput
 	return zeroVal, nil
 }
 
@@ -18746,6 +18863,81 @@ func (ec *executionContext) fieldContext_Query_getBuild(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_testSummaryStats(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_testSummaryStats(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TestSummaryStats(rctx, fc.Args["where"].(*ent.TestSummaryWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.TestSummaryStats)
+	fc.Result = res
+	return ec.marshalNTestSummaryStats2ᚖgithubᚗcomᚋbuildbarnᚋbbᚑportalᚋinternalᚋgraphqlᚋmodelᚐTestSummaryStats(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_testSummaryStats(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "tests":
+				return ec.fieldContext_TestSummaryStats_tests(ctx, field)
+			case "passed":
+				return ec.fieldContext_TestSummaryStats_passed(ctx, field)
+			case "flaky":
+				return ec.fieldContext_TestSummaryStats_flaky(ctx, field)
+			case "failed":
+				return ec.fieldContext_TestSummaryStats_failed(ctx, field)
+			case "incomplete":
+				return ec.fieldContext_TestSummaryStats_incomplete(ctx, field)
+			case "noStatus":
+				return ec.fieldContext_TestSummaryStats_noStatus(ctx, field)
+			case "runs":
+				return ec.fieldContext_TestSummaryStats_runs(ctx, field)
+			case "attempts":
+				return ec.fieldContext_TestSummaryStats_attempts(ctx, field)
+			case "cached":
+				return ec.fieldContext_TestSummaryStats_cached(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TestSummaryStats", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_testSummaryStats_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_getTarget(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getTarget(ctx, field)
 	if err != nil {
@@ -22784,6 +22976,402 @@ func (ec *executionContext) fieldContext_TestSummaryEdge_cursor(_ context.Contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TestSummaryStats_tests(ctx context.Context, field graphql.CollectedField, obj *model.TestSummaryStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TestSummaryStats_tests(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tests, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TestSummaryStats_tests(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TestSummaryStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TestSummaryStats_passed(ctx context.Context, field graphql.CollectedField, obj *model.TestSummaryStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TestSummaryStats_passed(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Passed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TestSummaryStats_passed(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TestSummaryStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TestSummaryStats_flaky(ctx context.Context, field graphql.CollectedField, obj *model.TestSummaryStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TestSummaryStats_flaky(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Flaky, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TestSummaryStats_flaky(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TestSummaryStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TestSummaryStats_failed(ctx context.Context, field graphql.CollectedField, obj *model.TestSummaryStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TestSummaryStats_failed(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Failed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TestSummaryStats_failed(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TestSummaryStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TestSummaryStats_incomplete(ctx context.Context, field graphql.CollectedField, obj *model.TestSummaryStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TestSummaryStats_incomplete(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Incomplete, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TestSummaryStats_incomplete(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TestSummaryStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TestSummaryStats_noStatus(ctx context.Context, field graphql.CollectedField, obj *model.TestSummaryStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TestSummaryStats_noStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NoStatus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TestSummaryStats_noStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TestSummaryStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TestSummaryStats_runs(ctx context.Context, field graphql.CollectedField, obj *model.TestSummaryStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TestSummaryStats_runs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Runs, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TestSummaryStats_runs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TestSummaryStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TestSummaryStats_attempts(ctx context.Context, field graphql.CollectedField, obj *model.TestSummaryStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TestSummaryStats_attempts(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Attempts, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TestSummaryStats_attempts(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TestSummaryStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TestSummaryStats_cached(ctx context.Context, field graphql.CollectedField, obj *model.TestSummaryStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TestSummaryStats_cached(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cached, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TestSummaryStats_cached(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TestSummaryStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -48376,6 +48964,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "testSummaryStats":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_testSummaryStats(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getTarget":
 			field := field
 
@@ -49778,6 +50388,85 @@ func (ec *executionContext) _TestSummaryEdge(ctx context.Context, sel ast.Select
 	return out
 }
 
+var testSummaryStatsImplementors = []string{"TestSummaryStats"}
+
+func (ec *executionContext) _TestSummaryStats(ctx context.Context, sel ast.SelectionSet, obj *model.TestSummaryStats) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, testSummaryStatsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TestSummaryStats")
+		case "tests":
+			out.Values[i] = ec._TestSummaryStats_tests(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "passed":
+			out.Values[i] = ec._TestSummaryStats_passed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "flaky":
+			out.Values[i] = ec._TestSummaryStats_flaky(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "failed":
+			out.Values[i] = ec._TestSummaryStats_failed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "incomplete":
+			out.Values[i] = ec._TestSummaryStats_incomplete(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "noStatus":
+			out.Values[i] = ec._TestSummaryStats_noStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "runs":
+			out.Values[i] = ec._TestSummaryStats_runs(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "attempts":
+			out.Values[i] = ec._TestSummaryStats_attempts(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "cached":
+			out.Values[i] = ec._TestSummaryStats_cached(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var testTargetImplementors = []string{"TestTarget", "Node"}
 
 func (ec *executionContext) _TestTarget(ctx context.Context, sel ast.SelectionSet, obj *ent.TestTarget) graphql.Marshaler {
@@ -51121,6 +51810,20 @@ func (ec *executionContext) marshalNTestSummaryOrderField2ᚖgithubᚗcomᚋbuil
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) marshalNTestSummaryStats2githubᚗcomᚋbuildbarnᚋbbᚑportalᚋinternalᚋgraphqlᚋmodelᚐTestSummaryStats(ctx context.Context, sel ast.SelectionSet, v model.TestSummaryStats) graphql.Marshaler {
+	return ec._TestSummaryStats(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTestSummaryStats2ᚖgithubᚗcomᚋbuildbarnᚋbbᚑportalᚋinternalᚋgraphqlᚋmodelᚐTestSummaryStats(ctx context.Context, sel ast.SelectionSet, v *model.TestSummaryStats) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TestSummaryStats(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNTestSummaryWhereInput2ᚖgithubᚗcomᚋbuildbarnᚋbbᚑportalᚋentᚋgenᚋentᚐTestSummaryWhereInput(ctx context.Context, v any) (*ent.TestSummaryWhereInput, error) {

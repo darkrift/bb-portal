@@ -2,6 +2,7 @@ extend type Query {
   getAuthenticatedUser(userUUID: UUID!): AuthenticatedUser
   getBazelInvocation(invocationID: UUID!): BazelInvocation
   getBuild(buildUUID: UUID!): Build
+  testSummaryStats(where: TestSummaryWhereInput): TestSummaryStats!
   getTarget(
     instanceName: String!
     label: String!
@@ -16,6 +17,18 @@ type Profile {
   digest: String!
   sizeInBytes: Int!
   digestFunction: String!
+}
+
+type TestSummaryStats {
+  tests: Int!
+  passed: Int!
+  flaky: Int!
+  failed: Int!
+  incomplete: Int!
+  noStatus: Int!
+  runs: Int!
+  attempts: Int!
+  cached: Int!
 }
 
 extend type BazelInvocation {

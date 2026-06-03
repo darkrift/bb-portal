@@ -31,6 +31,14 @@ buildifier(
     name = "buildifier",
 )
 
+exports_files(["gqlgen.yml"])
+
+alias(
+    name = "gqlgen",
+    actual = "//tools:gqlgen",
+    visibility = ["//visibility:public"],
+)
+
 write_source_files(
     name = "update_workflows",
     files = {

@@ -9,3 +9,15 @@ type Profile struct {
 	SizeInBytes    int    `json:"sizeInBytes"`
 	DigestFunction string `json:"digestFunction"`
 }
+
+type TestSummaryStats struct {
+	Tests      int `json:"tests"`
+	Passed     int `json:"passed"`
+	Flaky      int `json:"flaky"`
+	Failed     int `json:"failed"`
+	Incomplete int `json:"incomplete"`
+	NoStatus   int `json:"noStatus"`
+	Runs       int `json:"runs"`
+	Attempts   int `json:"attempts"`
+	Cached     int `json:"cached"`
+}

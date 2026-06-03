@@ -40,3 +40,14 @@ func targetLabelForID(ctx context.Context, client *ent.Client, targetID string) 
 	}
 	return targetNode.Label, nil
 }
+
+func sumTestSummaryInt32Field(ctx context.Context, query *ent.TestSummaryQuery, field string) (int, error) {
+	count, err := query.Clone().Count(ctx)
+	if err != nil {
+		return 0, err
+	}
+	if count == 0 {
+		return 0, nil
+	}
+	return query.Clone().Aggregate(ent.Sum(field)).Int(ctx)
+}
