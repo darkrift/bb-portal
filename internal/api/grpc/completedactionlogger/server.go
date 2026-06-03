@@ -296,8 +296,8 @@ func (s *Server) LogCompletedActions(stream grpc.BidiStreamingServer[cal_proto.C
 		if err != nil {
 			return err
 		}
-		actionDigest := completedAction.GetHistoricalExecuteResponse().GetActionDigest()
-		stored, err := s.saveCompletedAction(stream.Context(), completedAction)
+
+		_, err = s.saveCompletedAction(stream.Context(), completedAction)
 		if err != nil {
 			slog.Warn(
 				"Failed to store CompletedAction; not acknowledging",
@@ -306,15 +306,6 @@ func (s *Server) LogCompletedActions(stream grpc.BidiStreamingServer[cal_proto.C
 				"err", err,
 			)
 			return err
-		}
-		if stored {
-			slog.Info(
-				"Stored CompletedAction; acknowledging",
-				"uuid", completedAction.GetUuid(),
-				"instanceName", completedAction.GetInstanceName(),
-				"actionDigestHash", actionDigest.GetHash(),
-				"actionDigestSizeBytes", actionDigest.GetSizeBytes(),
-			)
 		}
 		if err = stream.Send(&emptypb.Empty{}); err != nil {
 			return err
