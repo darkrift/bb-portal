@@ -5,7 +5,9 @@ import (
 	"database/sql"
 
 	bes "github.com/bazelbuild/bazel/src/main/java/com/google/devtools/build/lib/buildeventstream/proto"
+	"github.com/buildbarn/bb-portal/ent/gen/ent/bazelinvocation"
 	"github.com/buildbarn/bb-portal/internal/database"
+	"github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics"
 	"github.com/buildbarn/bb-storage/pkg/util"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -27,7 +29,7 @@ func (r *buildEventRecorder) saveRemainingBatch(
 		),
 	)
 	defer span.End()
-	executionLogActions := r.readExecutionLogActionsFromBatch(ctx, batch)
+	executionLogResult := r.readExecutionLogActionsFromBatch(ctx, batch)
 
 	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
 	if err != nil {
@@ -49,8 +51,26 @@ func (r *buildEventRecorder) saveRemainingBatch(
 			return util.StatusWrapf(err, "Failed to save build event of type %T", buildEvent.GetId().GetId())
 		}
 	}
-	if err := r.saveExecutionLogActionMetadata(ctx, tx, executionLogActions); err != nil {
+	matchedActionCount, eligibleActionCount, err := r.saveExecutionLogActionMetadata(ctx, tx, executionLogResult.actions)
+	if err != nil {
 		return util.StatusWrap(err, "Failed to save Action execution metadata from execution log")
+	}
+	if executionLogResult.provided {
+		update := tx.Ent().BazelInvocation.UpdateOneID(r.InvocationDbID).
+			SetExecutionLogActionCount(eligibleActionCount).
+			SetExecutionLogMatchedActions(matchedActionCount)
+		if executionLogResult.err != nil {
+			update.
+				SetExecutionLogStatus(bazelinvocation.ExecutionLogStatus(actionanalytics.ExecutionLogFailed)).
+				SetExecutionLogFailureMessage(executionLogResult.err.Error())
+		} else {
+			update.
+				SetExecutionLogStatus(bazelinvocation.ExecutionLogStatus(actionanalytics.ExecutionLogProcessed)).
+				ClearExecutionLogFailureMessage()
+		}
+		if err := update.Exec(ctx); err != nil {
+			return util.StatusWrap(err, "Failed to save execution log processing status")
+		}
 	}
 
 	if err := r.saveHandledEventsForBatch(ctx, batch, tx); err != nil {

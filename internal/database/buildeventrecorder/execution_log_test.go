@@ -3,6 +3,7 @@ package buildeventrecorder
 import (
 	"bytes"
 	"testing"
+	"time"
 
 	bazelprotobuf "github.com/bazelbuild/bazel/src/main/protobuf"
 	"github.com/buildbarn/bb-portal/ent/gen/ent"
@@ -10,6 +11,7 @@ import (
 	"github.com/klauspost/compress/zstd"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protodelim"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func compactExecutionLog(t *testing.T, entries ...*bazelprotobuf.ExecLogEntry) []byte {
@@ -42,6 +44,25 @@ func TestParseCompactExecutionLog(t *testing.T) {
 				Mnemonic:    "GoLink",
 				Runner:      "remote",
 				CacheHit:    true,
+				Platform: &bazelprotobuf.Platform{Properties: []*bazelprotobuf.Platform_Property{
+					{Name: "cpu", Value: "arm64"},
+					{Name: "container-image", Value: "linux"},
+				}},
+				Metrics: &bazelprotobuf.SpawnMetrics{
+					TotalTime:           durationpb.New(9 * time.Second),
+					ParseTime:           durationpb.New(100 * time.Millisecond),
+					NetworkTime:         durationpb.New(200 * time.Millisecond),
+					FetchTime:           durationpb.New(300 * time.Millisecond),
+					QueueTime:           durationpb.New(3 * time.Second),
+					SetupTime:           durationpb.New(400 * time.Millisecond),
+					UploadTime:          durationpb.New(500 * time.Millisecond),
+					ExecutionWallTime:   durationpb.New(4 * time.Second),
+					ProcessOutputsTime:  durationpb.New(600 * time.Millisecond),
+					RetryTime:           durationpb.New(700 * time.Millisecond),
+					InputBytes:          4096,
+					InputFiles:          12,
+					MemoryEstimateBytes: 8192,
+				},
 				Outputs: []*bazelprotobuf.ExecLogEntry_Output{
 					{Type: &bazelprotobuf.ExecLogEntry_Output_OutputId{OutputId: 7}},
 				},
@@ -62,6 +83,20 @@ func TestParseCompactExecutionLog(t *testing.T) {
 	require.Equal(t, actionHash, actions[0].actionDigest.GetHashString())
 	require.EqualValues(t, 145, actions[0].actionDigest.GetSizeBytes())
 	require.Equal(t, "", actions[0].actionDigest.GetInstanceName().String())
+	require.Equal(t, map[string]string{"cpu": "arm64", "container-image": "linux"}, actions[0].metrics.executionPlatform)
+	require.EqualValues(t, 9000, *actions[0].metrics.totalTimeInMs)
+	require.EqualValues(t, 100, *actions[0].metrics.parseTimeInMs)
+	require.EqualValues(t, 200, *actions[0].metrics.networkTimeInMs)
+	require.EqualValues(t, 300, *actions[0].metrics.fetchTimeInMs)
+	require.EqualValues(t, 3000, *actions[0].metrics.queueTimeInMs)
+	require.EqualValues(t, 400, *actions[0].metrics.setupTimeInMs)
+	require.EqualValues(t, 500, *actions[0].metrics.uploadTimeInMs)
+	require.EqualValues(t, 4000, *actions[0].metrics.executionWallTimeInMs)
+	require.EqualValues(t, 600, *actions[0].metrics.processOutputsTimeInMs)
+	require.EqualValues(t, 700, *actions[0].metrics.retryTimeInMs)
+	require.EqualValues(t, 4096, *actions[0].metrics.inputBytes)
+	require.EqualValues(t, 12, *actions[0].metrics.inputFiles)
+	require.EqualValues(t, 8192, *actions[0].metrics.memoryEstimateBytes)
 }
 
 func TestParseCompactExecutionLogIgnoresSpawnsWithoutOutputs(t *testing.T) {

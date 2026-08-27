@@ -6,9 +6,11 @@ package sqlc
 
 import (
 	"context"
+	"time"
 )
 
 type Querier interface {
+	ClaimActionAnalytics(ctx context.Context, staleBefore time.Time) (int64, error)
 	//
 	// A function for creating authenticated
 	// users. It returns the ID and a bool

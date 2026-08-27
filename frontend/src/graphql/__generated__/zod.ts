@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import { ActionCacheStatisticsWhereInput, ActionDataWhereInput, ActionExecutionWhereInput, ActionSummaryWhereInput, ArtifactMetricsWhereInput, AuthenticatedUserWhereInput, BazelInvocationOrder, BazelInvocationOrderField, BazelInvocationWhereInput, BuildGraphAspectCountWhereInput, BuildGraphEvaluationStatWhereInput, BuildGraphMetricsWhereInput, BuildGraphRuleClassCountWhereInput, BuildOrder, BuildOrderField, BuildTagOrder, BuildTagOrderField, BuildTagWhereInput, BuildWhereInput, ConfigurationWhereInput, ConnectionMetadataWhereInput, CumulativeMetricsWhereInput, DigestWhereInput, DynamicExecutionMetricsWhereInput, DynamicExecutionRaceStatisticWhereInput, FilePathWhereInput, FileWhereInput, GarbageMetricsWhereInput, InstanceNameWhereInput, InvocationTagOrder, InvocationTagOrderField, InvocationTagWhereInput, InvocationTargetAbortReason, InvocationTargetWhereInput, MemoryMetricsWhereInput, MetricsWhereInput, MissDetailWhereInput, NetworkMetricsWhereInput, OrderDirection, PackageLoadMetricsWhereInput, PackageMetricsWhereInput, RunnerCountWhereInput, SourceControlWhereInput, SystemNetworkStatsWhereInput, TargetMetricsWhereInput, TargetWhereInput, TestResultWhereInput, TestSummaryOrder, TestSummaryOrderField, TestSummaryWhereInput, TestTargetWhereInput, TimingMetricsWhereInput, WorkerIdWhereInput, WorkerMetricsWhereInput, WorkerPoolMetricsWhereInput, WorkerPoolStatsWhereInput, WorkerStatsWhereInput } from './graphql'
+import { ActionAnalyticsState, ActionCacheStatisticsWhereInput, ActionDataWhereInput, ActionExecutionWhereInput, ActionSummaryWhereInput, ArtifactMetricsWhereInput, AuthenticatedUserWhereInput, BazelInvocationOrder, BazelInvocationOrderField, BazelInvocationWhereInput, BuildGraphAspectCountWhereInput, BuildGraphEvaluationStatWhereInput, BuildGraphMetricsWhereInput, BuildGraphRuleClassCountWhereInput, BuildOrder, BuildOrderField, BuildTagOrder, BuildTagOrderField, BuildTagWhereInput, BuildWhereInput, ConfigurationWhereInput, ConnectionMetadataWhereInput, CumulativeMetricsWhereInput, DigestWhereInput, DynamicExecutionMetricsWhereInput, DynamicExecutionRaceStatisticWhereInput, ExecutionLogStatus, FilePathWhereInput, FileWhereInput, GarbageMetricsWhereInput, InstanceNameWhereInput, InvocationTagOrder, InvocationTagOrderField, InvocationTagWhereInput, InvocationTargetAbortReason, InvocationTargetWhereInput, MemoryMetricsWhereInput, MetricsWhereInput, MissDetailWhereInput, NetworkMetricsWhereInput, OrderDirection, PackageLoadMetricsWhereInput, PackageMetricsWhereInput, RunnerCountWhereInput, SourceControlWhereInput, SystemNetworkStatsWhereInput, TargetMetricsWhereInput, TargetWhereInput, TestResultWhereInput, TestSummaryOrder, TestSummaryOrderField, TestSummaryWhereInput, TestTargetWhereInput, TimingMetricsWhereInput, WorkerIdWhereInput, WorkerMetricsWhereInput, WorkerPoolMetricsWhereInput, WorkerPoolStatsWhereInput, WorkerStatsWhereInput } from './graphql'
 
 type Properties<T> = Required<{
   [K in keyof T]: z.ZodType<T[K]>;
@@ -11,11 +11,15 @@ export const isDefinedNonNullAny = (v: any): v is definedNonNullAny => v !== und
 
 export const definedNonNullAnySchema = z.any().refine((v) => isDefinedNonNullAny(v));
 
+export const ActionAnalyticsStateSchema = z.enum(ActionAnalyticsState);
+
 export const BazelInvocationOrderFieldSchema = z.enum(BazelInvocationOrderField);
 
 export const BuildOrderFieldSchema = z.enum(BuildOrderField);
 
 export const BuildTagOrderFieldSchema = z.enum(BuildTagOrderField);
+
+export const ExecutionLogStatusSchema = z.enum(ExecutionLogStatus);
 
 export const InvocationTagOrderFieldSchema = z.enum(InvocationTagOrderField);
 

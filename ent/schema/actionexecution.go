@@ -69,6 +69,90 @@ func (ActionExecution) Fields() []ent.Field {
 			Optional().
 			Nillable(),
 
+		field.JSON("execution_platform", map[string]string{}).
+			Comment("Execution-platform properties reported by Bazel's compact execution log").
+			Optional().
+			Annotations(entgql.Skip()),
+
+		field.Int64("spawn_total_time_in_ms").
+			Comment("Total wall time spent running the spawn, measured locally by Bazel").
+			Optional().
+			Nillable().
+			NonNegative().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_parse_time_in_ms").
+			Comment("Time spent converting the spawn into a network request").
+			Optional().
+			Nillable().
+			NonNegative().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_network_time_in_ms").
+			Comment("Time spent communicating over the network").
+			Optional().
+			Nillable().
+			NonNegative().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_fetch_time_in_ms").
+			Comment("Time spent fetching remote outputs").
+			Optional().
+			Nillable().
+			NonNegative().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_queue_time_in_ms").
+			Comment("Time spent waiting in queues").
+			Optional().
+			Nillable().
+			NonNegative().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_setup_time_in_ms").
+			Comment("Time spent setting up the spawn execution environment").
+			Optional().
+			Nillable().
+			NonNegative().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_upload_time_in_ms").
+			Comment("Time spent uploading outputs to a remote store").
+			Optional().
+			Nillable().
+			NonNegative().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_execution_wall_time_in_ms").
+			Comment("Time spent running the subprocess").
+			Optional().
+			Nillable().
+			NonNegative().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_process_outputs_time_in_ms").
+			Comment("Time spent by the execution framework processing outputs").
+			Optional().
+			Nillable().
+			NonNegative().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_retry_time_in_ms").
+			Comment("Time spent in previous failed attempts, excluding queue time").
+			Optional().
+			Nillable().
+			NonNegative().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_input_bytes").
+			Comment("Total input size reported by Bazel; absent when unavailable").
+			Optional().
+			Nillable().
+			Positive().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_input_files").
+			Comment("Total input file count reported by Bazel; absent when unavailable").
+			Optional().
+			Nillable().
+			Positive().
+			Annotations(entgql.Skip()),
+		field.Int64("spawn_memory_estimate_bytes").
+			Comment("Estimated memory use reported by Bazel; absent when unavailable").
+			Optional().
+			Nillable().
+			Positive().
+			Annotations(entgql.Skip()),
+
 		field.Bool("success").Optional(),
 		field.Int32("exit_code").Optional(),
 

@@ -28,6 +28,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/sourcecontrol"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/targetkindmapping"
 	"github.com/buildbarn/bb-portal/pkg/invocation"
+	"github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics"
 	"github.com/google/uuid"
 )
 
@@ -89,6 +90,124 @@ func (_c *BazelInvocationCreate) SetBepCompleted(v bool) *BazelInvocationCreate 
 func (_c *BazelInvocationCreate) SetNillableBepCompleted(v *bool) *BazelInvocationCreate {
 	if v != nil {
 		_c.SetBepCompleted(*v)
+	}
+	return _c
+}
+
+// SetActionAnalyticsState sets the "action_analytics_state" field.
+func (_c *BazelInvocationCreate) SetActionAnalyticsState(v bazelinvocation.ActionAnalyticsState) *BazelInvocationCreate {
+	_c.mutation.SetActionAnalyticsState(v)
+	return _c
+}
+
+// SetNillableActionAnalyticsState sets the "action_analytics_state" field if the given value is not nil.
+func (_c *BazelInvocationCreate) SetNillableActionAnalyticsState(v *bazelinvocation.ActionAnalyticsState) *BazelInvocationCreate {
+	if v != nil {
+		_c.SetActionAnalyticsState(*v)
+	}
+	return _c
+}
+
+// SetActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field.
+func (_c *BazelInvocationCreate) SetActionAnalyticsFailureMessage(v string) *BazelInvocationCreate {
+	_c.mutation.SetActionAnalyticsFailureMessage(v)
+	return _c
+}
+
+// SetNillableActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field if the given value is not nil.
+func (_c *BazelInvocationCreate) SetNillableActionAnalyticsFailureMessage(v *string) *BazelInvocationCreate {
+	if v != nil {
+		_c.SetActionAnalyticsFailureMessage(*v)
+	}
+	return _c
+}
+
+// SetActionAnalyticsStartedAt sets the "action_analytics_started_at" field.
+func (_c *BazelInvocationCreate) SetActionAnalyticsStartedAt(v time.Time) *BazelInvocationCreate {
+	_c.mutation.SetActionAnalyticsStartedAt(v)
+	return _c
+}
+
+// SetNillableActionAnalyticsStartedAt sets the "action_analytics_started_at" field if the given value is not nil.
+func (_c *BazelInvocationCreate) SetNillableActionAnalyticsStartedAt(v *time.Time) *BazelInvocationCreate {
+	if v != nil {
+		_c.SetActionAnalyticsStartedAt(*v)
+	}
+	return _c
+}
+
+// SetActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field.
+func (_c *BazelInvocationCreate) SetActionAnalyticsCompletedAt(v time.Time) *BazelInvocationCreate {
+	_c.mutation.SetActionAnalyticsCompletedAt(v)
+	return _c
+}
+
+// SetNillableActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field if the given value is not nil.
+func (_c *BazelInvocationCreate) SetNillableActionAnalyticsCompletedAt(v *time.Time) *BazelInvocationCreate {
+	if v != nil {
+		_c.SetActionAnalyticsCompletedAt(*v)
+	}
+	return _c
+}
+
+// SetActionAnalyticsResult sets the "action_analytics_result" field.
+func (_c *BazelInvocationCreate) SetActionAnalyticsResult(v *actionanalytics.Report) *BazelInvocationCreate {
+	_c.mutation.SetActionAnalyticsResult(v)
+	return _c
+}
+
+// SetExecutionLogStatus sets the "execution_log_status" field.
+func (_c *BazelInvocationCreate) SetExecutionLogStatus(v bazelinvocation.ExecutionLogStatus) *BazelInvocationCreate {
+	_c.mutation.SetExecutionLogStatus(v)
+	return _c
+}
+
+// SetNillableExecutionLogStatus sets the "execution_log_status" field if the given value is not nil.
+func (_c *BazelInvocationCreate) SetNillableExecutionLogStatus(v *bazelinvocation.ExecutionLogStatus) *BazelInvocationCreate {
+	if v != nil {
+		_c.SetExecutionLogStatus(*v)
+	}
+	return _c
+}
+
+// SetExecutionLogFailureMessage sets the "execution_log_failure_message" field.
+func (_c *BazelInvocationCreate) SetExecutionLogFailureMessage(v string) *BazelInvocationCreate {
+	_c.mutation.SetExecutionLogFailureMessage(v)
+	return _c
+}
+
+// SetNillableExecutionLogFailureMessage sets the "execution_log_failure_message" field if the given value is not nil.
+func (_c *BazelInvocationCreate) SetNillableExecutionLogFailureMessage(v *string) *BazelInvocationCreate {
+	if v != nil {
+		_c.SetExecutionLogFailureMessage(*v)
+	}
+	return _c
+}
+
+// SetExecutionLogActionCount sets the "execution_log_action_count" field.
+func (_c *BazelInvocationCreate) SetExecutionLogActionCount(v int64) *BazelInvocationCreate {
+	_c.mutation.SetExecutionLogActionCount(v)
+	return _c
+}
+
+// SetNillableExecutionLogActionCount sets the "execution_log_action_count" field if the given value is not nil.
+func (_c *BazelInvocationCreate) SetNillableExecutionLogActionCount(v *int64) *BazelInvocationCreate {
+	if v != nil {
+		_c.SetExecutionLogActionCount(*v)
+	}
+	return _c
+}
+
+// SetExecutionLogMatchedActions sets the "execution_log_matched_actions" field.
+func (_c *BazelInvocationCreate) SetExecutionLogMatchedActions(v int64) *BazelInvocationCreate {
+	_c.mutation.SetExecutionLogMatchedActions(v)
+	return _c
+}
+
+// SetNillableExecutionLogMatchedActions sets the "execution_log_matched_actions" field if the given value is not nil.
+func (_c *BazelInvocationCreate) SetNillableExecutionLogMatchedActions(v *int64) *BazelInvocationCreate {
+	if v != nil {
+		_c.SetExecutionLogMatchedActions(*v)
 	}
 	return _c
 }
@@ -549,6 +668,22 @@ func (_c *BazelInvocationCreate) defaults() error {
 		v := bazelinvocation.DefaultBepCompleted
 		_c.mutation.SetBepCompleted(v)
 	}
+	if _, ok := _c.mutation.ActionAnalyticsState(); !ok {
+		v := bazelinvocation.DefaultActionAnalyticsState
+		_c.mutation.SetActionAnalyticsState(v)
+	}
+	if _, ok := _c.mutation.ExecutionLogStatus(); !ok {
+		v := bazelinvocation.DefaultExecutionLogStatus
+		_c.mutation.SetExecutionLogStatus(v)
+	}
+	if _, ok := _c.mutation.ExecutionLogActionCount(); !ok {
+		v := bazelinvocation.DefaultExecutionLogActionCount
+		_c.mutation.SetExecutionLogActionCount(v)
+	}
+	if _, ok := _c.mutation.ExecutionLogMatchedActions(); !ok {
+		v := bazelinvocation.DefaultExecutionLogMatchedActions
+		_c.mutation.SetExecutionLogMatchedActions(v)
+	}
 	if _, ok := _c.mutation.ProcessedEventStarted(); !ok {
 		v := bazelinvocation.DefaultProcessedEventStarted
 		_c.mutation.SetProcessedEventStarted(v)
@@ -578,6 +713,38 @@ func (_c *BazelInvocationCreate) check() error {
 	}
 	if _, ok := _c.mutation.BepCompleted(); !ok {
 		return &ValidationError{Name: "bep_completed", err: errors.New(`ent: missing required field "BazelInvocation.bep_completed"`)}
+	}
+	if _, ok := _c.mutation.ActionAnalyticsState(); !ok {
+		return &ValidationError{Name: "action_analytics_state", err: errors.New(`ent: missing required field "BazelInvocation.action_analytics_state"`)}
+	}
+	if v, ok := _c.mutation.ActionAnalyticsState(); ok {
+		if err := bazelinvocation.ActionAnalyticsStateValidator(v); err != nil {
+			return &ValidationError{Name: "action_analytics_state", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.action_analytics_state": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.ExecutionLogStatus(); !ok {
+		return &ValidationError{Name: "execution_log_status", err: errors.New(`ent: missing required field "BazelInvocation.execution_log_status"`)}
+	}
+	if v, ok := _c.mutation.ExecutionLogStatus(); ok {
+		if err := bazelinvocation.ExecutionLogStatusValidator(v); err != nil {
+			return &ValidationError{Name: "execution_log_status", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.execution_log_status": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.ExecutionLogActionCount(); !ok {
+		return &ValidationError{Name: "execution_log_action_count", err: errors.New(`ent: missing required field "BazelInvocation.execution_log_action_count"`)}
+	}
+	if v, ok := _c.mutation.ExecutionLogActionCount(); ok {
+		if err := bazelinvocation.ExecutionLogActionCountValidator(v); err != nil {
+			return &ValidationError{Name: "execution_log_action_count", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.execution_log_action_count": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.ExecutionLogMatchedActions(); !ok {
+		return &ValidationError{Name: "execution_log_matched_actions", err: errors.New(`ent: missing required field "BazelInvocation.execution_log_matched_actions"`)}
+	}
+	if v, ok := _c.mutation.ExecutionLogMatchedActions(); ok {
+		if err := bazelinvocation.ExecutionLogMatchedActionsValidator(v); err != nil {
+			return &ValidationError{Name: "execution_log_matched_actions", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.execution_log_matched_actions": %w`, err)}
+		}
 	}
 	if _, ok := _c.mutation.ProcessedEventStarted(); !ok {
 		return &ValidationError{Name: "processed_event_started", err: errors.New(`ent: missing required field "BazelInvocation.processed_event_started"`)}
@@ -646,6 +813,42 @@ func (_c *BazelInvocationCreate) createSpec() (*BazelInvocation, *sqlgraph.Creat
 	if value, ok := _c.mutation.BepCompleted(); ok {
 		_spec.SetField(bazelinvocation.FieldBepCompleted, field.TypeBool, value)
 		_node.BepCompleted = value
+	}
+	if value, ok := _c.mutation.ActionAnalyticsState(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsState, field.TypeEnum, value)
+		_node.ActionAnalyticsState = value
+	}
+	if value, ok := _c.mutation.ActionAnalyticsFailureMessage(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsFailureMessage, field.TypeString, value)
+		_node.ActionAnalyticsFailureMessage = value
+	}
+	if value, ok := _c.mutation.ActionAnalyticsStartedAt(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsStartedAt, field.TypeTime, value)
+		_node.ActionAnalyticsStartedAt = &value
+	}
+	if value, ok := _c.mutation.ActionAnalyticsCompletedAt(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsCompletedAt, field.TypeTime, value)
+		_node.ActionAnalyticsCompletedAt = &value
+	}
+	if value, ok := _c.mutation.ActionAnalyticsResult(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsResult, field.TypeJSON, value)
+		_node.ActionAnalyticsResult = value
+	}
+	if value, ok := _c.mutation.ExecutionLogStatus(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogStatus, field.TypeEnum, value)
+		_node.ExecutionLogStatus = value
+	}
+	if value, ok := _c.mutation.ExecutionLogFailureMessage(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogFailureMessage, field.TypeString, value)
+		_node.ExecutionLogFailureMessage = value
+	}
+	if value, ok := _c.mutation.ExecutionLogActionCount(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogActionCount, field.TypeInt64, value)
+		_node.ExecutionLogActionCount = value
+	}
+	if value, ok := _c.mutation.ExecutionLogMatchedActions(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogMatchedActions, field.TypeInt64, value)
+		_node.ExecutionLogMatchedActions = value
 	}
 	if value, ok := _c.mutation.Username(); ok {
 		_spec.SetField(bazelinvocation.FieldUsername, field.TypeString, value)
@@ -1047,6 +1250,156 @@ func (u *BazelInvocationUpsert) UpdateBepCompleted() *BazelInvocationUpsert {
 	return u
 }
 
+// SetActionAnalyticsState sets the "action_analytics_state" field.
+func (u *BazelInvocationUpsert) SetActionAnalyticsState(v bazelinvocation.ActionAnalyticsState) *BazelInvocationUpsert {
+	u.Set(bazelinvocation.FieldActionAnalyticsState, v)
+	return u
+}
+
+// UpdateActionAnalyticsState sets the "action_analytics_state" field to the value that was provided on create.
+func (u *BazelInvocationUpsert) UpdateActionAnalyticsState() *BazelInvocationUpsert {
+	u.SetExcluded(bazelinvocation.FieldActionAnalyticsState)
+	return u
+}
+
+// SetActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field.
+func (u *BazelInvocationUpsert) SetActionAnalyticsFailureMessage(v string) *BazelInvocationUpsert {
+	u.Set(bazelinvocation.FieldActionAnalyticsFailureMessage, v)
+	return u
+}
+
+// UpdateActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field to the value that was provided on create.
+func (u *BazelInvocationUpsert) UpdateActionAnalyticsFailureMessage() *BazelInvocationUpsert {
+	u.SetExcluded(bazelinvocation.FieldActionAnalyticsFailureMessage)
+	return u
+}
+
+// ClearActionAnalyticsFailureMessage clears the value of the "action_analytics_failure_message" field.
+func (u *BazelInvocationUpsert) ClearActionAnalyticsFailureMessage() *BazelInvocationUpsert {
+	u.SetNull(bazelinvocation.FieldActionAnalyticsFailureMessage)
+	return u
+}
+
+// SetActionAnalyticsStartedAt sets the "action_analytics_started_at" field.
+func (u *BazelInvocationUpsert) SetActionAnalyticsStartedAt(v time.Time) *BazelInvocationUpsert {
+	u.Set(bazelinvocation.FieldActionAnalyticsStartedAt, v)
+	return u
+}
+
+// UpdateActionAnalyticsStartedAt sets the "action_analytics_started_at" field to the value that was provided on create.
+func (u *BazelInvocationUpsert) UpdateActionAnalyticsStartedAt() *BazelInvocationUpsert {
+	u.SetExcluded(bazelinvocation.FieldActionAnalyticsStartedAt)
+	return u
+}
+
+// ClearActionAnalyticsStartedAt clears the value of the "action_analytics_started_at" field.
+func (u *BazelInvocationUpsert) ClearActionAnalyticsStartedAt() *BazelInvocationUpsert {
+	u.SetNull(bazelinvocation.FieldActionAnalyticsStartedAt)
+	return u
+}
+
+// SetActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field.
+func (u *BazelInvocationUpsert) SetActionAnalyticsCompletedAt(v time.Time) *BazelInvocationUpsert {
+	u.Set(bazelinvocation.FieldActionAnalyticsCompletedAt, v)
+	return u
+}
+
+// UpdateActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field to the value that was provided on create.
+func (u *BazelInvocationUpsert) UpdateActionAnalyticsCompletedAt() *BazelInvocationUpsert {
+	u.SetExcluded(bazelinvocation.FieldActionAnalyticsCompletedAt)
+	return u
+}
+
+// ClearActionAnalyticsCompletedAt clears the value of the "action_analytics_completed_at" field.
+func (u *BazelInvocationUpsert) ClearActionAnalyticsCompletedAt() *BazelInvocationUpsert {
+	u.SetNull(bazelinvocation.FieldActionAnalyticsCompletedAt)
+	return u
+}
+
+// SetActionAnalyticsResult sets the "action_analytics_result" field.
+func (u *BazelInvocationUpsert) SetActionAnalyticsResult(v *actionanalytics.Report) *BazelInvocationUpsert {
+	u.Set(bazelinvocation.FieldActionAnalyticsResult, v)
+	return u
+}
+
+// UpdateActionAnalyticsResult sets the "action_analytics_result" field to the value that was provided on create.
+func (u *BazelInvocationUpsert) UpdateActionAnalyticsResult() *BazelInvocationUpsert {
+	u.SetExcluded(bazelinvocation.FieldActionAnalyticsResult)
+	return u
+}
+
+// ClearActionAnalyticsResult clears the value of the "action_analytics_result" field.
+func (u *BazelInvocationUpsert) ClearActionAnalyticsResult() *BazelInvocationUpsert {
+	u.SetNull(bazelinvocation.FieldActionAnalyticsResult)
+	return u
+}
+
+// SetExecutionLogStatus sets the "execution_log_status" field.
+func (u *BazelInvocationUpsert) SetExecutionLogStatus(v bazelinvocation.ExecutionLogStatus) *BazelInvocationUpsert {
+	u.Set(bazelinvocation.FieldExecutionLogStatus, v)
+	return u
+}
+
+// UpdateExecutionLogStatus sets the "execution_log_status" field to the value that was provided on create.
+func (u *BazelInvocationUpsert) UpdateExecutionLogStatus() *BazelInvocationUpsert {
+	u.SetExcluded(bazelinvocation.FieldExecutionLogStatus)
+	return u
+}
+
+// SetExecutionLogFailureMessage sets the "execution_log_failure_message" field.
+func (u *BazelInvocationUpsert) SetExecutionLogFailureMessage(v string) *BazelInvocationUpsert {
+	u.Set(bazelinvocation.FieldExecutionLogFailureMessage, v)
+	return u
+}
+
+// UpdateExecutionLogFailureMessage sets the "execution_log_failure_message" field to the value that was provided on create.
+func (u *BazelInvocationUpsert) UpdateExecutionLogFailureMessage() *BazelInvocationUpsert {
+	u.SetExcluded(bazelinvocation.FieldExecutionLogFailureMessage)
+	return u
+}
+
+// ClearExecutionLogFailureMessage clears the value of the "execution_log_failure_message" field.
+func (u *BazelInvocationUpsert) ClearExecutionLogFailureMessage() *BazelInvocationUpsert {
+	u.SetNull(bazelinvocation.FieldExecutionLogFailureMessage)
+	return u
+}
+
+// SetExecutionLogActionCount sets the "execution_log_action_count" field.
+func (u *BazelInvocationUpsert) SetExecutionLogActionCount(v int64) *BazelInvocationUpsert {
+	u.Set(bazelinvocation.FieldExecutionLogActionCount, v)
+	return u
+}
+
+// UpdateExecutionLogActionCount sets the "execution_log_action_count" field to the value that was provided on create.
+func (u *BazelInvocationUpsert) UpdateExecutionLogActionCount() *BazelInvocationUpsert {
+	u.SetExcluded(bazelinvocation.FieldExecutionLogActionCount)
+	return u
+}
+
+// AddExecutionLogActionCount adds v to the "execution_log_action_count" field.
+func (u *BazelInvocationUpsert) AddExecutionLogActionCount(v int64) *BazelInvocationUpsert {
+	u.Add(bazelinvocation.FieldExecutionLogActionCount, v)
+	return u
+}
+
+// SetExecutionLogMatchedActions sets the "execution_log_matched_actions" field.
+func (u *BazelInvocationUpsert) SetExecutionLogMatchedActions(v int64) *BazelInvocationUpsert {
+	u.Set(bazelinvocation.FieldExecutionLogMatchedActions, v)
+	return u
+}
+
+// UpdateExecutionLogMatchedActions sets the "execution_log_matched_actions" field to the value that was provided on create.
+func (u *BazelInvocationUpsert) UpdateExecutionLogMatchedActions() *BazelInvocationUpsert {
+	u.SetExcluded(bazelinvocation.FieldExecutionLogMatchedActions)
+	return u
+}
+
+// AddExecutionLogMatchedActions adds v to the "execution_log_matched_actions" field.
+func (u *BazelInvocationUpsert) AddExecutionLogMatchedActions(v int64) *BazelInvocationUpsert {
+	u.Add(bazelinvocation.FieldExecutionLogMatchedActions, v)
+	return u
+}
+
 // SetUsername sets the "username" field.
 func (u *BazelInvocationUpsert) SetUsername(v string) *BazelInvocationUpsert {
 	u.Set(bazelinvocation.FieldUsername, v)
@@ -1412,6 +1765,181 @@ func (u *BazelInvocationUpsertOne) SetBepCompleted(v bool) *BazelInvocationUpser
 func (u *BazelInvocationUpsertOne) UpdateBepCompleted() *BazelInvocationUpsertOne {
 	return u.Update(func(s *BazelInvocationUpsert) {
 		s.UpdateBepCompleted()
+	})
+}
+
+// SetActionAnalyticsState sets the "action_analytics_state" field.
+func (u *BazelInvocationUpsertOne) SetActionAnalyticsState(v bazelinvocation.ActionAnalyticsState) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetActionAnalyticsState(v)
+	})
+}
+
+// UpdateActionAnalyticsState sets the "action_analytics_state" field to the value that was provided on create.
+func (u *BazelInvocationUpsertOne) UpdateActionAnalyticsState() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateActionAnalyticsState()
+	})
+}
+
+// SetActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field.
+func (u *BazelInvocationUpsertOne) SetActionAnalyticsFailureMessage(v string) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetActionAnalyticsFailureMessage(v)
+	})
+}
+
+// UpdateActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field to the value that was provided on create.
+func (u *BazelInvocationUpsertOne) UpdateActionAnalyticsFailureMessage() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateActionAnalyticsFailureMessage()
+	})
+}
+
+// ClearActionAnalyticsFailureMessage clears the value of the "action_analytics_failure_message" field.
+func (u *BazelInvocationUpsertOne) ClearActionAnalyticsFailureMessage() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearActionAnalyticsFailureMessage()
+	})
+}
+
+// SetActionAnalyticsStartedAt sets the "action_analytics_started_at" field.
+func (u *BazelInvocationUpsertOne) SetActionAnalyticsStartedAt(v time.Time) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetActionAnalyticsStartedAt(v)
+	})
+}
+
+// UpdateActionAnalyticsStartedAt sets the "action_analytics_started_at" field to the value that was provided on create.
+func (u *BazelInvocationUpsertOne) UpdateActionAnalyticsStartedAt() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateActionAnalyticsStartedAt()
+	})
+}
+
+// ClearActionAnalyticsStartedAt clears the value of the "action_analytics_started_at" field.
+func (u *BazelInvocationUpsertOne) ClearActionAnalyticsStartedAt() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearActionAnalyticsStartedAt()
+	})
+}
+
+// SetActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field.
+func (u *BazelInvocationUpsertOne) SetActionAnalyticsCompletedAt(v time.Time) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetActionAnalyticsCompletedAt(v)
+	})
+}
+
+// UpdateActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field to the value that was provided on create.
+func (u *BazelInvocationUpsertOne) UpdateActionAnalyticsCompletedAt() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateActionAnalyticsCompletedAt()
+	})
+}
+
+// ClearActionAnalyticsCompletedAt clears the value of the "action_analytics_completed_at" field.
+func (u *BazelInvocationUpsertOne) ClearActionAnalyticsCompletedAt() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearActionAnalyticsCompletedAt()
+	})
+}
+
+// SetActionAnalyticsResult sets the "action_analytics_result" field.
+func (u *BazelInvocationUpsertOne) SetActionAnalyticsResult(v *actionanalytics.Report) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetActionAnalyticsResult(v)
+	})
+}
+
+// UpdateActionAnalyticsResult sets the "action_analytics_result" field to the value that was provided on create.
+func (u *BazelInvocationUpsertOne) UpdateActionAnalyticsResult() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateActionAnalyticsResult()
+	})
+}
+
+// ClearActionAnalyticsResult clears the value of the "action_analytics_result" field.
+func (u *BazelInvocationUpsertOne) ClearActionAnalyticsResult() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearActionAnalyticsResult()
+	})
+}
+
+// SetExecutionLogStatus sets the "execution_log_status" field.
+func (u *BazelInvocationUpsertOne) SetExecutionLogStatus(v bazelinvocation.ExecutionLogStatus) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetExecutionLogStatus(v)
+	})
+}
+
+// UpdateExecutionLogStatus sets the "execution_log_status" field to the value that was provided on create.
+func (u *BazelInvocationUpsertOne) UpdateExecutionLogStatus() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateExecutionLogStatus()
+	})
+}
+
+// SetExecutionLogFailureMessage sets the "execution_log_failure_message" field.
+func (u *BazelInvocationUpsertOne) SetExecutionLogFailureMessage(v string) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetExecutionLogFailureMessage(v)
+	})
+}
+
+// UpdateExecutionLogFailureMessage sets the "execution_log_failure_message" field to the value that was provided on create.
+func (u *BazelInvocationUpsertOne) UpdateExecutionLogFailureMessage() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateExecutionLogFailureMessage()
+	})
+}
+
+// ClearExecutionLogFailureMessage clears the value of the "execution_log_failure_message" field.
+func (u *BazelInvocationUpsertOne) ClearExecutionLogFailureMessage() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearExecutionLogFailureMessage()
+	})
+}
+
+// SetExecutionLogActionCount sets the "execution_log_action_count" field.
+func (u *BazelInvocationUpsertOne) SetExecutionLogActionCount(v int64) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetExecutionLogActionCount(v)
+	})
+}
+
+// AddExecutionLogActionCount adds v to the "execution_log_action_count" field.
+func (u *BazelInvocationUpsertOne) AddExecutionLogActionCount(v int64) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.AddExecutionLogActionCount(v)
+	})
+}
+
+// UpdateExecutionLogActionCount sets the "execution_log_action_count" field to the value that was provided on create.
+func (u *BazelInvocationUpsertOne) UpdateExecutionLogActionCount() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateExecutionLogActionCount()
+	})
+}
+
+// SetExecutionLogMatchedActions sets the "execution_log_matched_actions" field.
+func (u *BazelInvocationUpsertOne) SetExecutionLogMatchedActions(v int64) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetExecutionLogMatchedActions(v)
+	})
+}
+
+// AddExecutionLogMatchedActions adds v to the "execution_log_matched_actions" field.
+func (u *BazelInvocationUpsertOne) AddExecutionLogMatchedActions(v int64) *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.AddExecutionLogMatchedActions(v)
+	})
+}
+
+// UpdateExecutionLogMatchedActions sets the "execution_log_matched_actions" field to the value that was provided on create.
+func (u *BazelInvocationUpsertOne) UpdateExecutionLogMatchedActions() *BazelInvocationUpsertOne {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateExecutionLogMatchedActions()
 	})
 }
 
@@ -1989,6 +2517,181 @@ func (u *BazelInvocationUpsertBulk) SetBepCompleted(v bool) *BazelInvocationUpse
 func (u *BazelInvocationUpsertBulk) UpdateBepCompleted() *BazelInvocationUpsertBulk {
 	return u.Update(func(s *BazelInvocationUpsert) {
 		s.UpdateBepCompleted()
+	})
+}
+
+// SetActionAnalyticsState sets the "action_analytics_state" field.
+func (u *BazelInvocationUpsertBulk) SetActionAnalyticsState(v bazelinvocation.ActionAnalyticsState) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetActionAnalyticsState(v)
+	})
+}
+
+// UpdateActionAnalyticsState sets the "action_analytics_state" field to the value that was provided on create.
+func (u *BazelInvocationUpsertBulk) UpdateActionAnalyticsState() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateActionAnalyticsState()
+	})
+}
+
+// SetActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field.
+func (u *BazelInvocationUpsertBulk) SetActionAnalyticsFailureMessage(v string) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetActionAnalyticsFailureMessage(v)
+	})
+}
+
+// UpdateActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field to the value that was provided on create.
+func (u *BazelInvocationUpsertBulk) UpdateActionAnalyticsFailureMessage() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateActionAnalyticsFailureMessage()
+	})
+}
+
+// ClearActionAnalyticsFailureMessage clears the value of the "action_analytics_failure_message" field.
+func (u *BazelInvocationUpsertBulk) ClearActionAnalyticsFailureMessage() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearActionAnalyticsFailureMessage()
+	})
+}
+
+// SetActionAnalyticsStartedAt sets the "action_analytics_started_at" field.
+func (u *BazelInvocationUpsertBulk) SetActionAnalyticsStartedAt(v time.Time) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetActionAnalyticsStartedAt(v)
+	})
+}
+
+// UpdateActionAnalyticsStartedAt sets the "action_analytics_started_at" field to the value that was provided on create.
+func (u *BazelInvocationUpsertBulk) UpdateActionAnalyticsStartedAt() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateActionAnalyticsStartedAt()
+	})
+}
+
+// ClearActionAnalyticsStartedAt clears the value of the "action_analytics_started_at" field.
+func (u *BazelInvocationUpsertBulk) ClearActionAnalyticsStartedAt() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearActionAnalyticsStartedAt()
+	})
+}
+
+// SetActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field.
+func (u *BazelInvocationUpsertBulk) SetActionAnalyticsCompletedAt(v time.Time) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetActionAnalyticsCompletedAt(v)
+	})
+}
+
+// UpdateActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field to the value that was provided on create.
+func (u *BazelInvocationUpsertBulk) UpdateActionAnalyticsCompletedAt() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateActionAnalyticsCompletedAt()
+	})
+}
+
+// ClearActionAnalyticsCompletedAt clears the value of the "action_analytics_completed_at" field.
+func (u *BazelInvocationUpsertBulk) ClearActionAnalyticsCompletedAt() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearActionAnalyticsCompletedAt()
+	})
+}
+
+// SetActionAnalyticsResult sets the "action_analytics_result" field.
+func (u *BazelInvocationUpsertBulk) SetActionAnalyticsResult(v *actionanalytics.Report) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetActionAnalyticsResult(v)
+	})
+}
+
+// UpdateActionAnalyticsResult sets the "action_analytics_result" field to the value that was provided on create.
+func (u *BazelInvocationUpsertBulk) UpdateActionAnalyticsResult() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateActionAnalyticsResult()
+	})
+}
+
+// ClearActionAnalyticsResult clears the value of the "action_analytics_result" field.
+func (u *BazelInvocationUpsertBulk) ClearActionAnalyticsResult() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearActionAnalyticsResult()
+	})
+}
+
+// SetExecutionLogStatus sets the "execution_log_status" field.
+func (u *BazelInvocationUpsertBulk) SetExecutionLogStatus(v bazelinvocation.ExecutionLogStatus) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetExecutionLogStatus(v)
+	})
+}
+
+// UpdateExecutionLogStatus sets the "execution_log_status" field to the value that was provided on create.
+func (u *BazelInvocationUpsertBulk) UpdateExecutionLogStatus() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateExecutionLogStatus()
+	})
+}
+
+// SetExecutionLogFailureMessage sets the "execution_log_failure_message" field.
+func (u *BazelInvocationUpsertBulk) SetExecutionLogFailureMessage(v string) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetExecutionLogFailureMessage(v)
+	})
+}
+
+// UpdateExecutionLogFailureMessage sets the "execution_log_failure_message" field to the value that was provided on create.
+func (u *BazelInvocationUpsertBulk) UpdateExecutionLogFailureMessage() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateExecutionLogFailureMessage()
+	})
+}
+
+// ClearExecutionLogFailureMessage clears the value of the "execution_log_failure_message" field.
+func (u *BazelInvocationUpsertBulk) ClearExecutionLogFailureMessage() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.ClearExecutionLogFailureMessage()
+	})
+}
+
+// SetExecutionLogActionCount sets the "execution_log_action_count" field.
+func (u *BazelInvocationUpsertBulk) SetExecutionLogActionCount(v int64) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetExecutionLogActionCount(v)
+	})
+}
+
+// AddExecutionLogActionCount adds v to the "execution_log_action_count" field.
+func (u *BazelInvocationUpsertBulk) AddExecutionLogActionCount(v int64) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.AddExecutionLogActionCount(v)
+	})
+}
+
+// UpdateExecutionLogActionCount sets the "execution_log_action_count" field to the value that was provided on create.
+func (u *BazelInvocationUpsertBulk) UpdateExecutionLogActionCount() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateExecutionLogActionCount()
+	})
+}
+
+// SetExecutionLogMatchedActions sets the "execution_log_matched_actions" field.
+func (u *BazelInvocationUpsertBulk) SetExecutionLogMatchedActions(v int64) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.SetExecutionLogMatchedActions(v)
+	})
+}
+
+// AddExecutionLogMatchedActions adds v to the "execution_log_matched_actions" field.
+func (u *BazelInvocationUpsertBulk) AddExecutionLogMatchedActions(v int64) *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.AddExecutionLogMatchedActions(v)
+	})
+}
+
+// UpdateExecutionLogMatchedActions sets the "execution_log_matched_actions" field to the value that was provided on create.
+func (u *BazelInvocationUpsertBulk) UpdateExecutionLogMatchedActions() *BazelInvocationUpsertBulk {
+	return u.Update(func(s *BazelInvocationUpsert) {
+		s.UpdateExecutionLogMatchedActions()
 	})
 }
 

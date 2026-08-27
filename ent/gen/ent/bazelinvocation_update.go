@@ -29,6 +29,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/sourcecontrol"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/targetkindmapping"
 	"github.com/buildbarn/bb-portal/pkg/invocation"
+	"github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics"
 )
 
 // BazelInvocationUpdate is the builder for updating BazelInvocation entities.
@@ -95,6 +96,168 @@ func (_u *BazelInvocationUpdate) SetNillableBepCompleted(v *bool) *BazelInvocati
 	if v != nil {
 		_u.SetBepCompleted(*v)
 	}
+	return _u
+}
+
+// SetActionAnalyticsState sets the "action_analytics_state" field.
+func (_u *BazelInvocationUpdate) SetActionAnalyticsState(v bazelinvocation.ActionAnalyticsState) *BazelInvocationUpdate {
+	_u.mutation.SetActionAnalyticsState(v)
+	return _u
+}
+
+// SetNillableActionAnalyticsState sets the "action_analytics_state" field if the given value is not nil.
+func (_u *BazelInvocationUpdate) SetNillableActionAnalyticsState(v *bazelinvocation.ActionAnalyticsState) *BazelInvocationUpdate {
+	if v != nil {
+		_u.SetActionAnalyticsState(*v)
+	}
+	return _u
+}
+
+// SetActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field.
+func (_u *BazelInvocationUpdate) SetActionAnalyticsFailureMessage(v string) *BazelInvocationUpdate {
+	_u.mutation.SetActionAnalyticsFailureMessage(v)
+	return _u
+}
+
+// SetNillableActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field if the given value is not nil.
+func (_u *BazelInvocationUpdate) SetNillableActionAnalyticsFailureMessage(v *string) *BazelInvocationUpdate {
+	if v != nil {
+		_u.SetActionAnalyticsFailureMessage(*v)
+	}
+	return _u
+}
+
+// ClearActionAnalyticsFailureMessage clears the value of the "action_analytics_failure_message" field.
+func (_u *BazelInvocationUpdate) ClearActionAnalyticsFailureMessage() *BazelInvocationUpdate {
+	_u.mutation.ClearActionAnalyticsFailureMessage()
+	return _u
+}
+
+// SetActionAnalyticsStartedAt sets the "action_analytics_started_at" field.
+func (_u *BazelInvocationUpdate) SetActionAnalyticsStartedAt(v time.Time) *BazelInvocationUpdate {
+	_u.mutation.SetActionAnalyticsStartedAt(v)
+	return _u
+}
+
+// SetNillableActionAnalyticsStartedAt sets the "action_analytics_started_at" field if the given value is not nil.
+func (_u *BazelInvocationUpdate) SetNillableActionAnalyticsStartedAt(v *time.Time) *BazelInvocationUpdate {
+	if v != nil {
+		_u.SetActionAnalyticsStartedAt(*v)
+	}
+	return _u
+}
+
+// ClearActionAnalyticsStartedAt clears the value of the "action_analytics_started_at" field.
+func (_u *BazelInvocationUpdate) ClearActionAnalyticsStartedAt() *BazelInvocationUpdate {
+	_u.mutation.ClearActionAnalyticsStartedAt()
+	return _u
+}
+
+// SetActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field.
+func (_u *BazelInvocationUpdate) SetActionAnalyticsCompletedAt(v time.Time) *BazelInvocationUpdate {
+	_u.mutation.SetActionAnalyticsCompletedAt(v)
+	return _u
+}
+
+// SetNillableActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field if the given value is not nil.
+func (_u *BazelInvocationUpdate) SetNillableActionAnalyticsCompletedAt(v *time.Time) *BazelInvocationUpdate {
+	if v != nil {
+		_u.SetActionAnalyticsCompletedAt(*v)
+	}
+	return _u
+}
+
+// ClearActionAnalyticsCompletedAt clears the value of the "action_analytics_completed_at" field.
+func (_u *BazelInvocationUpdate) ClearActionAnalyticsCompletedAt() *BazelInvocationUpdate {
+	_u.mutation.ClearActionAnalyticsCompletedAt()
+	return _u
+}
+
+// SetActionAnalyticsResult sets the "action_analytics_result" field.
+func (_u *BazelInvocationUpdate) SetActionAnalyticsResult(v *actionanalytics.Report) *BazelInvocationUpdate {
+	_u.mutation.SetActionAnalyticsResult(v)
+	return _u
+}
+
+// ClearActionAnalyticsResult clears the value of the "action_analytics_result" field.
+func (_u *BazelInvocationUpdate) ClearActionAnalyticsResult() *BazelInvocationUpdate {
+	_u.mutation.ClearActionAnalyticsResult()
+	return _u
+}
+
+// SetExecutionLogStatus sets the "execution_log_status" field.
+func (_u *BazelInvocationUpdate) SetExecutionLogStatus(v bazelinvocation.ExecutionLogStatus) *BazelInvocationUpdate {
+	_u.mutation.SetExecutionLogStatus(v)
+	return _u
+}
+
+// SetNillableExecutionLogStatus sets the "execution_log_status" field if the given value is not nil.
+func (_u *BazelInvocationUpdate) SetNillableExecutionLogStatus(v *bazelinvocation.ExecutionLogStatus) *BazelInvocationUpdate {
+	if v != nil {
+		_u.SetExecutionLogStatus(*v)
+	}
+	return _u
+}
+
+// SetExecutionLogFailureMessage sets the "execution_log_failure_message" field.
+func (_u *BazelInvocationUpdate) SetExecutionLogFailureMessage(v string) *BazelInvocationUpdate {
+	_u.mutation.SetExecutionLogFailureMessage(v)
+	return _u
+}
+
+// SetNillableExecutionLogFailureMessage sets the "execution_log_failure_message" field if the given value is not nil.
+func (_u *BazelInvocationUpdate) SetNillableExecutionLogFailureMessage(v *string) *BazelInvocationUpdate {
+	if v != nil {
+		_u.SetExecutionLogFailureMessage(*v)
+	}
+	return _u
+}
+
+// ClearExecutionLogFailureMessage clears the value of the "execution_log_failure_message" field.
+func (_u *BazelInvocationUpdate) ClearExecutionLogFailureMessage() *BazelInvocationUpdate {
+	_u.mutation.ClearExecutionLogFailureMessage()
+	return _u
+}
+
+// SetExecutionLogActionCount sets the "execution_log_action_count" field.
+func (_u *BazelInvocationUpdate) SetExecutionLogActionCount(v int64) *BazelInvocationUpdate {
+	_u.mutation.ResetExecutionLogActionCount()
+	_u.mutation.SetExecutionLogActionCount(v)
+	return _u
+}
+
+// SetNillableExecutionLogActionCount sets the "execution_log_action_count" field if the given value is not nil.
+func (_u *BazelInvocationUpdate) SetNillableExecutionLogActionCount(v *int64) *BazelInvocationUpdate {
+	if v != nil {
+		_u.SetExecutionLogActionCount(*v)
+	}
+	return _u
+}
+
+// AddExecutionLogActionCount adds value to the "execution_log_action_count" field.
+func (_u *BazelInvocationUpdate) AddExecutionLogActionCount(v int64) *BazelInvocationUpdate {
+	_u.mutation.AddExecutionLogActionCount(v)
+	return _u
+}
+
+// SetExecutionLogMatchedActions sets the "execution_log_matched_actions" field.
+func (_u *BazelInvocationUpdate) SetExecutionLogMatchedActions(v int64) *BazelInvocationUpdate {
+	_u.mutation.ResetExecutionLogMatchedActions()
+	_u.mutation.SetExecutionLogMatchedActions(v)
+	return _u
+}
+
+// SetNillableExecutionLogMatchedActions sets the "execution_log_matched_actions" field if the given value is not nil.
+func (_u *BazelInvocationUpdate) SetNillableExecutionLogMatchedActions(v *int64) *BazelInvocationUpdate {
+	if v != nil {
+		_u.SetExecutionLogMatchedActions(*v)
+	}
+	return _u
+}
+
+// AddExecutionLogMatchedActions adds value to the "execution_log_matched_actions" field.
+func (_u *BazelInvocationUpdate) AddExecutionLogMatchedActions(v int64) *BazelInvocationUpdate {
+	_u.mutation.AddExecutionLogMatchedActions(v)
 	return _u
 }
 
@@ -831,6 +994,26 @@ func (_u *BazelInvocationUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *BazelInvocationUpdate) check() error {
+	if v, ok := _u.mutation.ActionAnalyticsState(); ok {
+		if err := bazelinvocation.ActionAnalyticsStateValidator(v); err != nil {
+			return &ValidationError{Name: "action_analytics_state", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.action_analytics_state": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ExecutionLogStatus(); ok {
+		if err := bazelinvocation.ExecutionLogStatusValidator(v); err != nil {
+			return &ValidationError{Name: "execution_log_status", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.execution_log_status": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ExecutionLogActionCount(); ok {
+		if err := bazelinvocation.ExecutionLogActionCountValidator(v); err != nil {
+			return &ValidationError{Name: "execution_log_action_count", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.execution_log_action_count": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ExecutionLogMatchedActions(); ok {
+		if err := bazelinvocation.ExecutionLogMatchedActionsValidator(v); err != nil {
+			return &ValidationError{Name: "execution_log_matched_actions", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.execution_log_matched_actions": %w`, err)}
+		}
+	}
 	if _u.mutation.InstanceNameCleared() && len(_u.mutation.InstanceNameIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "BazelInvocation.instance_name"`)
 	}
@@ -863,6 +1046,54 @@ func (_u *BazelInvocationUpdate) sqlSave(ctx context.Context) (_node int, err er
 	}
 	if value, ok := _u.mutation.BepCompleted(); ok {
 		_spec.SetField(bazelinvocation.FieldBepCompleted, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.ActionAnalyticsState(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsState, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.ActionAnalyticsFailureMessage(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsFailureMessage, field.TypeString, value)
+	}
+	if _u.mutation.ActionAnalyticsFailureMessageCleared() {
+		_spec.ClearField(bazelinvocation.FieldActionAnalyticsFailureMessage, field.TypeString)
+	}
+	if value, ok := _u.mutation.ActionAnalyticsStartedAt(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsStartedAt, field.TypeTime, value)
+	}
+	if _u.mutation.ActionAnalyticsStartedAtCleared() {
+		_spec.ClearField(bazelinvocation.FieldActionAnalyticsStartedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.ActionAnalyticsCompletedAt(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsCompletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.ActionAnalyticsCompletedAtCleared() {
+		_spec.ClearField(bazelinvocation.FieldActionAnalyticsCompletedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.ActionAnalyticsResult(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsResult, field.TypeJSON, value)
+	}
+	if _u.mutation.ActionAnalyticsResultCleared() {
+		_spec.ClearField(bazelinvocation.FieldActionAnalyticsResult, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.ExecutionLogStatus(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogStatus, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.ExecutionLogFailureMessage(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogFailureMessage, field.TypeString, value)
+	}
+	if _u.mutation.ExecutionLogFailureMessageCleared() {
+		_spec.ClearField(bazelinvocation.FieldExecutionLogFailureMessage, field.TypeString)
+	}
+	if value, ok := _u.mutation.ExecutionLogActionCount(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogActionCount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedExecutionLogActionCount(); ok {
+		_spec.AddField(bazelinvocation.FieldExecutionLogActionCount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.ExecutionLogMatchedActions(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogMatchedActions, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedExecutionLogMatchedActions(); ok {
+		_spec.AddField(bazelinvocation.FieldExecutionLogMatchedActions, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Username(); ok {
 		_spec.SetField(bazelinvocation.FieldUsername, field.TypeString, value)
@@ -1576,6 +1807,168 @@ func (_u *BazelInvocationUpdateOne) SetNillableBepCompleted(v *bool) *BazelInvoc
 	if v != nil {
 		_u.SetBepCompleted(*v)
 	}
+	return _u
+}
+
+// SetActionAnalyticsState sets the "action_analytics_state" field.
+func (_u *BazelInvocationUpdateOne) SetActionAnalyticsState(v bazelinvocation.ActionAnalyticsState) *BazelInvocationUpdateOne {
+	_u.mutation.SetActionAnalyticsState(v)
+	return _u
+}
+
+// SetNillableActionAnalyticsState sets the "action_analytics_state" field if the given value is not nil.
+func (_u *BazelInvocationUpdateOne) SetNillableActionAnalyticsState(v *bazelinvocation.ActionAnalyticsState) *BazelInvocationUpdateOne {
+	if v != nil {
+		_u.SetActionAnalyticsState(*v)
+	}
+	return _u
+}
+
+// SetActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field.
+func (_u *BazelInvocationUpdateOne) SetActionAnalyticsFailureMessage(v string) *BazelInvocationUpdateOne {
+	_u.mutation.SetActionAnalyticsFailureMessage(v)
+	return _u
+}
+
+// SetNillableActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field if the given value is not nil.
+func (_u *BazelInvocationUpdateOne) SetNillableActionAnalyticsFailureMessage(v *string) *BazelInvocationUpdateOne {
+	if v != nil {
+		_u.SetActionAnalyticsFailureMessage(*v)
+	}
+	return _u
+}
+
+// ClearActionAnalyticsFailureMessage clears the value of the "action_analytics_failure_message" field.
+func (_u *BazelInvocationUpdateOne) ClearActionAnalyticsFailureMessage() *BazelInvocationUpdateOne {
+	_u.mutation.ClearActionAnalyticsFailureMessage()
+	return _u
+}
+
+// SetActionAnalyticsStartedAt sets the "action_analytics_started_at" field.
+func (_u *BazelInvocationUpdateOne) SetActionAnalyticsStartedAt(v time.Time) *BazelInvocationUpdateOne {
+	_u.mutation.SetActionAnalyticsStartedAt(v)
+	return _u
+}
+
+// SetNillableActionAnalyticsStartedAt sets the "action_analytics_started_at" field if the given value is not nil.
+func (_u *BazelInvocationUpdateOne) SetNillableActionAnalyticsStartedAt(v *time.Time) *BazelInvocationUpdateOne {
+	if v != nil {
+		_u.SetActionAnalyticsStartedAt(*v)
+	}
+	return _u
+}
+
+// ClearActionAnalyticsStartedAt clears the value of the "action_analytics_started_at" field.
+func (_u *BazelInvocationUpdateOne) ClearActionAnalyticsStartedAt() *BazelInvocationUpdateOne {
+	_u.mutation.ClearActionAnalyticsStartedAt()
+	return _u
+}
+
+// SetActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field.
+func (_u *BazelInvocationUpdateOne) SetActionAnalyticsCompletedAt(v time.Time) *BazelInvocationUpdateOne {
+	_u.mutation.SetActionAnalyticsCompletedAt(v)
+	return _u
+}
+
+// SetNillableActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field if the given value is not nil.
+func (_u *BazelInvocationUpdateOne) SetNillableActionAnalyticsCompletedAt(v *time.Time) *BazelInvocationUpdateOne {
+	if v != nil {
+		_u.SetActionAnalyticsCompletedAt(*v)
+	}
+	return _u
+}
+
+// ClearActionAnalyticsCompletedAt clears the value of the "action_analytics_completed_at" field.
+func (_u *BazelInvocationUpdateOne) ClearActionAnalyticsCompletedAt() *BazelInvocationUpdateOne {
+	_u.mutation.ClearActionAnalyticsCompletedAt()
+	return _u
+}
+
+// SetActionAnalyticsResult sets the "action_analytics_result" field.
+func (_u *BazelInvocationUpdateOne) SetActionAnalyticsResult(v *actionanalytics.Report) *BazelInvocationUpdateOne {
+	_u.mutation.SetActionAnalyticsResult(v)
+	return _u
+}
+
+// ClearActionAnalyticsResult clears the value of the "action_analytics_result" field.
+func (_u *BazelInvocationUpdateOne) ClearActionAnalyticsResult() *BazelInvocationUpdateOne {
+	_u.mutation.ClearActionAnalyticsResult()
+	return _u
+}
+
+// SetExecutionLogStatus sets the "execution_log_status" field.
+func (_u *BazelInvocationUpdateOne) SetExecutionLogStatus(v bazelinvocation.ExecutionLogStatus) *BazelInvocationUpdateOne {
+	_u.mutation.SetExecutionLogStatus(v)
+	return _u
+}
+
+// SetNillableExecutionLogStatus sets the "execution_log_status" field if the given value is not nil.
+func (_u *BazelInvocationUpdateOne) SetNillableExecutionLogStatus(v *bazelinvocation.ExecutionLogStatus) *BazelInvocationUpdateOne {
+	if v != nil {
+		_u.SetExecutionLogStatus(*v)
+	}
+	return _u
+}
+
+// SetExecutionLogFailureMessage sets the "execution_log_failure_message" field.
+func (_u *BazelInvocationUpdateOne) SetExecutionLogFailureMessage(v string) *BazelInvocationUpdateOne {
+	_u.mutation.SetExecutionLogFailureMessage(v)
+	return _u
+}
+
+// SetNillableExecutionLogFailureMessage sets the "execution_log_failure_message" field if the given value is not nil.
+func (_u *BazelInvocationUpdateOne) SetNillableExecutionLogFailureMessage(v *string) *BazelInvocationUpdateOne {
+	if v != nil {
+		_u.SetExecutionLogFailureMessage(*v)
+	}
+	return _u
+}
+
+// ClearExecutionLogFailureMessage clears the value of the "execution_log_failure_message" field.
+func (_u *BazelInvocationUpdateOne) ClearExecutionLogFailureMessage() *BazelInvocationUpdateOne {
+	_u.mutation.ClearExecutionLogFailureMessage()
+	return _u
+}
+
+// SetExecutionLogActionCount sets the "execution_log_action_count" field.
+func (_u *BazelInvocationUpdateOne) SetExecutionLogActionCount(v int64) *BazelInvocationUpdateOne {
+	_u.mutation.ResetExecutionLogActionCount()
+	_u.mutation.SetExecutionLogActionCount(v)
+	return _u
+}
+
+// SetNillableExecutionLogActionCount sets the "execution_log_action_count" field if the given value is not nil.
+func (_u *BazelInvocationUpdateOne) SetNillableExecutionLogActionCount(v *int64) *BazelInvocationUpdateOne {
+	if v != nil {
+		_u.SetExecutionLogActionCount(*v)
+	}
+	return _u
+}
+
+// AddExecutionLogActionCount adds value to the "execution_log_action_count" field.
+func (_u *BazelInvocationUpdateOne) AddExecutionLogActionCount(v int64) *BazelInvocationUpdateOne {
+	_u.mutation.AddExecutionLogActionCount(v)
+	return _u
+}
+
+// SetExecutionLogMatchedActions sets the "execution_log_matched_actions" field.
+func (_u *BazelInvocationUpdateOne) SetExecutionLogMatchedActions(v int64) *BazelInvocationUpdateOne {
+	_u.mutation.ResetExecutionLogMatchedActions()
+	_u.mutation.SetExecutionLogMatchedActions(v)
+	return _u
+}
+
+// SetNillableExecutionLogMatchedActions sets the "execution_log_matched_actions" field if the given value is not nil.
+func (_u *BazelInvocationUpdateOne) SetNillableExecutionLogMatchedActions(v *int64) *BazelInvocationUpdateOne {
+	if v != nil {
+		_u.SetExecutionLogMatchedActions(*v)
+	}
+	return _u
+}
+
+// AddExecutionLogMatchedActions adds value to the "execution_log_matched_actions" field.
+func (_u *BazelInvocationUpdateOne) AddExecutionLogMatchedActions(v int64) *BazelInvocationUpdateOne {
+	_u.mutation.AddExecutionLogMatchedActions(v)
 	return _u
 }
 
@@ -2325,6 +2718,26 @@ func (_u *BazelInvocationUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *BazelInvocationUpdateOne) check() error {
+	if v, ok := _u.mutation.ActionAnalyticsState(); ok {
+		if err := bazelinvocation.ActionAnalyticsStateValidator(v); err != nil {
+			return &ValidationError{Name: "action_analytics_state", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.action_analytics_state": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ExecutionLogStatus(); ok {
+		if err := bazelinvocation.ExecutionLogStatusValidator(v); err != nil {
+			return &ValidationError{Name: "execution_log_status", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.execution_log_status": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ExecutionLogActionCount(); ok {
+		if err := bazelinvocation.ExecutionLogActionCountValidator(v); err != nil {
+			return &ValidationError{Name: "execution_log_action_count", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.execution_log_action_count": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ExecutionLogMatchedActions(); ok {
+		if err := bazelinvocation.ExecutionLogMatchedActionsValidator(v); err != nil {
+			return &ValidationError{Name: "execution_log_matched_actions", err: fmt.Errorf(`ent: validator failed for field "BazelInvocation.execution_log_matched_actions": %w`, err)}
+		}
+	}
 	if _u.mutation.InstanceNameCleared() && len(_u.mutation.InstanceNameIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "BazelInvocation.instance_name"`)
 	}
@@ -2374,6 +2787,54 @@ func (_u *BazelInvocationUpdateOne) sqlSave(ctx context.Context) (_node *BazelIn
 	}
 	if value, ok := _u.mutation.BepCompleted(); ok {
 		_spec.SetField(bazelinvocation.FieldBepCompleted, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.ActionAnalyticsState(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsState, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.ActionAnalyticsFailureMessage(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsFailureMessage, field.TypeString, value)
+	}
+	if _u.mutation.ActionAnalyticsFailureMessageCleared() {
+		_spec.ClearField(bazelinvocation.FieldActionAnalyticsFailureMessage, field.TypeString)
+	}
+	if value, ok := _u.mutation.ActionAnalyticsStartedAt(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsStartedAt, field.TypeTime, value)
+	}
+	if _u.mutation.ActionAnalyticsStartedAtCleared() {
+		_spec.ClearField(bazelinvocation.FieldActionAnalyticsStartedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.ActionAnalyticsCompletedAt(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsCompletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.ActionAnalyticsCompletedAtCleared() {
+		_spec.ClearField(bazelinvocation.FieldActionAnalyticsCompletedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.ActionAnalyticsResult(); ok {
+		_spec.SetField(bazelinvocation.FieldActionAnalyticsResult, field.TypeJSON, value)
+	}
+	if _u.mutation.ActionAnalyticsResultCleared() {
+		_spec.ClearField(bazelinvocation.FieldActionAnalyticsResult, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.ExecutionLogStatus(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogStatus, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.ExecutionLogFailureMessage(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogFailureMessage, field.TypeString, value)
+	}
+	if _u.mutation.ExecutionLogFailureMessageCleared() {
+		_spec.ClearField(bazelinvocation.FieldExecutionLogFailureMessage, field.TypeString)
+	}
+	if value, ok := _u.mutation.ExecutionLogActionCount(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogActionCount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedExecutionLogActionCount(); ok {
+		_spec.AddField(bazelinvocation.FieldExecutionLogActionCount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.ExecutionLogMatchedActions(); ok {
+		_spec.SetField(bazelinvocation.FieldExecutionLogMatchedActions, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedExecutionLogMatchedActions(); ok {
+		_spec.AddField(bazelinvocation.FieldExecutionLogMatchedActions, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Username(); ok {
 		_spec.SetField(bazelinvocation.FieldUsername, field.TypeString, value)

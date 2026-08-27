@@ -41,6 +41,7 @@ import { Route as BazelInvocationsInvocationIDSourceControlRouteImport } from '.
 import { Route as BazelInvocationsInvocationIDMetricsRouteImport } from './routes/bazel-invocations.$invocationID/metrics'
 import { Route as BazelInvocationsInvocationIDLogRouteImport } from './routes/bazel-invocations.$invocationID/log'
 import { Route as BazelInvocationsInvocationIDCommandLineRouteImport } from './routes/bazel-invocations.$invocationID/command-line'
+import { Route as BazelInvocationsInvocationIDAnalyticsRouteImport } from './routes/bazel-invocations.$invocationID/analytics'
 import { Route as BazelInvocationsInvocationIDActionsRouteImport } from './routes/bazel-invocations.$invocationID/actions'
 import { Route as BazelInvocationsInvocationIDTestsIndexRouteImport } from './routes/bazel-invocations.$invocationID/tests.index'
 import { Route as BazelInvocationsInvocationIDTestsTestSummaryIDRouteImport } from './routes/bazel-invocations.$invocationID/tests.$testSummaryID'
@@ -214,6 +215,12 @@ const BazelInvocationsInvocationIDCommandLineRoute =
     path: '/command-line',
     getParentRoute: () => BazelInvocationsInvocationIDRoute,
   } as any)
+const BazelInvocationsInvocationIDAnalyticsRoute =
+  BazelInvocationsInvocationIDAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => BazelInvocationsInvocationIDRoute,
+  } as any)
 const BazelInvocationsInvocationIDActionsRoute =
   BazelInvocationsInvocationIDActionsRouteImport.update({
     id: '/actions',
@@ -257,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/targets/': typeof TargetsIndexRoute
   '/tests/': typeof TestsIndexRoute
   '/bazel-invocations/$invocationID/actions': typeof BazelInvocationsInvocationIDActionsRoute
+  '/bazel-invocations/$invocationID/analytics': typeof BazelInvocationsInvocationIDAnalyticsRoute
   '/bazel-invocations/$invocationID/command-line': typeof BazelInvocationsInvocationIDCommandLineRoute
   '/bazel-invocations/$invocationID/log': typeof BazelInvocationsInvocationIDLogRoute
   '/bazel-invocations/$invocationID/metrics': typeof BazelInvocationsInvocationIDMetricsRoute
@@ -286,6 +294,7 @@ export interface FileRoutesByTo {
   '/targets': typeof TargetsIndexRoute
   '/tests': typeof TestsIndexRoute
   '/bazel-invocations/$invocationID/actions': typeof BazelInvocationsInvocationIDActionsRoute
+  '/bazel-invocations/$invocationID/analytics': typeof BazelInvocationsInvocationIDAnalyticsRoute
   '/bazel-invocations/$invocationID/command-line': typeof BazelInvocationsInvocationIDCommandLineRoute
   '/bazel-invocations/$invocationID/log': typeof BazelInvocationsInvocationIDLogRoute
   '/bazel-invocations/$invocationID/metrics': typeof BazelInvocationsInvocationIDMetricsRoute
@@ -323,6 +332,7 @@ export interface FileRoutesById {
   '/targets/': typeof TargetsIndexRoute
   '/tests/': typeof TestsIndexRoute
   '/bazel-invocations/$invocationID/actions': typeof BazelInvocationsInvocationIDActionsRoute
+  '/bazel-invocations/$invocationID/analytics': typeof BazelInvocationsInvocationIDAnalyticsRoute
   '/bazel-invocations/$invocationID/command-line': typeof BazelInvocationsInvocationIDCommandLineRoute
   '/bazel-invocations/$invocationID/log': typeof BazelInvocationsInvocationIDLogRoute
   '/bazel-invocations/$invocationID/metrics': typeof BazelInvocationsInvocationIDMetricsRoute
@@ -362,6 +372,7 @@ export interface FileRouteTypes {
     | '/targets/'
     | '/tests/'
     | '/bazel-invocations/$invocationID/actions'
+    | '/bazel-invocations/$invocationID/analytics'
     | '/bazel-invocations/$invocationID/command-line'
     | '/bazel-invocations/$invocationID/log'
     | '/bazel-invocations/$invocationID/metrics'
@@ -391,6 +402,7 @@ export interface FileRouteTypes {
     | '/targets'
     | '/tests'
     | '/bazel-invocations/$invocationID/actions'
+    | '/bazel-invocations/$invocationID/analytics'
     | '/bazel-invocations/$invocationID/command-line'
     | '/bazel-invocations/$invocationID/log'
     | '/bazel-invocations/$invocationID/metrics'
@@ -427,6 +439,7 @@ export interface FileRouteTypes {
     | '/targets/'
     | '/tests/'
     | '/bazel-invocations/$invocationID/actions'
+    | '/bazel-invocations/$invocationID/analytics'
     | '/bazel-invocations/$invocationID/command-line'
     | '/bazel-invocations/$invocationID/log'
     | '/bazel-invocations/$invocationID/metrics'
@@ -680,6 +693,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BazelInvocationsInvocationIDCommandLineRouteImport
       parentRoute: typeof BazelInvocationsInvocationIDRoute
     }
+    '/bazel-invocations/$invocationID/analytics': {
+      id: '/bazel-invocations/$invocationID/analytics'
+      path: '/analytics'
+      fullPath: '/bazel-invocations/$invocationID/analytics'
+      preLoaderRoute: typeof BazelInvocationsInvocationIDAnalyticsRouteImport
+      parentRoute: typeof BazelInvocationsInvocationIDRoute
+    }
     '/bazel-invocations/$invocationID/actions': {
       id: '/bazel-invocations/$invocationID/actions'
       path: '/actions'
@@ -724,6 +744,7 @@ const BazelInvocationsInvocationIDTestsRouteWithChildren =
 
 interface BazelInvocationsInvocationIDRouteChildren {
   BazelInvocationsInvocationIDActionsRoute: typeof BazelInvocationsInvocationIDActionsRoute
+  BazelInvocationsInvocationIDAnalyticsRoute: typeof BazelInvocationsInvocationIDAnalyticsRoute
   BazelInvocationsInvocationIDCommandLineRoute: typeof BazelInvocationsInvocationIDCommandLineRoute
   BazelInvocationsInvocationIDLogRoute: typeof BazelInvocationsInvocationIDLogRoute
   BazelInvocationsInvocationIDMetricsRoute: typeof BazelInvocationsInvocationIDMetricsRoute
@@ -738,6 +759,8 @@ const BazelInvocationsInvocationIDRouteChildren: BazelInvocationsInvocationIDRou
   {
     BazelInvocationsInvocationIDActionsRoute:
       BazelInvocationsInvocationIDActionsRoute,
+    BazelInvocationsInvocationIDAnalyticsRoute:
+      BazelInvocationsInvocationIDAnalyticsRoute,
     BazelInvocationsInvocationIDCommandLineRoute:
       BazelInvocationsInvocationIDCommandLineRoute,
     BazelInvocationsInvocationIDLogRoute: BazelInvocationsInvocationIDLogRoute,

@@ -33,6 +33,34 @@ const (
 	FieldRunner = "runner"
 	// FieldCacheHit holds the string denoting the cache_hit field in the database.
 	FieldCacheHit = "cache_hit"
+	// FieldExecutionPlatform holds the string denoting the execution_platform field in the database.
+	FieldExecutionPlatform = "execution_platform"
+	// FieldSpawnTotalTimeInMs holds the string denoting the spawn_total_time_in_ms field in the database.
+	FieldSpawnTotalTimeInMs = "spawn_total_time_in_ms"
+	// FieldSpawnParseTimeInMs holds the string denoting the spawn_parse_time_in_ms field in the database.
+	FieldSpawnParseTimeInMs = "spawn_parse_time_in_ms"
+	// FieldSpawnNetworkTimeInMs holds the string denoting the spawn_network_time_in_ms field in the database.
+	FieldSpawnNetworkTimeInMs = "spawn_network_time_in_ms"
+	// FieldSpawnFetchTimeInMs holds the string denoting the spawn_fetch_time_in_ms field in the database.
+	FieldSpawnFetchTimeInMs = "spawn_fetch_time_in_ms"
+	// FieldSpawnQueueTimeInMs holds the string denoting the spawn_queue_time_in_ms field in the database.
+	FieldSpawnQueueTimeInMs = "spawn_queue_time_in_ms"
+	// FieldSpawnSetupTimeInMs holds the string denoting the spawn_setup_time_in_ms field in the database.
+	FieldSpawnSetupTimeInMs = "spawn_setup_time_in_ms"
+	// FieldSpawnUploadTimeInMs holds the string denoting the spawn_upload_time_in_ms field in the database.
+	FieldSpawnUploadTimeInMs = "spawn_upload_time_in_ms"
+	// FieldSpawnExecutionWallTimeInMs holds the string denoting the spawn_execution_wall_time_in_ms field in the database.
+	FieldSpawnExecutionWallTimeInMs = "spawn_execution_wall_time_in_ms"
+	// FieldSpawnProcessOutputsTimeInMs holds the string denoting the spawn_process_outputs_time_in_ms field in the database.
+	FieldSpawnProcessOutputsTimeInMs = "spawn_process_outputs_time_in_ms"
+	// FieldSpawnRetryTimeInMs holds the string denoting the spawn_retry_time_in_ms field in the database.
+	FieldSpawnRetryTimeInMs = "spawn_retry_time_in_ms"
+	// FieldSpawnInputBytes holds the string denoting the spawn_input_bytes field in the database.
+	FieldSpawnInputBytes = "spawn_input_bytes"
+	// FieldSpawnInputFiles holds the string denoting the spawn_input_files field in the database.
+	FieldSpawnInputFiles = "spawn_input_files"
+	// FieldSpawnMemoryEstimateBytes holds the string denoting the spawn_memory_estimate_bytes field in the database.
+	FieldSpawnMemoryEstimateBytes = "spawn_memory_estimate_bytes"
 	// FieldSuccess holds the string denoting the success field in the database.
 	FieldSuccess = "success"
 	// FieldExitCode holds the string denoting the exit_code field in the database.
@@ -120,6 +148,20 @@ var Columns = []string{
 	FieldType,
 	FieldRunner,
 	FieldCacheHit,
+	FieldExecutionPlatform,
+	FieldSpawnTotalTimeInMs,
+	FieldSpawnParseTimeInMs,
+	FieldSpawnNetworkTimeInMs,
+	FieldSpawnFetchTimeInMs,
+	FieldSpawnQueueTimeInMs,
+	FieldSpawnSetupTimeInMs,
+	FieldSpawnUploadTimeInMs,
+	FieldSpawnExecutionWallTimeInMs,
+	FieldSpawnProcessOutputsTimeInMs,
+	FieldSpawnRetryTimeInMs,
+	FieldSpawnInputBytes,
+	FieldSpawnInputFiles,
+	FieldSpawnMemoryEstimateBytes,
 	FieldSuccess,
 	FieldExitCode,
 	FieldCommandLine,
@@ -148,6 +190,32 @@ func ValidColumn(column string) bool {
 var (
 	Hooks  [1]ent.Hook
 	Policy ent.Policy
+	// SpawnTotalTimeInMsValidator is a validator for the "spawn_total_time_in_ms" field. It is called by the builders before save.
+	SpawnTotalTimeInMsValidator func(int64) error
+	// SpawnParseTimeInMsValidator is a validator for the "spawn_parse_time_in_ms" field. It is called by the builders before save.
+	SpawnParseTimeInMsValidator func(int64) error
+	// SpawnNetworkTimeInMsValidator is a validator for the "spawn_network_time_in_ms" field. It is called by the builders before save.
+	SpawnNetworkTimeInMsValidator func(int64) error
+	// SpawnFetchTimeInMsValidator is a validator for the "spawn_fetch_time_in_ms" field. It is called by the builders before save.
+	SpawnFetchTimeInMsValidator func(int64) error
+	// SpawnQueueTimeInMsValidator is a validator for the "spawn_queue_time_in_ms" field. It is called by the builders before save.
+	SpawnQueueTimeInMsValidator func(int64) error
+	// SpawnSetupTimeInMsValidator is a validator for the "spawn_setup_time_in_ms" field. It is called by the builders before save.
+	SpawnSetupTimeInMsValidator func(int64) error
+	// SpawnUploadTimeInMsValidator is a validator for the "spawn_upload_time_in_ms" field. It is called by the builders before save.
+	SpawnUploadTimeInMsValidator func(int64) error
+	// SpawnExecutionWallTimeInMsValidator is a validator for the "spawn_execution_wall_time_in_ms" field. It is called by the builders before save.
+	SpawnExecutionWallTimeInMsValidator func(int64) error
+	// SpawnProcessOutputsTimeInMsValidator is a validator for the "spawn_process_outputs_time_in_ms" field. It is called by the builders before save.
+	SpawnProcessOutputsTimeInMsValidator func(int64) error
+	// SpawnRetryTimeInMsValidator is a validator for the "spawn_retry_time_in_ms" field. It is called by the builders before save.
+	SpawnRetryTimeInMsValidator func(int64) error
+	// SpawnInputBytesValidator is a validator for the "spawn_input_bytes" field. It is called by the builders before save.
+	SpawnInputBytesValidator func(int64) error
+	// SpawnInputFilesValidator is a validator for the "spawn_input_files" field. It is called by the builders before save.
+	SpawnInputFilesValidator func(int64) error
+	// SpawnMemoryEstimateBytesValidator is a validator for the "spawn_memory_estimate_bytes" field. It is called by the builders before save.
+	SpawnMemoryEstimateBytesValidator func(int64) error
 )
 
 // OrderOption defines the ordering options for the ActionExecution queries.
@@ -206,6 +274,71 @@ func ByRunner(opts ...sql.OrderTermOption) OrderOption {
 // ByCacheHit orders the results by the cache_hit field.
 func ByCacheHit(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCacheHit, opts...).ToFunc()
+}
+
+// BySpawnTotalTimeInMs orders the results by the spawn_total_time_in_ms field.
+func BySpawnTotalTimeInMs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnTotalTimeInMs, opts...).ToFunc()
+}
+
+// BySpawnParseTimeInMs orders the results by the spawn_parse_time_in_ms field.
+func BySpawnParseTimeInMs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnParseTimeInMs, opts...).ToFunc()
+}
+
+// BySpawnNetworkTimeInMs orders the results by the spawn_network_time_in_ms field.
+func BySpawnNetworkTimeInMs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnNetworkTimeInMs, opts...).ToFunc()
+}
+
+// BySpawnFetchTimeInMs orders the results by the spawn_fetch_time_in_ms field.
+func BySpawnFetchTimeInMs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnFetchTimeInMs, opts...).ToFunc()
+}
+
+// BySpawnQueueTimeInMs orders the results by the spawn_queue_time_in_ms field.
+func BySpawnQueueTimeInMs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnQueueTimeInMs, opts...).ToFunc()
+}
+
+// BySpawnSetupTimeInMs orders the results by the spawn_setup_time_in_ms field.
+func BySpawnSetupTimeInMs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnSetupTimeInMs, opts...).ToFunc()
+}
+
+// BySpawnUploadTimeInMs orders the results by the spawn_upload_time_in_ms field.
+func BySpawnUploadTimeInMs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnUploadTimeInMs, opts...).ToFunc()
+}
+
+// BySpawnExecutionWallTimeInMs orders the results by the spawn_execution_wall_time_in_ms field.
+func BySpawnExecutionWallTimeInMs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnExecutionWallTimeInMs, opts...).ToFunc()
+}
+
+// BySpawnProcessOutputsTimeInMs orders the results by the spawn_process_outputs_time_in_ms field.
+func BySpawnProcessOutputsTimeInMs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnProcessOutputsTimeInMs, opts...).ToFunc()
+}
+
+// BySpawnRetryTimeInMs orders the results by the spawn_retry_time_in_ms field.
+func BySpawnRetryTimeInMs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnRetryTimeInMs, opts...).ToFunc()
+}
+
+// BySpawnInputBytes orders the results by the spawn_input_bytes field.
+func BySpawnInputBytes(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnInputBytes, opts...).ToFunc()
+}
+
+// BySpawnInputFiles orders the results by the spawn_input_files field.
+func BySpawnInputFiles(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnInputFiles, opts...).ToFunc()
+}
+
+// BySpawnMemoryEstimateBytes orders the results by the spawn_memory_estimate_bytes field.
+func BySpawnMemoryEstimateBytes(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpawnMemoryEstimateBytes, opts...).ToFunc()
 }
 
 // BySuccess orders the results by the success field.

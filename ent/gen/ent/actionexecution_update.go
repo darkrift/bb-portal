@@ -124,6 +124,369 @@ func (_u *ActionExecutionUpdate) ClearCacheHit() *ActionExecutionUpdate {
 	return _u
 }
 
+// SetExecutionPlatform sets the "execution_platform" field.
+func (_u *ActionExecutionUpdate) SetExecutionPlatform(v map[string]string) *ActionExecutionUpdate {
+	_u.mutation.SetExecutionPlatform(v)
+	return _u
+}
+
+// ClearExecutionPlatform clears the value of the "execution_platform" field.
+func (_u *ActionExecutionUpdate) ClearExecutionPlatform() *ActionExecutionUpdate {
+	_u.mutation.ClearExecutionPlatform()
+	return _u
+}
+
+// SetSpawnTotalTimeInMs sets the "spawn_total_time_in_ms" field.
+func (_u *ActionExecutionUpdate) SetSpawnTotalTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnTotalTimeInMs()
+	_u.mutation.SetSpawnTotalTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnTotalTimeInMs sets the "spawn_total_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnTotalTimeInMs(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnTotalTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnTotalTimeInMs adds value to the "spawn_total_time_in_ms" field.
+func (_u *ActionExecutionUpdate) AddSpawnTotalTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnTotalTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnTotalTimeInMs clears the value of the "spawn_total_time_in_ms" field.
+func (_u *ActionExecutionUpdate) ClearSpawnTotalTimeInMs() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnTotalTimeInMs()
+	return _u
+}
+
+// SetSpawnParseTimeInMs sets the "spawn_parse_time_in_ms" field.
+func (_u *ActionExecutionUpdate) SetSpawnParseTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnParseTimeInMs()
+	_u.mutation.SetSpawnParseTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnParseTimeInMs sets the "spawn_parse_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnParseTimeInMs(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnParseTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnParseTimeInMs adds value to the "spawn_parse_time_in_ms" field.
+func (_u *ActionExecutionUpdate) AddSpawnParseTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnParseTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnParseTimeInMs clears the value of the "spawn_parse_time_in_ms" field.
+func (_u *ActionExecutionUpdate) ClearSpawnParseTimeInMs() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnParseTimeInMs()
+	return _u
+}
+
+// SetSpawnNetworkTimeInMs sets the "spawn_network_time_in_ms" field.
+func (_u *ActionExecutionUpdate) SetSpawnNetworkTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnNetworkTimeInMs()
+	_u.mutation.SetSpawnNetworkTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnNetworkTimeInMs sets the "spawn_network_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnNetworkTimeInMs(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnNetworkTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnNetworkTimeInMs adds value to the "spawn_network_time_in_ms" field.
+func (_u *ActionExecutionUpdate) AddSpawnNetworkTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnNetworkTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnNetworkTimeInMs clears the value of the "spawn_network_time_in_ms" field.
+func (_u *ActionExecutionUpdate) ClearSpawnNetworkTimeInMs() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnNetworkTimeInMs()
+	return _u
+}
+
+// SetSpawnFetchTimeInMs sets the "spawn_fetch_time_in_ms" field.
+func (_u *ActionExecutionUpdate) SetSpawnFetchTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnFetchTimeInMs()
+	_u.mutation.SetSpawnFetchTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnFetchTimeInMs sets the "spawn_fetch_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnFetchTimeInMs(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnFetchTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnFetchTimeInMs adds value to the "spawn_fetch_time_in_ms" field.
+func (_u *ActionExecutionUpdate) AddSpawnFetchTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnFetchTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnFetchTimeInMs clears the value of the "spawn_fetch_time_in_ms" field.
+func (_u *ActionExecutionUpdate) ClearSpawnFetchTimeInMs() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnFetchTimeInMs()
+	return _u
+}
+
+// SetSpawnQueueTimeInMs sets the "spawn_queue_time_in_ms" field.
+func (_u *ActionExecutionUpdate) SetSpawnQueueTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnQueueTimeInMs()
+	_u.mutation.SetSpawnQueueTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnQueueTimeInMs sets the "spawn_queue_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnQueueTimeInMs(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnQueueTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnQueueTimeInMs adds value to the "spawn_queue_time_in_ms" field.
+func (_u *ActionExecutionUpdate) AddSpawnQueueTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnQueueTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnQueueTimeInMs clears the value of the "spawn_queue_time_in_ms" field.
+func (_u *ActionExecutionUpdate) ClearSpawnQueueTimeInMs() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnQueueTimeInMs()
+	return _u
+}
+
+// SetSpawnSetupTimeInMs sets the "spawn_setup_time_in_ms" field.
+func (_u *ActionExecutionUpdate) SetSpawnSetupTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnSetupTimeInMs()
+	_u.mutation.SetSpawnSetupTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnSetupTimeInMs sets the "spawn_setup_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnSetupTimeInMs(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnSetupTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnSetupTimeInMs adds value to the "spawn_setup_time_in_ms" field.
+func (_u *ActionExecutionUpdate) AddSpawnSetupTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnSetupTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnSetupTimeInMs clears the value of the "spawn_setup_time_in_ms" field.
+func (_u *ActionExecutionUpdate) ClearSpawnSetupTimeInMs() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnSetupTimeInMs()
+	return _u
+}
+
+// SetSpawnUploadTimeInMs sets the "spawn_upload_time_in_ms" field.
+func (_u *ActionExecutionUpdate) SetSpawnUploadTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnUploadTimeInMs()
+	_u.mutation.SetSpawnUploadTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnUploadTimeInMs sets the "spawn_upload_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnUploadTimeInMs(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnUploadTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnUploadTimeInMs adds value to the "spawn_upload_time_in_ms" field.
+func (_u *ActionExecutionUpdate) AddSpawnUploadTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnUploadTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnUploadTimeInMs clears the value of the "spawn_upload_time_in_ms" field.
+func (_u *ActionExecutionUpdate) ClearSpawnUploadTimeInMs() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnUploadTimeInMs()
+	return _u
+}
+
+// SetSpawnExecutionWallTimeInMs sets the "spawn_execution_wall_time_in_ms" field.
+func (_u *ActionExecutionUpdate) SetSpawnExecutionWallTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnExecutionWallTimeInMs()
+	_u.mutation.SetSpawnExecutionWallTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnExecutionWallTimeInMs sets the "spawn_execution_wall_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnExecutionWallTimeInMs(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnExecutionWallTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnExecutionWallTimeInMs adds value to the "spawn_execution_wall_time_in_ms" field.
+func (_u *ActionExecutionUpdate) AddSpawnExecutionWallTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnExecutionWallTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnExecutionWallTimeInMs clears the value of the "spawn_execution_wall_time_in_ms" field.
+func (_u *ActionExecutionUpdate) ClearSpawnExecutionWallTimeInMs() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnExecutionWallTimeInMs()
+	return _u
+}
+
+// SetSpawnProcessOutputsTimeInMs sets the "spawn_process_outputs_time_in_ms" field.
+func (_u *ActionExecutionUpdate) SetSpawnProcessOutputsTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnProcessOutputsTimeInMs()
+	_u.mutation.SetSpawnProcessOutputsTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnProcessOutputsTimeInMs sets the "spawn_process_outputs_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnProcessOutputsTimeInMs(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnProcessOutputsTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnProcessOutputsTimeInMs adds value to the "spawn_process_outputs_time_in_ms" field.
+func (_u *ActionExecutionUpdate) AddSpawnProcessOutputsTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnProcessOutputsTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnProcessOutputsTimeInMs clears the value of the "spawn_process_outputs_time_in_ms" field.
+func (_u *ActionExecutionUpdate) ClearSpawnProcessOutputsTimeInMs() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnProcessOutputsTimeInMs()
+	return _u
+}
+
+// SetSpawnRetryTimeInMs sets the "spawn_retry_time_in_ms" field.
+func (_u *ActionExecutionUpdate) SetSpawnRetryTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnRetryTimeInMs()
+	_u.mutation.SetSpawnRetryTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnRetryTimeInMs sets the "spawn_retry_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnRetryTimeInMs(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnRetryTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnRetryTimeInMs adds value to the "spawn_retry_time_in_ms" field.
+func (_u *ActionExecutionUpdate) AddSpawnRetryTimeInMs(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnRetryTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnRetryTimeInMs clears the value of the "spawn_retry_time_in_ms" field.
+func (_u *ActionExecutionUpdate) ClearSpawnRetryTimeInMs() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnRetryTimeInMs()
+	return _u
+}
+
+// SetSpawnInputBytes sets the "spawn_input_bytes" field.
+func (_u *ActionExecutionUpdate) SetSpawnInputBytes(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnInputBytes()
+	_u.mutation.SetSpawnInputBytes(v)
+	return _u
+}
+
+// SetNillableSpawnInputBytes sets the "spawn_input_bytes" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnInputBytes(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnInputBytes(*v)
+	}
+	return _u
+}
+
+// AddSpawnInputBytes adds value to the "spawn_input_bytes" field.
+func (_u *ActionExecutionUpdate) AddSpawnInputBytes(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnInputBytes(v)
+	return _u
+}
+
+// ClearSpawnInputBytes clears the value of the "spawn_input_bytes" field.
+func (_u *ActionExecutionUpdate) ClearSpawnInputBytes() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnInputBytes()
+	return _u
+}
+
+// SetSpawnInputFiles sets the "spawn_input_files" field.
+func (_u *ActionExecutionUpdate) SetSpawnInputFiles(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnInputFiles()
+	_u.mutation.SetSpawnInputFiles(v)
+	return _u
+}
+
+// SetNillableSpawnInputFiles sets the "spawn_input_files" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnInputFiles(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnInputFiles(*v)
+	}
+	return _u
+}
+
+// AddSpawnInputFiles adds value to the "spawn_input_files" field.
+func (_u *ActionExecutionUpdate) AddSpawnInputFiles(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnInputFiles(v)
+	return _u
+}
+
+// ClearSpawnInputFiles clears the value of the "spawn_input_files" field.
+func (_u *ActionExecutionUpdate) ClearSpawnInputFiles() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnInputFiles()
+	return _u
+}
+
+// SetSpawnMemoryEstimateBytes sets the "spawn_memory_estimate_bytes" field.
+func (_u *ActionExecutionUpdate) SetSpawnMemoryEstimateBytes(v int64) *ActionExecutionUpdate {
+	_u.mutation.ResetSpawnMemoryEstimateBytes()
+	_u.mutation.SetSpawnMemoryEstimateBytes(v)
+	return _u
+}
+
+// SetNillableSpawnMemoryEstimateBytes sets the "spawn_memory_estimate_bytes" field if the given value is not nil.
+func (_u *ActionExecutionUpdate) SetNillableSpawnMemoryEstimateBytes(v *int64) *ActionExecutionUpdate {
+	if v != nil {
+		_u.SetSpawnMemoryEstimateBytes(*v)
+	}
+	return _u
+}
+
+// AddSpawnMemoryEstimateBytes adds value to the "spawn_memory_estimate_bytes" field.
+func (_u *ActionExecutionUpdate) AddSpawnMemoryEstimateBytes(v int64) *ActionExecutionUpdate {
+	_u.mutation.AddSpawnMemoryEstimateBytes(v)
+	return _u
+}
+
+// ClearSpawnMemoryEstimateBytes clears the value of the "spawn_memory_estimate_bytes" field.
+func (_u *ActionExecutionUpdate) ClearSpawnMemoryEstimateBytes() *ActionExecutionUpdate {
+	_u.mutation.ClearSpawnMemoryEstimateBytes()
+	return _u
+}
+
 // SetSuccess sets the "success" field.
 func (_u *ActionExecutionUpdate) SetSuccess(v bool) *ActionExecutionUpdate {
 	_u.mutation.SetSuccess(v)
@@ -334,6 +697,71 @@ func (_u *ActionExecutionUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *ActionExecutionUpdate) check() error {
+	if v, ok := _u.mutation.SpawnTotalTimeInMs(); ok {
+		if err := actionexecution.SpawnTotalTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_total_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_total_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnParseTimeInMs(); ok {
+		if err := actionexecution.SpawnParseTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_parse_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_parse_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnNetworkTimeInMs(); ok {
+		if err := actionexecution.SpawnNetworkTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_network_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_network_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnFetchTimeInMs(); ok {
+		if err := actionexecution.SpawnFetchTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_fetch_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_fetch_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnQueueTimeInMs(); ok {
+		if err := actionexecution.SpawnQueueTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_queue_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_queue_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnSetupTimeInMs(); ok {
+		if err := actionexecution.SpawnSetupTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_setup_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_setup_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnUploadTimeInMs(); ok {
+		if err := actionexecution.SpawnUploadTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_upload_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_upload_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnExecutionWallTimeInMs(); ok {
+		if err := actionexecution.SpawnExecutionWallTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_execution_wall_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_execution_wall_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnProcessOutputsTimeInMs(); ok {
+		if err := actionexecution.SpawnProcessOutputsTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_process_outputs_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_process_outputs_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnRetryTimeInMs(); ok {
+		if err := actionexecution.SpawnRetryTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_retry_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_retry_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnInputBytes(); ok {
+		if err := actionexecution.SpawnInputBytesValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_input_bytes", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_input_bytes": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnInputFiles(); ok {
+		if err := actionexecution.SpawnInputFilesValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_input_files", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_input_files": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnMemoryEstimateBytes(); ok {
+		if err := actionexecution.SpawnMemoryEstimateBytesValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_memory_estimate_bytes", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_memory_estimate_bytes": %w`, err)}
+		}
+	}
 	if _u.mutation.BazelInvocationCleared() && len(_u.mutation.BazelInvocationIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ActionExecution.bazel_invocation"`)
 	}
@@ -372,6 +800,129 @@ func (_u *ActionExecutionUpdate) sqlSave(ctx context.Context) (_node int, err er
 	}
 	if _u.mutation.CacheHitCleared() {
 		_spec.ClearField(actionexecution.FieldCacheHit, field.TypeBool)
+	}
+	if value, ok := _u.mutation.ExecutionPlatform(); ok {
+		_spec.SetField(actionexecution.FieldExecutionPlatform, field.TypeJSON, value)
+	}
+	if _u.mutation.ExecutionPlatformCleared() {
+		_spec.ClearField(actionexecution.FieldExecutionPlatform, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.SpawnTotalTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnTotalTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnTotalTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnTotalTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnTotalTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnTotalTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnParseTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnParseTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnParseTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnParseTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnParseTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnParseTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnNetworkTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnNetworkTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnNetworkTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnNetworkTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnNetworkTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnNetworkTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnFetchTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnFetchTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnFetchTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnFetchTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnFetchTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnFetchTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnQueueTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnQueueTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnQueueTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnQueueTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnQueueTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnQueueTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnSetupTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnSetupTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnSetupTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnSetupTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnSetupTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnSetupTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnUploadTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnUploadTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnUploadTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnUploadTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnUploadTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnUploadTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnExecutionWallTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnExecutionWallTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnExecutionWallTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnExecutionWallTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnExecutionWallTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnExecutionWallTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnProcessOutputsTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnProcessOutputsTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnProcessOutputsTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnProcessOutputsTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnProcessOutputsTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnProcessOutputsTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnRetryTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnRetryTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnRetryTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnRetryTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnRetryTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnRetryTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnInputBytes(); ok {
+		_spec.SetField(actionexecution.FieldSpawnInputBytes, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnInputBytes(); ok {
+		_spec.AddField(actionexecution.FieldSpawnInputBytes, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnInputBytesCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnInputBytes, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnInputFiles(); ok {
+		_spec.SetField(actionexecution.FieldSpawnInputFiles, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnInputFiles(); ok {
+		_spec.AddField(actionexecution.FieldSpawnInputFiles, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnInputFilesCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnInputFiles, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnMemoryEstimateBytes(); ok {
+		_spec.SetField(actionexecution.FieldSpawnMemoryEstimateBytes, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnMemoryEstimateBytes(); ok {
+		_spec.AddField(actionexecution.FieldSpawnMemoryEstimateBytes, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnMemoryEstimateBytesCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnMemoryEstimateBytes, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Success(); ok {
 		_spec.SetField(actionexecution.FieldSuccess, field.TypeBool, value)
@@ -569,6 +1120,369 @@ func (_u *ActionExecutionUpdateOne) SetNillableCacheHit(v *bool) *ActionExecutio
 // ClearCacheHit clears the value of the "cache_hit" field.
 func (_u *ActionExecutionUpdateOne) ClearCacheHit() *ActionExecutionUpdateOne {
 	_u.mutation.ClearCacheHit()
+	return _u
+}
+
+// SetExecutionPlatform sets the "execution_platform" field.
+func (_u *ActionExecutionUpdateOne) SetExecutionPlatform(v map[string]string) *ActionExecutionUpdateOne {
+	_u.mutation.SetExecutionPlatform(v)
+	return _u
+}
+
+// ClearExecutionPlatform clears the value of the "execution_platform" field.
+func (_u *ActionExecutionUpdateOne) ClearExecutionPlatform() *ActionExecutionUpdateOne {
+	_u.mutation.ClearExecutionPlatform()
+	return _u
+}
+
+// SetSpawnTotalTimeInMs sets the "spawn_total_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnTotalTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnTotalTimeInMs()
+	_u.mutation.SetSpawnTotalTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnTotalTimeInMs sets the "spawn_total_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnTotalTimeInMs(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnTotalTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnTotalTimeInMs adds value to the "spawn_total_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnTotalTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnTotalTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnTotalTimeInMs clears the value of the "spawn_total_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnTotalTimeInMs() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnTotalTimeInMs()
+	return _u
+}
+
+// SetSpawnParseTimeInMs sets the "spawn_parse_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnParseTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnParseTimeInMs()
+	_u.mutation.SetSpawnParseTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnParseTimeInMs sets the "spawn_parse_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnParseTimeInMs(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnParseTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnParseTimeInMs adds value to the "spawn_parse_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnParseTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnParseTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnParseTimeInMs clears the value of the "spawn_parse_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnParseTimeInMs() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnParseTimeInMs()
+	return _u
+}
+
+// SetSpawnNetworkTimeInMs sets the "spawn_network_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnNetworkTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnNetworkTimeInMs()
+	_u.mutation.SetSpawnNetworkTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnNetworkTimeInMs sets the "spawn_network_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnNetworkTimeInMs(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnNetworkTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnNetworkTimeInMs adds value to the "spawn_network_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnNetworkTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnNetworkTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnNetworkTimeInMs clears the value of the "spawn_network_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnNetworkTimeInMs() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnNetworkTimeInMs()
+	return _u
+}
+
+// SetSpawnFetchTimeInMs sets the "spawn_fetch_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnFetchTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnFetchTimeInMs()
+	_u.mutation.SetSpawnFetchTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnFetchTimeInMs sets the "spawn_fetch_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnFetchTimeInMs(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnFetchTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnFetchTimeInMs adds value to the "spawn_fetch_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnFetchTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnFetchTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnFetchTimeInMs clears the value of the "spawn_fetch_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnFetchTimeInMs() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnFetchTimeInMs()
+	return _u
+}
+
+// SetSpawnQueueTimeInMs sets the "spawn_queue_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnQueueTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnQueueTimeInMs()
+	_u.mutation.SetSpawnQueueTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnQueueTimeInMs sets the "spawn_queue_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnQueueTimeInMs(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnQueueTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnQueueTimeInMs adds value to the "spawn_queue_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnQueueTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnQueueTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnQueueTimeInMs clears the value of the "spawn_queue_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnQueueTimeInMs() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnQueueTimeInMs()
+	return _u
+}
+
+// SetSpawnSetupTimeInMs sets the "spawn_setup_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnSetupTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnSetupTimeInMs()
+	_u.mutation.SetSpawnSetupTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnSetupTimeInMs sets the "spawn_setup_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnSetupTimeInMs(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnSetupTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnSetupTimeInMs adds value to the "spawn_setup_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnSetupTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnSetupTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnSetupTimeInMs clears the value of the "spawn_setup_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnSetupTimeInMs() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnSetupTimeInMs()
+	return _u
+}
+
+// SetSpawnUploadTimeInMs sets the "spawn_upload_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnUploadTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnUploadTimeInMs()
+	_u.mutation.SetSpawnUploadTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnUploadTimeInMs sets the "spawn_upload_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnUploadTimeInMs(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnUploadTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnUploadTimeInMs adds value to the "spawn_upload_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnUploadTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnUploadTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnUploadTimeInMs clears the value of the "spawn_upload_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnUploadTimeInMs() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnUploadTimeInMs()
+	return _u
+}
+
+// SetSpawnExecutionWallTimeInMs sets the "spawn_execution_wall_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnExecutionWallTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnExecutionWallTimeInMs()
+	_u.mutation.SetSpawnExecutionWallTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnExecutionWallTimeInMs sets the "spawn_execution_wall_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnExecutionWallTimeInMs(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnExecutionWallTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnExecutionWallTimeInMs adds value to the "spawn_execution_wall_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnExecutionWallTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnExecutionWallTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnExecutionWallTimeInMs clears the value of the "spawn_execution_wall_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnExecutionWallTimeInMs() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnExecutionWallTimeInMs()
+	return _u
+}
+
+// SetSpawnProcessOutputsTimeInMs sets the "spawn_process_outputs_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnProcessOutputsTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnProcessOutputsTimeInMs()
+	_u.mutation.SetSpawnProcessOutputsTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnProcessOutputsTimeInMs sets the "spawn_process_outputs_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnProcessOutputsTimeInMs(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnProcessOutputsTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnProcessOutputsTimeInMs adds value to the "spawn_process_outputs_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnProcessOutputsTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnProcessOutputsTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnProcessOutputsTimeInMs clears the value of the "spawn_process_outputs_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnProcessOutputsTimeInMs() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnProcessOutputsTimeInMs()
+	return _u
+}
+
+// SetSpawnRetryTimeInMs sets the "spawn_retry_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnRetryTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnRetryTimeInMs()
+	_u.mutation.SetSpawnRetryTimeInMs(v)
+	return _u
+}
+
+// SetNillableSpawnRetryTimeInMs sets the "spawn_retry_time_in_ms" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnRetryTimeInMs(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnRetryTimeInMs(*v)
+	}
+	return _u
+}
+
+// AddSpawnRetryTimeInMs adds value to the "spawn_retry_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnRetryTimeInMs(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnRetryTimeInMs(v)
+	return _u
+}
+
+// ClearSpawnRetryTimeInMs clears the value of the "spawn_retry_time_in_ms" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnRetryTimeInMs() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnRetryTimeInMs()
+	return _u
+}
+
+// SetSpawnInputBytes sets the "spawn_input_bytes" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnInputBytes(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnInputBytes()
+	_u.mutation.SetSpawnInputBytes(v)
+	return _u
+}
+
+// SetNillableSpawnInputBytes sets the "spawn_input_bytes" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnInputBytes(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnInputBytes(*v)
+	}
+	return _u
+}
+
+// AddSpawnInputBytes adds value to the "spawn_input_bytes" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnInputBytes(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnInputBytes(v)
+	return _u
+}
+
+// ClearSpawnInputBytes clears the value of the "spawn_input_bytes" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnInputBytes() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnInputBytes()
+	return _u
+}
+
+// SetSpawnInputFiles sets the "spawn_input_files" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnInputFiles(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnInputFiles()
+	_u.mutation.SetSpawnInputFiles(v)
+	return _u
+}
+
+// SetNillableSpawnInputFiles sets the "spawn_input_files" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnInputFiles(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnInputFiles(*v)
+	}
+	return _u
+}
+
+// AddSpawnInputFiles adds value to the "spawn_input_files" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnInputFiles(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnInputFiles(v)
+	return _u
+}
+
+// ClearSpawnInputFiles clears the value of the "spawn_input_files" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnInputFiles() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnInputFiles()
+	return _u
+}
+
+// SetSpawnMemoryEstimateBytes sets the "spawn_memory_estimate_bytes" field.
+func (_u *ActionExecutionUpdateOne) SetSpawnMemoryEstimateBytes(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.ResetSpawnMemoryEstimateBytes()
+	_u.mutation.SetSpawnMemoryEstimateBytes(v)
+	return _u
+}
+
+// SetNillableSpawnMemoryEstimateBytes sets the "spawn_memory_estimate_bytes" field if the given value is not nil.
+func (_u *ActionExecutionUpdateOne) SetNillableSpawnMemoryEstimateBytes(v *int64) *ActionExecutionUpdateOne {
+	if v != nil {
+		_u.SetSpawnMemoryEstimateBytes(*v)
+	}
+	return _u
+}
+
+// AddSpawnMemoryEstimateBytes adds value to the "spawn_memory_estimate_bytes" field.
+func (_u *ActionExecutionUpdateOne) AddSpawnMemoryEstimateBytes(v int64) *ActionExecutionUpdateOne {
+	_u.mutation.AddSpawnMemoryEstimateBytes(v)
+	return _u
+}
+
+// ClearSpawnMemoryEstimateBytes clears the value of the "spawn_memory_estimate_bytes" field.
+func (_u *ActionExecutionUpdateOne) ClearSpawnMemoryEstimateBytes() *ActionExecutionUpdateOne {
+	_u.mutation.ClearSpawnMemoryEstimateBytes()
 	return _u
 }
 
@@ -795,6 +1709,71 @@ func (_u *ActionExecutionUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *ActionExecutionUpdateOne) check() error {
+	if v, ok := _u.mutation.SpawnTotalTimeInMs(); ok {
+		if err := actionexecution.SpawnTotalTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_total_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_total_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnParseTimeInMs(); ok {
+		if err := actionexecution.SpawnParseTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_parse_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_parse_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnNetworkTimeInMs(); ok {
+		if err := actionexecution.SpawnNetworkTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_network_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_network_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnFetchTimeInMs(); ok {
+		if err := actionexecution.SpawnFetchTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_fetch_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_fetch_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnQueueTimeInMs(); ok {
+		if err := actionexecution.SpawnQueueTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_queue_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_queue_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnSetupTimeInMs(); ok {
+		if err := actionexecution.SpawnSetupTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_setup_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_setup_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnUploadTimeInMs(); ok {
+		if err := actionexecution.SpawnUploadTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_upload_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_upload_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnExecutionWallTimeInMs(); ok {
+		if err := actionexecution.SpawnExecutionWallTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_execution_wall_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_execution_wall_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnProcessOutputsTimeInMs(); ok {
+		if err := actionexecution.SpawnProcessOutputsTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_process_outputs_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_process_outputs_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnRetryTimeInMs(); ok {
+		if err := actionexecution.SpawnRetryTimeInMsValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_retry_time_in_ms", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_retry_time_in_ms": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnInputBytes(); ok {
+		if err := actionexecution.SpawnInputBytesValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_input_bytes", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_input_bytes": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnInputFiles(); ok {
+		if err := actionexecution.SpawnInputFilesValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_input_files", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_input_files": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.SpawnMemoryEstimateBytes(); ok {
+		if err := actionexecution.SpawnMemoryEstimateBytesValidator(v); err != nil {
+			return &ValidationError{Name: "spawn_memory_estimate_bytes", err: fmt.Errorf(`ent: validator failed for field "ActionExecution.spawn_memory_estimate_bytes": %w`, err)}
+		}
+	}
 	if _u.mutation.BazelInvocationCleared() && len(_u.mutation.BazelInvocationIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ActionExecution.bazel_invocation"`)
 	}
@@ -850,6 +1829,129 @@ func (_u *ActionExecutionUpdateOne) sqlSave(ctx context.Context) (_node *ActionE
 	}
 	if _u.mutation.CacheHitCleared() {
 		_spec.ClearField(actionexecution.FieldCacheHit, field.TypeBool)
+	}
+	if value, ok := _u.mutation.ExecutionPlatform(); ok {
+		_spec.SetField(actionexecution.FieldExecutionPlatform, field.TypeJSON, value)
+	}
+	if _u.mutation.ExecutionPlatformCleared() {
+		_spec.ClearField(actionexecution.FieldExecutionPlatform, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.SpawnTotalTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnTotalTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnTotalTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnTotalTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnTotalTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnTotalTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnParseTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnParseTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnParseTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnParseTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnParseTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnParseTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnNetworkTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnNetworkTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnNetworkTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnNetworkTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnNetworkTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnNetworkTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnFetchTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnFetchTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnFetchTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnFetchTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnFetchTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnFetchTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnQueueTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnQueueTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnQueueTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnQueueTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnQueueTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnQueueTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnSetupTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnSetupTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnSetupTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnSetupTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnSetupTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnSetupTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnUploadTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnUploadTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnUploadTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnUploadTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnUploadTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnUploadTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnExecutionWallTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnExecutionWallTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnExecutionWallTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnExecutionWallTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnExecutionWallTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnExecutionWallTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnProcessOutputsTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnProcessOutputsTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnProcessOutputsTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnProcessOutputsTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnProcessOutputsTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnProcessOutputsTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnRetryTimeInMs(); ok {
+		_spec.SetField(actionexecution.FieldSpawnRetryTimeInMs, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnRetryTimeInMs(); ok {
+		_spec.AddField(actionexecution.FieldSpawnRetryTimeInMs, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnRetryTimeInMsCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnRetryTimeInMs, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnInputBytes(); ok {
+		_spec.SetField(actionexecution.FieldSpawnInputBytes, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnInputBytes(); ok {
+		_spec.AddField(actionexecution.FieldSpawnInputBytes, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnInputBytesCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnInputBytes, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnInputFiles(); ok {
+		_spec.SetField(actionexecution.FieldSpawnInputFiles, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnInputFiles(); ok {
+		_spec.AddField(actionexecution.FieldSpawnInputFiles, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnInputFilesCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnInputFiles, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpawnMemoryEstimateBytes(); ok {
+		_spec.SetField(actionexecution.FieldSpawnMemoryEstimateBytes, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpawnMemoryEstimateBytes(); ok {
+		_spec.AddField(actionexecution.FieldSpawnMemoryEstimateBytes, field.TypeInt64, value)
+	}
+	if _u.mutation.SpawnMemoryEstimateBytesCleared() {
+		_spec.ClearField(actionexecution.FieldSpawnMemoryEstimateBytes, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Success(); ok {
 		_spec.SetField(actionexecution.FieldSuccess, field.TypeBool, value)

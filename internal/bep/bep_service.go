@@ -11,6 +11,7 @@ import (
 	"github.com/buildbarn/bb-portal/internal/api/http/bepuploader"
 	"github.com/buildbarn/bb-portal/internal/api/http/loghandler"
 	"github.com/buildbarn/bb-portal/internal/database"
+	"github.com/buildbarn/bb-portal/internal/database/actionanalyticsservice"
 	"github.com/buildbarn/bb-portal/internal/database/common"
 	"github.com/buildbarn/bb-portal/internal/database/dbauthservice"
 	"github.com/buildbarn/bb-portal/internal/database/dbcleanupservice"
@@ -80,6 +81,7 @@ func NewBuildEventProtocolService(
 		return util.StatusWrap(err, "Failed to create DatabaseCleanupService")
 	}
 	databaseCleanupService.StartDbCleanupService(context.Background(), dependenciesGroup)
+	actionanalyticsservice.New(dbClient, clock.SystemClock, tracerProvider).Start(dependenciesGroup)
 
 	dbAuthService := dbauthservice.NewDbAuthService(dbClient.Ent(), clock.SystemClock, instanceNameAuthorizer, time.Second*5)
 

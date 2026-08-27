@@ -100,6 +100,71 @@ func CacheHit(v bool) predicate.ActionExecution {
 	return predicate.ActionExecution(sql.FieldEQ(FieldCacheHit, v))
 }
 
+// SpawnTotalTimeInMs applies equality check predicate on the "spawn_total_time_in_ms" field. It's identical to SpawnTotalTimeInMsEQ.
+func SpawnTotalTimeInMs(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnTotalTimeInMs, v))
+}
+
+// SpawnParseTimeInMs applies equality check predicate on the "spawn_parse_time_in_ms" field. It's identical to SpawnParseTimeInMsEQ.
+func SpawnParseTimeInMs(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnParseTimeInMs, v))
+}
+
+// SpawnNetworkTimeInMs applies equality check predicate on the "spawn_network_time_in_ms" field. It's identical to SpawnNetworkTimeInMsEQ.
+func SpawnNetworkTimeInMs(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnNetworkTimeInMs, v))
+}
+
+// SpawnFetchTimeInMs applies equality check predicate on the "spawn_fetch_time_in_ms" field. It's identical to SpawnFetchTimeInMsEQ.
+func SpawnFetchTimeInMs(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnFetchTimeInMs, v))
+}
+
+// SpawnQueueTimeInMs applies equality check predicate on the "spawn_queue_time_in_ms" field. It's identical to SpawnQueueTimeInMsEQ.
+func SpawnQueueTimeInMs(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnQueueTimeInMs, v))
+}
+
+// SpawnSetupTimeInMs applies equality check predicate on the "spawn_setup_time_in_ms" field. It's identical to SpawnSetupTimeInMsEQ.
+func SpawnSetupTimeInMs(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnSetupTimeInMs, v))
+}
+
+// SpawnUploadTimeInMs applies equality check predicate on the "spawn_upload_time_in_ms" field. It's identical to SpawnUploadTimeInMsEQ.
+func SpawnUploadTimeInMs(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnUploadTimeInMs, v))
+}
+
+// SpawnExecutionWallTimeInMs applies equality check predicate on the "spawn_execution_wall_time_in_ms" field. It's identical to SpawnExecutionWallTimeInMsEQ.
+func SpawnExecutionWallTimeInMs(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnExecutionWallTimeInMs, v))
+}
+
+// SpawnProcessOutputsTimeInMs applies equality check predicate on the "spawn_process_outputs_time_in_ms" field. It's identical to SpawnProcessOutputsTimeInMsEQ.
+func SpawnProcessOutputsTimeInMs(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnProcessOutputsTimeInMs, v))
+}
+
+// SpawnRetryTimeInMs applies equality check predicate on the "spawn_retry_time_in_ms" field. It's identical to SpawnRetryTimeInMsEQ.
+func SpawnRetryTimeInMs(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnRetryTimeInMs, v))
+}
+
+// SpawnInputBytes applies equality check predicate on the "spawn_input_bytes" field. It's identical to SpawnInputBytesEQ.
+func SpawnInputBytes(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnInputBytes, v))
+}
+
+// SpawnInputFiles applies equality check predicate on the "spawn_input_files" field. It's identical to SpawnInputFilesEQ.
+func SpawnInputFiles(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnInputFiles, v))
+}
+
+// SpawnMemoryEstimateBytes applies equality check predicate on the "spawn_memory_estimate_bytes" field. It's identical to SpawnMemoryEstimateBytesEQ.
+func SpawnMemoryEstimateBytes(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnMemoryEstimateBytes, v))
+}
+
 // Success applies equality check predicate on the "success" field. It's identical to SuccessEQ.
 func Success(v bool) predicate.ActionExecution {
 	return predicate.ActionExecution(sql.FieldEQ(FieldSuccess, v))
@@ -538,6 +603,666 @@ func CacheHitIsNil() predicate.ActionExecution {
 // CacheHitNotNil applies the NotNil predicate on the "cache_hit" field.
 func CacheHitNotNil() predicate.ActionExecution {
 	return predicate.ActionExecution(sql.FieldNotNull(FieldCacheHit))
+}
+
+// ExecutionPlatformIsNil applies the IsNil predicate on the "execution_platform" field.
+func ExecutionPlatformIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldExecutionPlatform))
+}
+
+// ExecutionPlatformNotNil applies the NotNil predicate on the "execution_platform" field.
+func ExecutionPlatformNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldExecutionPlatform))
+}
+
+// SpawnTotalTimeInMsEQ applies the EQ predicate on the "spawn_total_time_in_ms" field.
+func SpawnTotalTimeInMsEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnTotalTimeInMs, v))
+}
+
+// SpawnTotalTimeInMsNEQ applies the NEQ predicate on the "spawn_total_time_in_ms" field.
+func SpawnTotalTimeInMsNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnTotalTimeInMs, v))
+}
+
+// SpawnTotalTimeInMsIn applies the In predicate on the "spawn_total_time_in_ms" field.
+func SpawnTotalTimeInMsIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnTotalTimeInMs, vs...))
+}
+
+// SpawnTotalTimeInMsNotIn applies the NotIn predicate on the "spawn_total_time_in_ms" field.
+func SpawnTotalTimeInMsNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnTotalTimeInMs, vs...))
+}
+
+// SpawnTotalTimeInMsGT applies the GT predicate on the "spawn_total_time_in_ms" field.
+func SpawnTotalTimeInMsGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnTotalTimeInMs, v))
+}
+
+// SpawnTotalTimeInMsGTE applies the GTE predicate on the "spawn_total_time_in_ms" field.
+func SpawnTotalTimeInMsGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnTotalTimeInMs, v))
+}
+
+// SpawnTotalTimeInMsLT applies the LT predicate on the "spawn_total_time_in_ms" field.
+func SpawnTotalTimeInMsLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnTotalTimeInMs, v))
+}
+
+// SpawnTotalTimeInMsLTE applies the LTE predicate on the "spawn_total_time_in_ms" field.
+func SpawnTotalTimeInMsLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnTotalTimeInMs, v))
+}
+
+// SpawnTotalTimeInMsIsNil applies the IsNil predicate on the "spawn_total_time_in_ms" field.
+func SpawnTotalTimeInMsIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnTotalTimeInMs))
+}
+
+// SpawnTotalTimeInMsNotNil applies the NotNil predicate on the "spawn_total_time_in_ms" field.
+func SpawnTotalTimeInMsNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnTotalTimeInMs))
+}
+
+// SpawnParseTimeInMsEQ applies the EQ predicate on the "spawn_parse_time_in_ms" field.
+func SpawnParseTimeInMsEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnParseTimeInMs, v))
+}
+
+// SpawnParseTimeInMsNEQ applies the NEQ predicate on the "spawn_parse_time_in_ms" field.
+func SpawnParseTimeInMsNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnParseTimeInMs, v))
+}
+
+// SpawnParseTimeInMsIn applies the In predicate on the "spawn_parse_time_in_ms" field.
+func SpawnParseTimeInMsIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnParseTimeInMs, vs...))
+}
+
+// SpawnParseTimeInMsNotIn applies the NotIn predicate on the "spawn_parse_time_in_ms" field.
+func SpawnParseTimeInMsNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnParseTimeInMs, vs...))
+}
+
+// SpawnParseTimeInMsGT applies the GT predicate on the "spawn_parse_time_in_ms" field.
+func SpawnParseTimeInMsGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnParseTimeInMs, v))
+}
+
+// SpawnParseTimeInMsGTE applies the GTE predicate on the "spawn_parse_time_in_ms" field.
+func SpawnParseTimeInMsGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnParseTimeInMs, v))
+}
+
+// SpawnParseTimeInMsLT applies the LT predicate on the "spawn_parse_time_in_ms" field.
+func SpawnParseTimeInMsLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnParseTimeInMs, v))
+}
+
+// SpawnParseTimeInMsLTE applies the LTE predicate on the "spawn_parse_time_in_ms" field.
+func SpawnParseTimeInMsLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnParseTimeInMs, v))
+}
+
+// SpawnParseTimeInMsIsNil applies the IsNil predicate on the "spawn_parse_time_in_ms" field.
+func SpawnParseTimeInMsIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnParseTimeInMs))
+}
+
+// SpawnParseTimeInMsNotNil applies the NotNil predicate on the "spawn_parse_time_in_ms" field.
+func SpawnParseTimeInMsNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnParseTimeInMs))
+}
+
+// SpawnNetworkTimeInMsEQ applies the EQ predicate on the "spawn_network_time_in_ms" field.
+func SpawnNetworkTimeInMsEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnNetworkTimeInMs, v))
+}
+
+// SpawnNetworkTimeInMsNEQ applies the NEQ predicate on the "spawn_network_time_in_ms" field.
+func SpawnNetworkTimeInMsNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnNetworkTimeInMs, v))
+}
+
+// SpawnNetworkTimeInMsIn applies the In predicate on the "spawn_network_time_in_ms" field.
+func SpawnNetworkTimeInMsIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnNetworkTimeInMs, vs...))
+}
+
+// SpawnNetworkTimeInMsNotIn applies the NotIn predicate on the "spawn_network_time_in_ms" field.
+func SpawnNetworkTimeInMsNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnNetworkTimeInMs, vs...))
+}
+
+// SpawnNetworkTimeInMsGT applies the GT predicate on the "spawn_network_time_in_ms" field.
+func SpawnNetworkTimeInMsGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnNetworkTimeInMs, v))
+}
+
+// SpawnNetworkTimeInMsGTE applies the GTE predicate on the "spawn_network_time_in_ms" field.
+func SpawnNetworkTimeInMsGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnNetworkTimeInMs, v))
+}
+
+// SpawnNetworkTimeInMsLT applies the LT predicate on the "spawn_network_time_in_ms" field.
+func SpawnNetworkTimeInMsLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnNetworkTimeInMs, v))
+}
+
+// SpawnNetworkTimeInMsLTE applies the LTE predicate on the "spawn_network_time_in_ms" field.
+func SpawnNetworkTimeInMsLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnNetworkTimeInMs, v))
+}
+
+// SpawnNetworkTimeInMsIsNil applies the IsNil predicate on the "spawn_network_time_in_ms" field.
+func SpawnNetworkTimeInMsIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnNetworkTimeInMs))
+}
+
+// SpawnNetworkTimeInMsNotNil applies the NotNil predicate on the "spawn_network_time_in_ms" field.
+func SpawnNetworkTimeInMsNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnNetworkTimeInMs))
+}
+
+// SpawnFetchTimeInMsEQ applies the EQ predicate on the "spawn_fetch_time_in_ms" field.
+func SpawnFetchTimeInMsEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnFetchTimeInMs, v))
+}
+
+// SpawnFetchTimeInMsNEQ applies the NEQ predicate on the "spawn_fetch_time_in_ms" field.
+func SpawnFetchTimeInMsNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnFetchTimeInMs, v))
+}
+
+// SpawnFetchTimeInMsIn applies the In predicate on the "spawn_fetch_time_in_ms" field.
+func SpawnFetchTimeInMsIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnFetchTimeInMs, vs...))
+}
+
+// SpawnFetchTimeInMsNotIn applies the NotIn predicate on the "spawn_fetch_time_in_ms" field.
+func SpawnFetchTimeInMsNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnFetchTimeInMs, vs...))
+}
+
+// SpawnFetchTimeInMsGT applies the GT predicate on the "spawn_fetch_time_in_ms" field.
+func SpawnFetchTimeInMsGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnFetchTimeInMs, v))
+}
+
+// SpawnFetchTimeInMsGTE applies the GTE predicate on the "spawn_fetch_time_in_ms" field.
+func SpawnFetchTimeInMsGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnFetchTimeInMs, v))
+}
+
+// SpawnFetchTimeInMsLT applies the LT predicate on the "spawn_fetch_time_in_ms" field.
+func SpawnFetchTimeInMsLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnFetchTimeInMs, v))
+}
+
+// SpawnFetchTimeInMsLTE applies the LTE predicate on the "spawn_fetch_time_in_ms" field.
+func SpawnFetchTimeInMsLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnFetchTimeInMs, v))
+}
+
+// SpawnFetchTimeInMsIsNil applies the IsNil predicate on the "spawn_fetch_time_in_ms" field.
+func SpawnFetchTimeInMsIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnFetchTimeInMs))
+}
+
+// SpawnFetchTimeInMsNotNil applies the NotNil predicate on the "spawn_fetch_time_in_ms" field.
+func SpawnFetchTimeInMsNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnFetchTimeInMs))
+}
+
+// SpawnQueueTimeInMsEQ applies the EQ predicate on the "spawn_queue_time_in_ms" field.
+func SpawnQueueTimeInMsEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnQueueTimeInMs, v))
+}
+
+// SpawnQueueTimeInMsNEQ applies the NEQ predicate on the "spawn_queue_time_in_ms" field.
+func SpawnQueueTimeInMsNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnQueueTimeInMs, v))
+}
+
+// SpawnQueueTimeInMsIn applies the In predicate on the "spawn_queue_time_in_ms" field.
+func SpawnQueueTimeInMsIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnQueueTimeInMs, vs...))
+}
+
+// SpawnQueueTimeInMsNotIn applies the NotIn predicate on the "spawn_queue_time_in_ms" field.
+func SpawnQueueTimeInMsNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnQueueTimeInMs, vs...))
+}
+
+// SpawnQueueTimeInMsGT applies the GT predicate on the "spawn_queue_time_in_ms" field.
+func SpawnQueueTimeInMsGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnQueueTimeInMs, v))
+}
+
+// SpawnQueueTimeInMsGTE applies the GTE predicate on the "spawn_queue_time_in_ms" field.
+func SpawnQueueTimeInMsGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnQueueTimeInMs, v))
+}
+
+// SpawnQueueTimeInMsLT applies the LT predicate on the "spawn_queue_time_in_ms" field.
+func SpawnQueueTimeInMsLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnQueueTimeInMs, v))
+}
+
+// SpawnQueueTimeInMsLTE applies the LTE predicate on the "spawn_queue_time_in_ms" field.
+func SpawnQueueTimeInMsLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnQueueTimeInMs, v))
+}
+
+// SpawnQueueTimeInMsIsNil applies the IsNil predicate on the "spawn_queue_time_in_ms" field.
+func SpawnQueueTimeInMsIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnQueueTimeInMs))
+}
+
+// SpawnQueueTimeInMsNotNil applies the NotNil predicate on the "spawn_queue_time_in_ms" field.
+func SpawnQueueTimeInMsNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnQueueTimeInMs))
+}
+
+// SpawnSetupTimeInMsEQ applies the EQ predicate on the "spawn_setup_time_in_ms" field.
+func SpawnSetupTimeInMsEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnSetupTimeInMs, v))
+}
+
+// SpawnSetupTimeInMsNEQ applies the NEQ predicate on the "spawn_setup_time_in_ms" field.
+func SpawnSetupTimeInMsNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnSetupTimeInMs, v))
+}
+
+// SpawnSetupTimeInMsIn applies the In predicate on the "spawn_setup_time_in_ms" field.
+func SpawnSetupTimeInMsIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnSetupTimeInMs, vs...))
+}
+
+// SpawnSetupTimeInMsNotIn applies the NotIn predicate on the "spawn_setup_time_in_ms" field.
+func SpawnSetupTimeInMsNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnSetupTimeInMs, vs...))
+}
+
+// SpawnSetupTimeInMsGT applies the GT predicate on the "spawn_setup_time_in_ms" field.
+func SpawnSetupTimeInMsGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnSetupTimeInMs, v))
+}
+
+// SpawnSetupTimeInMsGTE applies the GTE predicate on the "spawn_setup_time_in_ms" field.
+func SpawnSetupTimeInMsGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnSetupTimeInMs, v))
+}
+
+// SpawnSetupTimeInMsLT applies the LT predicate on the "spawn_setup_time_in_ms" field.
+func SpawnSetupTimeInMsLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnSetupTimeInMs, v))
+}
+
+// SpawnSetupTimeInMsLTE applies the LTE predicate on the "spawn_setup_time_in_ms" field.
+func SpawnSetupTimeInMsLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnSetupTimeInMs, v))
+}
+
+// SpawnSetupTimeInMsIsNil applies the IsNil predicate on the "spawn_setup_time_in_ms" field.
+func SpawnSetupTimeInMsIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnSetupTimeInMs))
+}
+
+// SpawnSetupTimeInMsNotNil applies the NotNil predicate on the "spawn_setup_time_in_ms" field.
+func SpawnSetupTimeInMsNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnSetupTimeInMs))
+}
+
+// SpawnUploadTimeInMsEQ applies the EQ predicate on the "spawn_upload_time_in_ms" field.
+func SpawnUploadTimeInMsEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnUploadTimeInMs, v))
+}
+
+// SpawnUploadTimeInMsNEQ applies the NEQ predicate on the "spawn_upload_time_in_ms" field.
+func SpawnUploadTimeInMsNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnUploadTimeInMs, v))
+}
+
+// SpawnUploadTimeInMsIn applies the In predicate on the "spawn_upload_time_in_ms" field.
+func SpawnUploadTimeInMsIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnUploadTimeInMs, vs...))
+}
+
+// SpawnUploadTimeInMsNotIn applies the NotIn predicate on the "spawn_upload_time_in_ms" field.
+func SpawnUploadTimeInMsNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnUploadTimeInMs, vs...))
+}
+
+// SpawnUploadTimeInMsGT applies the GT predicate on the "spawn_upload_time_in_ms" field.
+func SpawnUploadTimeInMsGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnUploadTimeInMs, v))
+}
+
+// SpawnUploadTimeInMsGTE applies the GTE predicate on the "spawn_upload_time_in_ms" field.
+func SpawnUploadTimeInMsGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnUploadTimeInMs, v))
+}
+
+// SpawnUploadTimeInMsLT applies the LT predicate on the "spawn_upload_time_in_ms" field.
+func SpawnUploadTimeInMsLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnUploadTimeInMs, v))
+}
+
+// SpawnUploadTimeInMsLTE applies the LTE predicate on the "spawn_upload_time_in_ms" field.
+func SpawnUploadTimeInMsLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnUploadTimeInMs, v))
+}
+
+// SpawnUploadTimeInMsIsNil applies the IsNil predicate on the "spawn_upload_time_in_ms" field.
+func SpawnUploadTimeInMsIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnUploadTimeInMs))
+}
+
+// SpawnUploadTimeInMsNotNil applies the NotNil predicate on the "spawn_upload_time_in_ms" field.
+func SpawnUploadTimeInMsNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnUploadTimeInMs))
+}
+
+// SpawnExecutionWallTimeInMsEQ applies the EQ predicate on the "spawn_execution_wall_time_in_ms" field.
+func SpawnExecutionWallTimeInMsEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnExecutionWallTimeInMs, v))
+}
+
+// SpawnExecutionWallTimeInMsNEQ applies the NEQ predicate on the "spawn_execution_wall_time_in_ms" field.
+func SpawnExecutionWallTimeInMsNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnExecutionWallTimeInMs, v))
+}
+
+// SpawnExecutionWallTimeInMsIn applies the In predicate on the "spawn_execution_wall_time_in_ms" field.
+func SpawnExecutionWallTimeInMsIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnExecutionWallTimeInMs, vs...))
+}
+
+// SpawnExecutionWallTimeInMsNotIn applies the NotIn predicate on the "spawn_execution_wall_time_in_ms" field.
+func SpawnExecutionWallTimeInMsNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnExecutionWallTimeInMs, vs...))
+}
+
+// SpawnExecutionWallTimeInMsGT applies the GT predicate on the "spawn_execution_wall_time_in_ms" field.
+func SpawnExecutionWallTimeInMsGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnExecutionWallTimeInMs, v))
+}
+
+// SpawnExecutionWallTimeInMsGTE applies the GTE predicate on the "spawn_execution_wall_time_in_ms" field.
+func SpawnExecutionWallTimeInMsGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnExecutionWallTimeInMs, v))
+}
+
+// SpawnExecutionWallTimeInMsLT applies the LT predicate on the "spawn_execution_wall_time_in_ms" field.
+func SpawnExecutionWallTimeInMsLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnExecutionWallTimeInMs, v))
+}
+
+// SpawnExecutionWallTimeInMsLTE applies the LTE predicate on the "spawn_execution_wall_time_in_ms" field.
+func SpawnExecutionWallTimeInMsLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnExecutionWallTimeInMs, v))
+}
+
+// SpawnExecutionWallTimeInMsIsNil applies the IsNil predicate on the "spawn_execution_wall_time_in_ms" field.
+func SpawnExecutionWallTimeInMsIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnExecutionWallTimeInMs))
+}
+
+// SpawnExecutionWallTimeInMsNotNil applies the NotNil predicate on the "spawn_execution_wall_time_in_ms" field.
+func SpawnExecutionWallTimeInMsNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnExecutionWallTimeInMs))
+}
+
+// SpawnProcessOutputsTimeInMsEQ applies the EQ predicate on the "spawn_process_outputs_time_in_ms" field.
+func SpawnProcessOutputsTimeInMsEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnProcessOutputsTimeInMs, v))
+}
+
+// SpawnProcessOutputsTimeInMsNEQ applies the NEQ predicate on the "spawn_process_outputs_time_in_ms" field.
+func SpawnProcessOutputsTimeInMsNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnProcessOutputsTimeInMs, v))
+}
+
+// SpawnProcessOutputsTimeInMsIn applies the In predicate on the "spawn_process_outputs_time_in_ms" field.
+func SpawnProcessOutputsTimeInMsIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnProcessOutputsTimeInMs, vs...))
+}
+
+// SpawnProcessOutputsTimeInMsNotIn applies the NotIn predicate on the "spawn_process_outputs_time_in_ms" field.
+func SpawnProcessOutputsTimeInMsNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnProcessOutputsTimeInMs, vs...))
+}
+
+// SpawnProcessOutputsTimeInMsGT applies the GT predicate on the "spawn_process_outputs_time_in_ms" field.
+func SpawnProcessOutputsTimeInMsGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnProcessOutputsTimeInMs, v))
+}
+
+// SpawnProcessOutputsTimeInMsGTE applies the GTE predicate on the "spawn_process_outputs_time_in_ms" field.
+func SpawnProcessOutputsTimeInMsGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnProcessOutputsTimeInMs, v))
+}
+
+// SpawnProcessOutputsTimeInMsLT applies the LT predicate on the "spawn_process_outputs_time_in_ms" field.
+func SpawnProcessOutputsTimeInMsLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnProcessOutputsTimeInMs, v))
+}
+
+// SpawnProcessOutputsTimeInMsLTE applies the LTE predicate on the "spawn_process_outputs_time_in_ms" field.
+func SpawnProcessOutputsTimeInMsLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnProcessOutputsTimeInMs, v))
+}
+
+// SpawnProcessOutputsTimeInMsIsNil applies the IsNil predicate on the "spawn_process_outputs_time_in_ms" field.
+func SpawnProcessOutputsTimeInMsIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnProcessOutputsTimeInMs))
+}
+
+// SpawnProcessOutputsTimeInMsNotNil applies the NotNil predicate on the "spawn_process_outputs_time_in_ms" field.
+func SpawnProcessOutputsTimeInMsNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnProcessOutputsTimeInMs))
+}
+
+// SpawnRetryTimeInMsEQ applies the EQ predicate on the "spawn_retry_time_in_ms" field.
+func SpawnRetryTimeInMsEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnRetryTimeInMs, v))
+}
+
+// SpawnRetryTimeInMsNEQ applies the NEQ predicate on the "spawn_retry_time_in_ms" field.
+func SpawnRetryTimeInMsNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnRetryTimeInMs, v))
+}
+
+// SpawnRetryTimeInMsIn applies the In predicate on the "spawn_retry_time_in_ms" field.
+func SpawnRetryTimeInMsIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnRetryTimeInMs, vs...))
+}
+
+// SpawnRetryTimeInMsNotIn applies the NotIn predicate on the "spawn_retry_time_in_ms" field.
+func SpawnRetryTimeInMsNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnRetryTimeInMs, vs...))
+}
+
+// SpawnRetryTimeInMsGT applies the GT predicate on the "spawn_retry_time_in_ms" field.
+func SpawnRetryTimeInMsGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnRetryTimeInMs, v))
+}
+
+// SpawnRetryTimeInMsGTE applies the GTE predicate on the "spawn_retry_time_in_ms" field.
+func SpawnRetryTimeInMsGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnRetryTimeInMs, v))
+}
+
+// SpawnRetryTimeInMsLT applies the LT predicate on the "spawn_retry_time_in_ms" field.
+func SpawnRetryTimeInMsLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnRetryTimeInMs, v))
+}
+
+// SpawnRetryTimeInMsLTE applies the LTE predicate on the "spawn_retry_time_in_ms" field.
+func SpawnRetryTimeInMsLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnRetryTimeInMs, v))
+}
+
+// SpawnRetryTimeInMsIsNil applies the IsNil predicate on the "spawn_retry_time_in_ms" field.
+func SpawnRetryTimeInMsIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnRetryTimeInMs))
+}
+
+// SpawnRetryTimeInMsNotNil applies the NotNil predicate on the "spawn_retry_time_in_ms" field.
+func SpawnRetryTimeInMsNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnRetryTimeInMs))
+}
+
+// SpawnInputBytesEQ applies the EQ predicate on the "spawn_input_bytes" field.
+func SpawnInputBytesEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnInputBytes, v))
+}
+
+// SpawnInputBytesNEQ applies the NEQ predicate on the "spawn_input_bytes" field.
+func SpawnInputBytesNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnInputBytes, v))
+}
+
+// SpawnInputBytesIn applies the In predicate on the "spawn_input_bytes" field.
+func SpawnInputBytesIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnInputBytes, vs...))
+}
+
+// SpawnInputBytesNotIn applies the NotIn predicate on the "spawn_input_bytes" field.
+func SpawnInputBytesNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnInputBytes, vs...))
+}
+
+// SpawnInputBytesGT applies the GT predicate on the "spawn_input_bytes" field.
+func SpawnInputBytesGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnInputBytes, v))
+}
+
+// SpawnInputBytesGTE applies the GTE predicate on the "spawn_input_bytes" field.
+func SpawnInputBytesGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnInputBytes, v))
+}
+
+// SpawnInputBytesLT applies the LT predicate on the "spawn_input_bytes" field.
+func SpawnInputBytesLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnInputBytes, v))
+}
+
+// SpawnInputBytesLTE applies the LTE predicate on the "spawn_input_bytes" field.
+func SpawnInputBytesLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnInputBytes, v))
+}
+
+// SpawnInputBytesIsNil applies the IsNil predicate on the "spawn_input_bytes" field.
+func SpawnInputBytesIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnInputBytes))
+}
+
+// SpawnInputBytesNotNil applies the NotNil predicate on the "spawn_input_bytes" field.
+func SpawnInputBytesNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnInputBytes))
+}
+
+// SpawnInputFilesEQ applies the EQ predicate on the "spawn_input_files" field.
+func SpawnInputFilesEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnInputFiles, v))
+}
+
+// SpawnInputFilesNEQ applies the NEQ predicate on the "spawn_input_files" field.
+func SpawnInputFilesNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnInputFiles, v))
+}
+
+// SpawnInputFilesIn applies the In predicate on the "spawn_input_files" field.
+func SpawnInputFilesIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnInputFiles, vs...))
+}
+
+// SpawnInputFilesNotIn applies the NotIn predicate on the "spawn_input_files" field.
+func SpawnInputFilesNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnInputFiles, vs...))
+}
+
+// SpawnInputFilesGT applies the GT predicate on the "spawn_input_files" field.
+func SpawnInputFilesGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnInputFiles, v))
+}
+
+// SpawnInputFilesGTE applies the GTE predicate on the "spawn_input_files" field.
+func SpawnInputFilesGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnInputFiles, v))
+}
+
+// SpawnInputFilesLT applies the LT predicate on the "spawn_input_files" field.
+func SpawnInputFilesLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnInputFiles, v))
+}
+
+// SpawnInputFilesLTE applies the LTE predicate on the "spawn_input_files" field.
+func SpawnInputFilesLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnInputFiles, v))
+}
+
+// SpawnInputFilesIsNil applies the IsNil predicate on the "spawn_input_files" field.
+func SpawnInputFilesIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnInputFiles))
+}
+
+// SpawnInputFilesNotNil applies the NotNil predicate on the "spawn_input_files" field.
+func SpawnInputFilesNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnInputFiles))
+}
+
+// SpawnMemoryEstimateBytesEQ applies the EQ predicate on the "spawn_memory_estimate_bytes" field.
+func SpawnMemoryEstimateBytesEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldEQ(FieldSpawnMemoryEstimateBytes, v))
+}
+
+// SpawnMemoryEstimateBytesNEQ applies the NEQ predicate on the "spawn_memory_estimate_bytes" field.
+func SpawnMemoryEstimateBytesNEQ(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNEQ(FieldSpawnMemoryEstimateBytes, v))
+}
+
+// SpawnMemoryEstimateBytesIn applies the In predicate on the "spawn_memory_estimate_bytes" field.
+func SpawnMemoryEstimateBytesIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIn(FieldSpawnMemoryEstimateBytes, vs...))
+}
+
+// SpawnMemoryEstimateBytesNotIn applies the NotIn predicate on the "spawn_memory_estimate_bytes" field.
+func SpawnMemoryEstimateBytesNotIn(vs ...int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotIn(FieldSpawnMemoryEstimateBytes, vs...))
+}
+
+// SpawnMemoryEstimateBytesGT applies the GT predicate on the "spawn_memory_estimate_bytes" field.
+func SpawnMemoryEstimateBytesGT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGT(FieldSpawnMemoryEstimateBytes, v))
+}
+
+// SpawnMemoryEstimateBytesGTE applies the GTE predicate on the "spawn_memory_estimate_bytes" field.
+func SpawnMemoryEstimateBytesGTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldGTE(FieldSpawnMemoryEstimateBytes, v))
+}
+
+// SpawnMemoryEstimateBytesLT applies the LT predicate on the "spawn_memory_estimate_bytes" field.
+func SpawnMemoryEstimateBytesLT(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLT(FieldSpawnMemoryEstimateBytes, v))
+}
+
+// SpawnMemoryEstimateBytesLTE applies the LTE predicate on the "spawn_memory_estimate_bytes" field.
+func SpawnMemoryEstimateBytesLTE(v int64) predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldLTE(FieldSpawnMemoryEstimateBytes, v))
+}
+
+// SpawnMemoryEstimateBytesIsNil applies the IsNil predicate on the "spawn_memory_estimate_bytes" field.
+func SpawnMemoryEstimateBytesIsNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldIsNull(FieldSpawnMemoryEstimateBytes))
+}
+
+// SpawnMemoryEstimateBytesNotNil applies the NotNil predicate on the "spawn_memory_estimate_bytes" field.
+func SpawnMemoryEstimateBytesNotNil() predicate.ActionExecution {
+	return predicate.ActionExecution(sql.FieldNotNull(FieldSpawnMemoryEstimateBytes))
 }
 
 // SuccessEQ applies the EQ predicate on the "success" field.

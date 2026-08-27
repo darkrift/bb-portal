@@ -114,24 +114,38 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "ActionExecution",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			actionexecution.FieldBazelInvocationID:   {Type: field.TypeInt64, Column: actionexecution.FieldBazelInvocationID},
-			actionexecution.FieldConfigurationID:     {Type: field.TypeInt64, Column: actionexecution.FieldConfigurationID},
-			actionexecution.FieldActionDigestID:      {Type: field.TypeInt64, Column: actionexecution.FieldActionDigestID},
-			actionexecution.FieldPrimaryOutputFileID: {Type: field.TypeInt64, Column: actionexecution.FieldPrimaryOutputFileID},
-			actionexecution.FieldStdoutFileID:        {Type: field.TypeInt64, Column: actionexecution.FieldStdoutFileID},
-			actionexecution.FieldStderrFileID:        {Type: field.TypeInt64, Column: actionexecution.FieldStderrFileID},
-			actionexecution.FieldLabel:               {Type: field.TypeString, Column: actionexecution.FieldLabel},
-			actionexecution.FieldType:                {Type: field.TypeString, Column: actionexecution.FieldType},
-			actionexecution.FieldRunner:              {Type: field.TypeString, Column: actionexecution.FieldRunner},
-			actionexecution.FieldCacheHit:            {Type: field.TypeBool, Column: actionexecution.FieldCacheHit},
-			actionexecution.FieldSuccess:             {Type: field.TypeBool, Column: actionexecution.FieldSuccess},
-			actionexecution.FieldExitCode:            {Type: field.TypeInt32, Column: actionexecution.FieldExitCode},
-			actionexecution.FieldCommandLine:         {Type: field.TypeJSON, Column: actionexecution.FieldCommandLine},
-			actionexecution.FieldStartTime:           {Type: field.TypeTime, Column: actionexecution.FieldStartTime},
-			actionexecution.FieldEndTime:             {Type: field.TypeTime, Column: actionexecution.FieldEndTime},
-			actionexecution.FieldFailureCode:         {Type: field.TypeString, Column: actionexecution.FieldFailureCode},
-			actionexecution.FieldFailureMessage:      {Type: field.TypeString, Column: actionexecution.FieldFailureMessage},
-			actionexecution.FieldPrimaryOutput:       {Type: field.TypeString, Column: actionexecution.FieldPrimaryOutput},
+			actionexecution.FieldBazelInvocationID:           {Type: field.TypeInt64, Column: actionexecution.FieldBazelInvocationID},
+			actionexecution.FieldConfigurationID:             {Type: field.TypeInt64, Column: actionexecution.FieldConfigurationID},
+			actionexecution.FieldActionDigestID:              {Type: field.TypeInt64, Column: actionexecution.FieldActionDigestID},
+			actionexecution.FieldPrimaryOutputFileID:         {Type: field.TypeInt64, Column: actionexecution.FieldPrimaryOutputFileID},
+			actionexecution.FieldStdoutFileID:                {Type: field.TypeInt64, Column: actionexecution.FieldStdoutFileID},
+			actionexecution.FieldStderrFileID:                {Type: field.TypeInt64, Column: actionexecution.FieldStderrFileID},
+			actionexecution.FieldLabel:                       {Type: field.TypeString, Column: actionexecution.FieldLabel},
+			actionexecution.FieldType:                        {Type: field.TypeString, Column: actionexecution.FieldType},
+			actionexecution.FieldRunner:                      {Type: field.TypeString, Column: actionexecution.FieldRunner},
+			actionexecution.FieldCacheHit:                    {Type: field.TypeBool, Column: actionexecution.FieldCacheHit},
+			actionexecution.FieldExecutionPlatform:           {Type: field.TypeJSON, Column: actionexecution.FieldExecutionPlatform},
+			actionexecution.FieldSpawnTotalTimeInMs:          {Type: field.TypeInt64, Column: actionexecution.FieldSpawnTotalTimeInMs},
+			actionexecution.FieldSpawnParseTimeInMs:          {Type: field.TypeInt64, Column: actionexecution.FieldSpawnParseTimeInMs},
+			actionexecution.FieldSpawnNetworkTimeInMs:        {Type: field.TypeInt64, Column: actionexecution.FieldSpawnNetworkTimeInMs},
+			actionexecution.FieldSpawnFetchTimeInMs:          {Type: field.TypeInt64, Column: actionexecution.FieldSpawnFetchTimeInMs},
+			actionexecution.FieldSpawnQueueTimeInMs:          {Type: field.TypeInt64, Column: actionexecution.FieldSpawnQueueTimeInMs},
+			actionexecution.FieldSpawnSetupTimeInMs:          {Type: field.TypeInt64, Column: actionexecution.FieldSpawnSetupTimeInMs},
+			actionexecution.FieldSpawnUploadTimeInMs:         {Type: field.TypeInt64, Column: actionexecution.FieldSpawnUploadTimeInMs},
+			actionexecution.FieldSpawnExecutionWallTimeInMs:  {Type: field.TypeInt64, Column: actionexecution.FieldSpawnExecutionWallTimeInMs},
+			actionexecution.FieldSpawnProcessOutputsTimeInMs: {Type: field.TypeInt64, Column: actionexecution.FieldSpawnProcessOutputsTimeInMs},
+			actionexecution.FieldSpawnRetryTimeInMs:          {Type: field.TypeInt64, Column: actionexecution.FieldSpawnRetryTimeInMs},
+			actionexecution.FieldSpawnInputBytes:             {Type: field.TypeInt64, Column: actionexecution.FieldSpawnInputBytes},
+			actionexecution.FieldSpawnInputFiles:             {Type: field.TypeInt64, Column: actionexecution.FieldSpawnInputFiles},
+			actionexecution.FieldSpawnMemoryEstimateBytes:    {Type: field.TypeInt64, Column: actionexecution.FieldSpawnMemoryEstimateBytes},
+			actionexecution.FieldSuccess:                     {Type: field.TypeBool, Column: actionexecution.FieldSuccess},
+			actionexecution.FieldExitCode:                    {Type: field.TypeInt32, Column: actionexecution.FieldExitCode},
+			actionexecution.FieldCommandLine:                 {Type: field.TypeJSON, Column: actionexecution.FieldCommandLine},
+			actionexecution.FieldStartTime:                   {Type: field.TypeTime, Column: actionexecution.FieldStartTime},
+			actionexecution.FieldEndTime:                     {Type: field.TypeTime, Column: actionexecution.FieldEndTime},
+			actionexecution.FieldFailureCode:                 {Type: field.TypeString, Column: actionexecution.FieldFailureCode},
+			actionexecution.FieldFailureMessage:              {Type: field.TypeString, Column: actionexecution.FieldFailureMessage},
+			actionexecution.FieldPrimaryOutput:               {Type: field.TypeString, Column: actionexecution.FieldPrimaryOutput},
 		},
 	}
 	graph.Nodes[3] = &sqlgraph.Node{
@@ -205,6 +219,15 @@ var schemaGraph = func() *sqlgraph.Schema {
 			bazelinvocation.FieldStartedAt:                     {Type: field.TypeTime, Column: bazelinvocation.FieldStartedAt},
 			bazelinvocation.FieldEndedAt:                       {Type: field.TypeTime, Column: bazelinvocation.FieldEndedAt},
 			bazelinvocation.FieldBepCompleted:                  {Type: field.TypeBool, Column: bazelinvocation.FieldBepCompleted},
+			bazelinvocation.FieldActionAnalyticsState:          {Type: field.TypeEnum, Column: bazelinvocation.FieldActionAnalyticsState},
+			bazelinvocation.FieldActionAnalyticsFailureMessage: {Type: field.TypeString, Column: bazelinvocation.FieldActionAnalyticsFailureMessage},
+			bazelinvocation.FieldActionAnalyticsStartedAt:      {Type: field.TypeTime, Column: bazelinvocation.FieldActionAnalyticsStartedAt},
+			bazelinvocation.FieldActionAnalyticsCompletedAt:    {Type: field.TypeTime, Column: bazelinvocation.FieldActionAnalyticsCompletedAt},
+			bazelinvocation.FieldActionAnalyticsResult:         {Type: field.TypeJSON, Column: bazelinvocation.FieldActionAnalyticsResult},
+			bazelinvocation.FieldExecutionLogStatus:            {Type: field.TypeEnum, Column: bazelinvocation.FieldExecutionLogStatus},
+			bazelinvocation.FieldExecutionLogFailureMessage:    {Type: field.TypeString, Column: bazelinvocation.FieldExecutionLogFailureMessage},
+			bazelinvocation.FieldExecutionLogActionCount:       {Type: field.TypeInt64, Column: bazelinvocation.FieldExecutionLogActionCount},
+			bazelinvocation.FieldExecutionLogMatchedActions:    {Type: field.TypeInt64, Column: bazelinvocation.FieldExecutionLogMatchedActions},
 			bazelinvocation.FieldUsername:                      {Type: field.TypeString, Column: bazelinvocation.FieldUsername},
 			bazelinvocation.FieldHostname:                      {Type: field.TypeString, Column: bazelinvocation.FieldHostname},
 			bazelinvocation.FieldNumFetches:                    {Type: field.TypeInt64, Column: bazelinvocation.FieldNumFetches},
@@ -2691,6 +2714,76 @@ func (f *ActionExecutionFilter) WhereCacheHit(p entql.BoolP) {
 	f.Where(p.Field(actionexecution.FieldCacheHit))
 }
 
+// WhereExecutionPlatform applies the entql json.RawMessage predicate on the execution_platform field.
+func (f *ActionExecutionFilter) WhereExecutionPlatform(p entql.BytesP) {
+	f.Where(p.Field(actionexecution.FieldExecutionPlatform))
+}
+
+// WhereSpawnTotalTimeInMs applies the entql int64 predicate on the spawn_total_time_in_ms field.
+func (f *ActionExecutionFilter) WhereSpawnTotalTimeInMs(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnTotalTimeInMs))
+}
+
+// WhereSpawnParseTimeInMs applies the entql int64 predicate on the spawn_parse_time_in_ms field.
+func (f *ActionExecutionFilter) WhereSpawnParseTimeInMs(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnParseTimeInMs))
+}
+
+// WhereSpawnNetworkTimeInMs applies the entql int64 predicate on the spawn_network_time_in_ms field.
+func (f *ActionExecutionFilter) WhereSpawnNetworkTimeInMs(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnNetworkTimeInMs))
+}
+
+// WhereSpawnFetchTimeInMs applies the entql int64 predicate on the spawn_fetch_time_in_ms field.
+func (f *ActionExecutionFilter) WhereSpawnFetchTimeInMs(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnFetchTimeInMs))
+}
+
+// WhereSpawnQueueTimeInMs applies the entql int64 predicate on the spawn_queue_time_in_ms field.
+func (f *ActionExecutionFilter) WhereSpawnQueueTimeInMs(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnQueueTimeInMs))
+}
+
+// WhereSpawnSetupTimeInMs applies the entql int64 predicate on the spawn_setup_time_in_ms field.
+func (f *ActionExecutionFilter) WhereSpawnSetupTimeInMs(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnSetupTimeInMs))
+}
+
+// WhereSpawnUploadTimeInMs applies the entql int64 predicate on the spawn_upload_time_in_ms field.
+func (f *ActionExecutionFilter) WhereSpawnUploadTimeInMs(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnUploadTimeInMs))
+}
+
+// WhereSpawnExecutionWallTimeInMs applies the entql int64 predicate on the spawn_execution_wall_time_in_ms field.
+func (f *ActionExecutionFilter) WhereSpawnExecutionWallTimeInMs(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnExecutionWallTimeInMs))
+}
+
+// WhereSpawnProcessOutputsTimeInMs applies the entql int64 predicate on the spawn_process_outputs_time_in_ms field.
+func (f *ActionExecutionFilter) WhereSpawnProcessOutputsTimeInMs(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnProcessOutputsTimeInMs))
+}
+
+// WhereSpawnRetryTimeInMs applies the entql int64 predicate on the spawn_retry_time_in_ms field.
+func (f *ActionExecutionFilter) WhereSpawnRetryTimeInMs(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnRetryTimeInMs))
+}
+
+// WhereSpawnInputBytes applies the entql int64 predicate on the spawn_input_bytes field.
+func (f *ActionExecutionFilter) WhereSpawnInputBytes(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnInputBytes))
+}
+
+// WhereSpawnInputFiles applies the entql int64 predicate on the spawn_input_files field.
+func (f *ActionExecutionFilter) WhereSpawnInputFiles(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnInputFiles))
+}
+
+// WhereSpawnMemoryEstimateBytes applies the entql int64 predicate on the spawn_memory_estimate_bytes field.
+func (f *ActionExecutionFilter) WhereSpawnMemoryEstimateBytes(p entql.Int64P) {
+	f.Where(p.Field(actionexecution.FieldSpawnMemoryEstimateBytes))
+}
+
 // WhereSuccess applies the entql bool predicate on the success field.
 func (f *ActionExecutionFilter) WhereSuccess(p entql.BoolP) {
 	f.Where(p.Field(actionexecution.FieldSuccess))
@@ -3162,6 +3255,51 @@ func (f *BazelInvocationFilter) WhereEndedAt(p entql.TimeP) {
 // WhereBepCompleted applies the entql bool predicate on the bep_completed field.
 func (f *BazelInvocationFilter) WhereBepCompleted(p entql.BoolP) {
 	f.Where(p.Field(bazelinvocation.FieldBepCompleted))
+}
+
+// WhereActionAnalyticsState applies the entql string predicate on the action_analytics_state field.
+func (f *BazelInvocationFilter) WhereActionAnalyticsState(p entql.StringP) {
+	f.Where(p.Field(bazelinvocation.FieldActionAnalyticsState))
+}
+
+// WhereActionAnalyticsFailureMessage applies the entql string predicate on the action_analytics_failure_message field.
+func (f *BazelInvocationFilter) WhereActionAnalyticsFailureMessage(p entql.StringP) {
+	f.Where(p.Field(bazelinvocation.FieldActionAnalyticsFailureMessage))
+}
+
+// WhereActionAnalyticsStartedAt applies the entql time.Time predicate on the action_analytics_started_at field.
+func (f *BazelInvocationFilter) WhereActionAnalyticsStartedAt(p entql.TimeP) {
+	f.Where(p.Field(bazelinvocation.FieldActionAnalyticsStartedAt))
+}
+
+// WhereActionAnalyticsCompletedAt applies the entql time.Time predicate on the action_analytics_completed_at field.
+func (f *BazelInvocationFilter) WhereActionAnalyticsCompletedAt(p entql.TimeP) {
+	f.Where(p.Field(bazelinvocation.FieldActionAnalyticsCompletedAt))
+}
+
+// WhereActionAnalyticsResult applies the entql json.RawMessage predicate on the action_analytics_result field.
+func (f *BazelInvocationFilter) WhereActionAnalyticsResult(p entql.BytesP) {
+	f.Where(p.Field(bazelinvocation.FieldActionAnalyticsResult))
+}
+
+// WhereExecutionLogStatus applies the entql string predicate on the execution_log_status field.
+func (f *BazelInvocationFilter) WhereExecutionLogStatus(p entql.StringP) {
+	f.Where(p.Field(bazelinvocation.FieldExecutionLogStatus))
+}
+
+// WhereExecutionLogFailureMessage applies the entql string predicate on the execution_log_failure_message field.
+func (f *BazelInvocationFilter) WhereExecutionLogFailureMessage(p entql.StringP) {
+	f.Where(p.Field(bazelinvocation.FieldExecutionLogFailureMessage))
+}
+
+// WhereExecutionLogActionCount applies the entql int64 predicate on the execution_log_action_count field.
+func (f *BazelInvocationFilter) WhereExecutionLogActionCount(p entql.Int64P) {
+	f.Where(p.Field(bazelinvocation.FieldExecutionLogActionCount))
+}
+
+// WhereExecutionLogMatchedActions applies the entql int64 predicate on the execution_log_matched_actions field.
+func (f *BazelInvocationFilter) WhereExecutionLogMatchedActions(p entql.Int64P) {
+	f.Where(p.Field(bazelinvocation.FieldExecutionLogMatchedActions))
 }
 
 // WhereUsername applies the entql string predicate on the username field.

@@ -5,6 +5,7 @@ import {
   DeploymentUnitOutlined,
   ExperimentOutlined,
   FileSearchOutlined,
+  FundProjectionScreenOutlined,
   InfoCircleOutlined,
   LineChartOutlined,
   TagsOutlined,
@@ -94,6 +95,18 @@ const getMenuItems = (
         params={{ invocationID }}
       >
         Actions
+      </Link>
+    ),
+  });
+  items.push({
+    key: "analytics",
+    icon: <FundProjectionScreenOutlined />,
+    label: (
+      <Link
+        to="/bazel-invocations/$invocationID/analytics"
+        params={{ invocationID }}
+      >
+        Analytics
       </Link>
     ),
   });

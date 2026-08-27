@@ -19,6 +19,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/instancename"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/metrics"
 	"github.com/buildbarn/bb-portal/pkg/invocation"
+	"github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics"
 	"github.com/google/uuid"
 )
 
@@ -37,6 +38,24 @@ type BazelInvocation struct {
 	EndedAt *time.Time `json:"ended_at,omitempty"`
 	// BepCompleted holds the value of the "bep_completed" field.
 	BepCompleted bool `json:"bep_completed,omitempty"`
+	// Lifecycle state of asynchronous action analytics processing
+	ActionAnalyticsState bazelinvocation.ActionAnalyticsState `json:"action_analytics_state,omitempty"`
+	// ActionAnalyticsFailureMessage holds the value of the "action_analytics_failure_message" field.
+	ActionAnalyticsFailureMessage string `json:"action_analytics_failure_message,omitempty"`
+	// ActionAnalyticsStartedAt holds the value of the "action_analytics_started_at" field.
+	ActionAnalyticsStartedAt *time.Time `json:"action_analytics_started_at,omitempty"`
+	// ActionAnalyticsCompletedAt holds the value of the "action_analytics_completed_at" field.
+	ActionAnalyticsCompletedAt *time.Time `json:"action_analytics_completed_at,omitempty"`
+	// ActionAnalyticsResult holds the value of the "action_analytics_result" field.
+	ActionAnalyticsResult *actionanalytics.Report `json:"action_analytics_result,omitempty"`
+	// Whether the compact execution log was provided and processed
+	ExecutionLogStatus bazelinvocation.ExecutionLogStatus `json:"execution_log_status,omitempty"`
+	// ExecutionLogFailureMessage holds the value of the "execution_log_failure_message" field.
+	ExecutionLogFailureMessage string `json:"execution_log_failure_message,omitempty"`
+	// Number of published actions eligible for compact execution-log correlation
+	ExecutionLogActionCount int64 `json:"execution_log_action_count,omitempty"`
+	// ExecutionLogMatchedActions holds the value of the "execution_log_matched_actions" field.
+	ExecutionLogMatchedActions int64 `json:"execution_log_matched_actions,omitempty"`
 	// Username holds the value of the "username" field.
 	Username string `json:"username,omitempty"`
 	// Hostname holds the value of the "hostname" field.
@@ -278,15 +297,15 @@ func (*BazelInvocation) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case bazelinvocation.FieldCanonicalCommandLine, bazelinvocation.FieldOriginalCommandLine, bazelinvocation.FieldOptionsParsed, bazelinvocation.FieldEnvironmentVariables:
+		case bazelinvocation.FieldActionAnalyticsResult, bazelinvocation.FieldCanonicalCommandLine, bazelinvocation.FieldOriginalCommandLine, bazelinvocation.FieldOptionsParsed, bazelinvocation.FieldEnvironmentVariables:
 			values[i] = new([]byte)
 		case bazelinvocation.FieldBepCompleted, bazelinvocation.FieldProcessedEventStarted, bazelinvocation.FieldProcessedEventBuildMetadata, bazelinvocation.FieldProcessedEventBuildFinished, bazelinvocation.FieldProcessedEventWorkspaceStatus:
 			values[i] = new(sql.NullBool)
-		case bazelinvocation.FieldID, bazelinvocation.FieldNumFetches, bazelinvocation.FieldProfileID, bazelinvocation.FieldExitCodeCode:
+		case bazelinvocation.FieldID, bazelinvocation.FieldExecutionLogActionCount, bazelinvocation.FieldExecutionLogMatchedActions, bazelinvocation.FieldNumFetches, bazelinvocation.FieldProfileID, bazelinvocation.FieldExitCodeCode:
 			values[i] = new(sql.NullInt64)
-		case bazelinvocation.FieldUsername, bazelinvocation.FieldHostname, bazelinvocation.FieldBazelVersion, bazelinvocation.FieldExitCodeName:
+		case bazelinvocation.FieldActionAnalyticsState, bazelinvocation.FieldActionAnalyticsFailureMessage, bazelinvocation.FieldExecutionLogStatus, bazelinvocation.FieldExecutionLogFailureMessage, bazelinvocation.FieldUsername, bazelinvocation.FieldHostname, bazelinvocation.FieldBazelVersion, bazelinvocation.FieldExitCodeName:
 			values[i] = new(sql.NullString)
-		case bazelinvocation.FieldCreatedTimestamp, bazelinvocation.FieldStartedAt, bazelinvocation.FieldEndedAt:
+		case bazelinvocation.FieldCreatedTimestamp, bazelinvocation.FieldStartedAt, bazelinvocation.FieldEndedAt, bazelinvocation.FieldActionAnalyticsStartedAt, bazelinvocation.FieldActionAnalyticsCompletedAt:
 			values[i] = new(sql.NullTime)
 		case bazelinvocation.FieldInvocationID:
 			values[i] = new(uuid.UUID)
@@ -347,6 +366,64 @@ func (_m *BazelInvocation) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field bep_completed", values[i])
 			} else if value.Valid {
 				_m.BepCompleted = value.Bool
+			}
+		case bazelinvocation.FieldActionAnalyticsState:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field action_analytics_state", values[i])
+			} else if value.Valid {
+				_m.ActionAnalyticsState = bazelinvocation.ActionAnalyticsState(value.String)
+			}
+		case bazelinvocation.FieldActionAnalyticsFailureMessage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field action_analytics_failure_message", values[i])
+			} else if value.Valid {
+				_m.ActionAnalyticsFailureMessage = value.String
+			}
+		case bazelinvocation.FieldActionAnalyticsStartedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field action_analytics_started_at", values[i])
+			} else if value.Valid {
+				_m.ActionAnalyticsStartedAt = new(time.Time)
+				*_m.ActionAnalyticsStartedAt = value.Time
+			}
+		case bazelinvocation.FieldActionAnalyticsCompletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field action_analytics_completed_at", values[i])
+			} else if value.Valid {
+				_m.ActionAnalyticsCompletedAt = new(time.Time)
+				*_m.ActionAnalyticsCompletedAt = value.Time
+			}
+		case bazelinvocation.FieldActionAnalyticsResult:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field action_analytics_result", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.ActionAnalyticsResult); err != nil {
+					return fmt.Errorf("unmarshal field action_analytics_result: %w", err)
+				}
+			}
+		case bazelinvocation.FieldExecutionLogStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field execution_log_status", values[i])
+			} else if value.Valid {
+				_m.ExecutionLogStatus = bazelinvocation.ExecutionLogStatus(value.String)
+			}
+		case bazelinvocation.FieldExecutionLogFailureMessage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field execution_log_failure_message", values[i])
+			} else if value.Valid {
+				_m.ExecutionLogFailureMessage = value.String
+			}
+		case bazelinvocation.FieldExecutionLogActionCount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field execution_log_action_count", values[i])
+			} else if value.Valid {
+				_m.ExecutionLogActionCount = value.Int64
+			}
+		case bazelinvocation.FieldExecutionLogMatchedActions:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field execution_log_matched_actions", values[i])
+			} else if value.Valid {
+				_m.ExecutionLogMatchedActions = value.Int64
 			}
 		case bazelinvocation.FieldUsername:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -594,6 +671,37 @@ func (_m *BazelInvocation) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("bep_completed=")
 	builder.WriteString(fmt.Sprintf("%v", _m.BepCompleted))
+	builder.WriteString(", ")
+	builder.WriteString("action_analytics_state=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ActionAnalyticsState))
+	builder.WriteString(", ")
+	builder.WriteString("action_analytics_failure_message=")
+	builder.WriteString(_m.ActionAnalyticsFailureMessage)
+	builder.WriteString(", ")
+	if v := _m.ActionAnalyticsStartedAt; v != nil {
+		builder.WriteString("action_analytics_started_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := _m.ActionAnalyticsCompletedAt; v != nil {
+		builder.WriteString("action_analytics_completed_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("action_analytics_result=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ActionAnalyticsResult))
+	builder.WriteString(", ")
+	builder.WriteString("execution_log_status=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ExecutionLogStatus))
+	builder.WriteString(", ")
+	builder.WriteString("execution_log_failure_message=")
+	builder.WriteString(_m.ExecutionLogFailureMessage)
+	builder.WriteString(", ")
+	builder.WriteString("execution_log_action_count=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ExecutionLogActionCount))
+	builder.WriteString(", ")
+	builder.WriteString("execution_log_matched_actions=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ExecutionLogMatchedActions))
 	builder.WriteString(", ")
 	builder.WriteString("username=")
 	builder.WriteString(_m.Username)

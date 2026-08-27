@@ -36,25 +36,39 @@ type ActionDatum struct {
 }
 
 type ActionExecution struct {
-	ID                  int64
-	Label               string
-	Type                sql.NullString
-	Runner              sql.NullString
-	CacheHit            sql.NullBool
-	Success             sql.NullBool
-	ExitCode            sql.NullInt32
-	CommandLine         pqtype.NullRawMessage
-	StartTime           sql.NullTime
-	EndTime             sql.NullTime
-	FailureCode         sql.NullString
-	FailureMessage      sql.NullString
-	PrimaryOutput       sql.NullString
-	ConfigurationID     sql.NullInt64
-	PrimaryOutputFileID sql.NullInt64
-	StdoutFileID        sql.NullInt64
-	StderrFileID        sql.NullInt64
-	BazelInvocationID   int64
-	ActionDigestID      sql.NullInt64
+	ID                          int64
+	Label                       string
+	Type                        sql.NullString
+	Runner                      sql.NullString
+	CacheHit                    sql.NullBool
+	ExecutionPlatform           pqtype.NullRawMessage
+	SpawnTotalTimeInMs          sql.NullInt64
+	SpawnParseTimeInMs          sql.NullInt64
+	SpawnNetworkTimeInMs        sql.NullInt64
+	SpawnFetchTimeInMs          sql.NullInt64
+	SpawnQueueTimeInMs          sql.NullInt64
+	SpawnSetupTimeInMs          sql.NullInt64
+	SpawnUploadTimeInMs         sql.NullInt64
+	SpawnExecutionWallTimeInMs  sql.NullInt64
+	SpawnProcessOutputsTimeInMs sql.NullInt64
+	SpawnRetryTimeInMs          sql.NullInt64
+	SpawnInputBytes             sql.NullInt64
+	SpawnInputFiles             sql.NullInt64
+	SpawnMemoryEstimateBytes    sql.NullInt64
+	Success                     sql.NullBool
+	ExitCode                    sql.NullInt32
+	CommandLine                 pqtype.NullRawMessage
+	StartTime                   sql.NullTime
+	EndTime                     sql.NullTime
+	FailureCode                 sql.NullString
+	FailureMessage              sql.NullString
+	PrimaryOutput               sql.NullString
+	ConfigurationID             sql.NullInt64
+	PrimaryOutputFileID         sql.NullInt64
+	StdoutFileID                sql.NullInt64
+	StderrFileID                sql.NullInt64
+	BazelInvocationID           int64
+	ActionDigestID              sql.NullInt64
 }
 
 type ActionSummary struct {
@@ -94,6 +108,15 @@ type BazelInvocation struct {
 	StartedAt                         sql.NullTime
 	EndedAt                           sql.NullTime
 	BepCompleted                      bool
+	ActionAnalyticsState              string
+	ActionAnalyticsFailureMessage     sql.NullString
+	ActionAnalyticsStartedAt          sql.NullTime
+	ActionAnalyticsCompletedAt        sql.NullTime
+	ActionAnalyticsResult             pqtype.NullRawMessage
+	ExecutionLogStatus                string
+	ExecutionLogFailureMessage        sql.NullString
+	ExecutionLogActionCount           int64
+	ExecutionLogMatchedActions        int64
 	Username                          sql.NullString
 	Hostname                          sql.NullString
 	NumFetches                        sql.NullInt64

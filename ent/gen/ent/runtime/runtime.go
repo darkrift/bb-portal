@@ -34,6 +34,60 @@ func init() {
 			return next.Mutate(ctx, m)
 		})
 	}
+	actionexecutionFields := authschema.ActionExecution{}.Fields()
+	_ = actionexecutionFields
+	// actionexecutionDescSpawnTotalTimeInMs is the schema descriptor for spawn_total_time_in_ms field.
+	actionexecutionDescSpawnTotalTimeInMs := actionexecutionFields[11].Descriptor()
+	// actionexecution.SpawnTotalTimeInMsValidator is a validator for the "spawn_total_time_in_ms" field. It is called by the builders before save.
+	actionexecution.SpawnTotalTimeInMsValidator = actionexecutionDescSpawnTotalTimeInMs.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnParseTimeInMs is the schema descriptor for spawn_parse_time_in_ms field.
+	actionexecutionDescSpawnParseTimeInMs := actionexecutionFields[12].Descriptor()
+	// actionexecution.SpawnParseTimeInMsValidator is a validator for the "spawn_parse_time_in_ms" field. It is called by the builders before save.
+	actionexecution.SpawnParseTimeInMsValidator = actionexecutionDescSpawnParseTimeInMs.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnNetworkTimeInMs is the schema descriptor for spawn_network_time_in_ms field.
+	actionexecutionDescSpawnNetworkTimeInMs := actionexecutionFields[13].Descriptor()
+	// actionexecution.SpawnNetworkTimeInMsValidator is a validator for the "spawn_network_time_in_ms" field. It is called by the builders before save.
+	actionexecution.SpawnNetworkTimeInMsValidator = actionexecutionDescSpawnNetworkTimeInMs.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnFetchTimeInMs is the schema descriptor for spawn_fetch_time_in_ms field.
+	actionexecutionDescSpawnFetchTimeInMs := actionexecutionFields[14].Descriptor()
+	// actionexecution.SpawnFetchTimeInMsValidator is a validator for the "spawn_fetch_time_in_ms" field. It is called by the builders before save.
+	actionexecution.SpawnFetchTimeInMsValidator = actionexecutionDescSpawnFetchTimeInMs.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnQueueTimeInMs is the schema descriptor for spawn_queue_time_in_ms field.
+	actionexecutionDescSpawnQueueTimeInMs := actionexecutionFields[15].Descriptor()
+	// actionexecution.SpawnQueueTimeInMsValidator is a validator for the "spawn_queue_time_in_ms" field. It is called by the builders before save.
+	actionexecution.SpawnQueueTimeInMsValidator = actionexecutionDescSpawnQueueTimeInMs.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnSetupTimeInMs is the schema descriptor for spawn_setup_time_in_ms field.
+	actionexecutionDescSpawnSetupTimeInMs := actionexecutionFields[16].Descriptor()
+	// actionexecution.SpawnSetupTimeInMsValidator is a validator for the "spawn_setup_time_in_ms" field. It is called by the builders before save.
+	actionexecution.SpawnSetupTimeInMsValidator = actionexecutionDescSpawnSetupTimeInMs.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnUploadTimeInMs is the schema descriptor for spawn_upload_time_in_ms field.
+	actionexecutionDescSpawnUploadTimeInMs := actionexecutionFields[17].Descriptor()
+	// actionexecution.SpawnUploadTimeInMsValidator is a validator for the "spawn_upload_time_in_ms" field. It is called by the builders before save.
+	actionexecution.SpawnUploadTimeInMsValidator = actionexecutionDescSpawnUploadTimeInMs.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnExecutionWallTimeInMs is the schema descriptor for spawn_execution_wall_time_in_ms field.
+	actionexecutionDescSpawnExecutionWallTimeInMs := actionexecutionFields[18].Descriptor()
+	// actionexecution.SpawnExecutionWallTimeInMsValidator is a validator for the "spawn_execution_wall_time_in_ms" field. It is called by the builders before save.
+	actionexecution.SpawnExecutionWallTimeInMsValidator = actionexecutionDescSpawnExecutionWallTimeInMs.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnProcessOutputsTimeInMs is the schema descriptor for spawn_process_outputs_time_in_ms field.
+	actionexecutionDescSpawnProcessOutputsTimeInMs := actionexecutionFields[19].Descriptor()
+	// actionexecution.SpawnProcessOutputsTimeInMsValidator is a validator for the "spawn_process_outputs_time_in_ms" field. It is called by the builders before save.
+	actionexecution.SpawnProcessOutputsTimeInMsValidator = actionexecutionDescSpawnProcessOutputsTimeInMs.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnRetryTimeInMs is the schema descriptor for spawn_retry_time_in_ms field.
+	actionexecutionDescSpawnRetryTimeInMs := actionexecutionFields[20].Descriptor()
+	// actionexecution.SpawnRetryTimeInMsValidator is a validator for the "spawn_retry_time_in_ms" field. It is called by the builders before save.
+	actionexecution.SpawnRetryTimeInMsValidator = actionexecutionDescSpawnRetryTimeInMs.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnInputBytes is the schema descriptor for spawn_input_bytes field.
+	actionexecutionDescSpawnInputBytes := actionexecutionFields[21].Descriptor()
+	// actionexecution.SpawnInputBytesValidator is a validator for the "spawn_input_bytes" field. It is called by the builders before save.
+	actionexecution.SpawnInputBytesValidator = actionexecutionDescSpawnInputBytes.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnInputFiles is the schema descriptor for spawn_input_files field.
+	actionexecutionDescSpawnInputFiles := actionexecutionFields[22].Descriptor()
+	// actionexecution.SpawnInputFilesValidator is a validator for the "spawn_input_files" field. It is called by the builders before save.
+	actionexecution.SpawnInputFilesValidator = actionexecutionDescSpawnInputFiles.Validators[0].(func(int64) error)
+	// actionexecutionDescSpawnMemoryEstimateBytes is the schema descriptor for spawn_memory_estimate_bytes field.
+	actionexecutionDescSpawnMemoryEstimateBytes := actionexecutionFields[23].Descriptor()
+	// actionexecution.SpawnMemoryEstimateBytesValidator is a validator for the "spawn_memory_estimate_bytes" field. It is called by the builders before save.
+	actionexecution.SpawnMemoryEstimateBytesValidator = actionexecutionDescSpawnMemoryEstimateBytes.Validators[0].(func(int64) error)
 	authenticateduser.Policy = privacy.NewPolicies(authschema.AuthenticatedUser{})
 	authenticateduser.Hooks[0] = func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -58,20 +112,32 @@ func init() {
 	bazelinvocationDescBepCompleted := bazelinvocationFields[4].Descriptor()
 	// bazelinvocation.DefaultBepCompleted holds the default value on creation for the bep_completed field.
 	bazelinvocation.DefaultBepCompleted = bazelinvocationDescBepCompleted.Default.(bool)
+	// bazelinvocationDescExecutionLogActionCount is the schema descriptor for execution_log_action_count field.
+	bazelinvocationDescExecutionLogActionCount := bazelinvocationFields[12].Descriptor()
+	// bazelinvocation.DefaultExecutionLogActionCount holds the default value on creation for the execution_log_action_count field.
+	bazelinvocation.DefaultExecutionLogActionCount = bazelinvocationDescExecutionLogActionCount.Default.(int64)
+	// bazelinvocation.ExecutionLogActionCountValidator is a validator for the "execution_log_action_count" field. It is called by the builders before save.
+	bazelinvocation.ExecutionLogActionCountValidator = bazelinvocationDescExecutionLogActionCount.Validators[0].(func(int64) error)
+	// bazelinvocationDescExecutionLogMatchedActions is the schema descriptor for execution_log_matched_actions field.
+	bazelinvocationDescExecutionLogMatchedActions := bazelinvocationFields[13].Descriptor()
+	// bazelinvocation.DefaultExecutionLogMatchedActions holds the default value on creation for the execution_log_matched_actions field.
+	bazelinvocation.DefaultExecutionLogMatchedActions = bazelinvocationDescExecutionLogMatchedActions.Default.(int64)
+	// bazelinvocation.ExecutionLogMatchedActionsValidator is a validator for the "execution_log_matched_actions" field. It is called by the builders before save.
+	bazelinvocation.ExecutionLogMatchedActionsValidator = bazelinvocationDescExecutionLogMatchedActions.Validators[0].(func(int64) error)
 	// bazelinvocationDescProcessedEventStarted is the schema descriptor for processed_event_started field.
-	bazelinvocationDescProcessedEventStarted := bazelinvocationFields[16].Descriptor()
+	bazelinvocationDescProcessedEventStarted := bazelinvocationFields[25].Descriptor()
 	// bazelinvocation.DefaultProcessedEventStarted holds the default value on creation for the processed_event_started field.
 	bazelinvocation.DefaultProcessedEventStarted = bazelinvocationDescProcessedEventStarted.Default.(bool)
 	// bazelinvocationDescProcessedEventBuildMetadata is the schema descriptor for processed_event_build_metadata field.
-	bazelinvocationDescProcessedEventBuildMetadata := bazelinvocationFields[17].Descriptor()
+	bazelinvocationDescProcessedEventBuildMetadata := bazelinvocationFields[26].Descriptor()
 	// bazelinvocation.DefaultProcessedEventBuildMetadata holds the default value on creation for the processed_event_build_metadata field.
 	bazelinvocation.DefaultProcessedEventBuildMetadata = bazelinvocationDescProcessedEventBuildMetadata.Default.(bool)
 	// bazelinvocationDescProcessedEventBuildFinished is the schema descriptor for processed_event_build_finished field.
-	bazelinvocationDescProcessedEventBuildFinished := bazelinvocationFields[18].Descriptor()
+	bazelinvocationDescProcessedEventBuildFinished := bazelinvocationFields[27].Descriptor()
 	// bazelinvocation.DefaultProcessedEventBuildFinished holds the default value on creation for the processed_event_build_finished field.
 	bazelinvocation.DefaultProcessedEventBuildFinished = bazelinvocationDescProcessedEventBuildFinished.Default.(bool)
 	// bazelinvocationDescProcessedEventWorkspaceStatus is the schema descriptor for processed_event_workspace_status field.
-	bazelinvocationDescProcessedEventWorkspaceStatus := bazelinvocationFields[19].Descriptor()
+	bazelinvocationDescProcessedEventWorkspaceStatus := bazelinvocationFields[28].Descriptor()
 	// bazelinvocation.DefaultProcessedEventWorkspaceStatus holds the default value on creation for the processed_event_workspace_status field.
 	bazelinvocation.DefaultProcessedEventWorkspaceStatus = bazelinvocationDescProcessedEventWorkspaceStatus.Default.(bool)
 	build.Policy = privacy.NewPolicies(authschema.Build{})

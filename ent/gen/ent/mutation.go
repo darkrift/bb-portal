@@ -63,6 +63,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/workerpoolstats"
 	"github.com/buildbarn/bb-portal/ent/gen/ent/workerstats"
 	"github.com/buildbarn/bb-portal/pkg/invocation"
+	"github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics"
 	"github.com/google/uuid"
 )
 
@@ -2274,39 +2275,66 @@ func (m *ActionDataMutation) ResetEdge(name string) error {
 // ActionExecutionMutation represents an operation that mutates the ActionExecution nodes in the graph.
 type ActionExecutionMutation struct {
 	config
-	op                         Op
-	typ                        string
-	id                         *int64
-	label                      *string
-	_type                      *string
-	runner                     *string
-	cache_hit                  *bool
-	success                    *bool
-	exit_code                  *int32
-	addexit_code               *int32
-	command_line               *[]string
-	appendcommand_line         []string
-	start_time                 *time.Time
-	end_time                   *time.Time
-	failure_code               *string
-	failure_message            *string
-	primary_output             *string
-	clearedFields              map[string]struct{}
-	bazel_invocation           *int64
-	clearedbazel_invocation    bool
-	configuration              *int64
-	clearedconfiguration       bool
-	action_digest              *int64
-	clearedaction_digest       bool
-	primary_output_file        *int64
-	clearedprimary_output_file bool
-	stdout                     *int64
-	clearedstdout              bool
-	stderr                     *int64
-	clearedstderr              bool
-	done                       bool
-	oldValue                   func(context.Context) (*ActionExecution, error)
-	predicates                 []predicate.ActionExecution
+	op                                  Op
+	typ                                 string
+	id                                  *int64
+	label                               *string
+	_type                               *string
+	runner                              *string
+	cache_hit                           *bool
+	execution_platform                  *map[string]string
+	spawn_total_time_in_ms              *int64
+	addspawn_total_time_in_ms           *int64
+	spawn_parse_time_in_ms              *int64
+	addspawn_parse_time_in_ms           *int64
+	spawn_network_time_in_ms            *int64
+	addspawn_network_time_in_ms         *int64
+	spawn_fetch_time_in_ms              *int64
+	addspawn_fetch_time_in_ms           *int64
+	spawn_queue_time_in_ms              *int64
+	addspawn_queue_time_in_ms           *int64
+	spawn_setup_time_in_ms              *int64
+	addspawn_setup_time_in_ms           *int64
+	spawn_upload_time_in_ms             *int64
+	addspawn_upload_time_in_ms          *int64
+	spawn_execution_wall_time_in_ms     *int64
+	addspawn_execution_wall_time_in_ms  *int64
+	spawn_process_outputs_time_in_ms    *int64
+	addspawn_process_outputs_time_in_ms *int64
+	spawn_retry_time_in_ms              *int64
+	addspawn_retry_time_in_ms           *int64
+	spawn_input_bytes                   *int64
+	addspawn_input_bytes                *int64
+	spawn_input_files                   *int64
+	addspawn_input_files                *int64
+	spawn_memory_estimate_bytes         *int64
+	addspawn_memory_estimate_bytes      *int64
+	success                             *bool
+	exit_code                           *int32
+	addexit_code                        *int32
+	command_line                        *[]string
+	appendcommand_line                  []string
+	start_time                          *time.Time
+	end_time                            *time.Time
+	failure_code                        *string
+	failure_message                     *string
+	primary_output                      *string
+	clearedFields                       map[string]struct{}
+	bazel_invocation                    *int64
+	clearedbazel_invocation             bool
+	configuration                       *int64
+	clearedconfiguration                bool
+	action_digest                       *int64
+	clearedaction_digest                bool
+	primary_output_file                 *int64
+	clearedprimary_output_file          bool
+	stdout                              *int64
+	clearedstdout                       bool
+	stderr                              *int64
+	clearedstderr                       bool
+	done                                bool
+	oldValue                            func(context.Context) (*ActionExecution, error)
+	predicates                          []predicate.ActionExecution
 }
 
 var _ ent.Mutation = (*ActionExecutionMutation)(nil)
@@ -2875,6 +2903,965 @@ func (m *ActionExecutionMutation) CacheHitCleared() bool {
 func (m *ActionExecutionMutation) ResetCacheHit() {
 	m.cache_hit = nil
 	delete(m.clearedFields, actionexecution.FieldCacheHit)
+}
+
+// SetExecutionPlatform sets the "execution_platform" field.
+func (m *ActionExecutionMutation) SetExecutionPlatform(value map[string]string) {
+	m.execution_platform = &value
+}
+
+// ExecutionPlatform returns the value of the "execution_platform" field in the mutation.
+func (m *ActionExecutionMutation) ExecutionPlatform() (r map[string]string, exists bool) {
+	v := m.execution_platform
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExecutionPlatform returns the old "execution_platform" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldExecutionPlatform(ctx context.Context) (v map[string]string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExecutionPlatform is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExecutionPlatform requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExecutionPlatform: %w", err)
+	}
+	return oldValue.ExecutionPlatform, nil
+}
+
+// ClearExecutionPlatform clears the value of the "execution_platform" field.
+func (m *ActionExecutionMutation) ClearExecutionPlatform() {
+	m.execution_platform = nil
+	m.clearedFields[actionexecution.FieldExecutionPlatform] = struct{}{}
+}
+
+// ExecutionPlatformCleared returns if the "execution_platform" field was cleared in this mutation.
+func (m *ActionExecutionMutation) ExecutionPlatformCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldExecutionPlatform]
+	return ok
+}
+
+// ResetExecutionPlatform resets all changes to the "execution_platform" field.
+func (m *ActionExecutionMutation) ResetExecutionPlatform() {
+	m.execution_platform = nil
+	delete(m.clearedFields, actionexecution.FieldExecutionPlatform)
+}
+
+// SetSpawnTotalTimeInMs sets the "spawn_total_time_in_ms" field.
+func (m *ActionExecutionMutation) SetSpawnTotalTimeInMs(i int64) {
+	m.spawn_total_time_in_ms = &i
+	m.addspawn_total_time_in_ms = nil
+}
+
+// SpawnTotalTimeInMs returns the value of the "spawn_total_time_in_ms" field in the mutation.
+func (m *ActionExecutionMutation) SpawnTotalTimeInMs() (r int64, exists bool) {
+	v := m.spawn_total_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnTotalTimeInMs returns the old "spawn_total_time_in_ms" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnTotalTimeInMs(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnTotalTimeInMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnTotalTimeInMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnTotalTimeInMs: %w", err)
+	}
+	return oldValue.SpawnTotalTimeInMs, nil
+}
+
+// AddSpawnTotalTimeInMs adds i to the "spawn_total_time_in_ms" field.
+func (m *ActionExecutionMutation) AddSpawnTotalTimeInMs(i int64) {
+	if m.addspawn_total_time_in_ms != nil {
+		*m.addspawn_total_time_in_ms += i
+	} else {
+		m.addspawn_total_time_in_ms = &i
+	}
+}
+
+// AddedSpawnTotalTimeInMs returns the value that was added to the "spawn_total_time_in_ms" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnTotalTimeInMs() (r int64, exists bool) {
+	v := m.addspawn_total_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnTotalTimeInMs clears the value of the "spawn_total_time_in_ms" field.
+func (m *ActionExecutionMutation) ClearSpawnTotalTimeInMs() {
+	m.spawn_total_time_in_ms = nil
+	m.addspawn_total_time_in_ms = nil
+	m.clearedFields[actionexecution.FieldSpawnTotalTimeInMs] = struct{}{}
+}
+
+// SpawnTotalTimeInMsCleared returns if the "spawn_total_time_in_ms" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnTotalTimeInMsCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnTotalTimeInMs]
+	return ok
+}
+
+// ResetSpawnTotalTimeInMs resets all changes to the "spawn_total_time_in_ms" field.
+func (m *ActionExecutionMutation) ResetSpawnTotalTimeInMs() {
+	m.spawn_total_time_in_ms = nil
+	m.addspawn_total_time_in_ms = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnTotalTimeInMs)
+}
+
+// SetSpawnParseTimeInMs sets the "spawn_parse_time_in_ms" field.
+func (m *ActionExecutionMutation) SetSpawnParseTimeInMs(i int64) {
+	m.spawn_parse_time_in_ms = &i
+	m.addspawn_parse_time_in_ms = nil
+}
+
+// SpawnParseTimeInMs returns the value of the "spawn_parse_time_in_ms" field in the mutation.
+func (m *ActionExecutionMutation) SpawnParseTimeInMs() (r int64, exists bool) {
+	v := m.spawn_parse_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnParseTimeInMs returns the old "spawn_parse_time_in_ms" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnParseTimeInMs(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnParseTimeInMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnParseTimeInMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnParseTimeInMs: %w", err)
+	}
+	return oldValue.SpawnParseTimeInMs, nil
+}
+
+// AddSpawnParseTimeInMs adds i to the "spawn_parse_time_in_ms" field.
+func (m *ActionExecutionMutation) AddSpawnParseTimeInMs(i int64) {
+	if m.addspawn_parse_time_in_ms != nil {
+		*m.addspawn_parse_time_in_ms += i
+	} else {
+		m.addspawn_parse_time_in_ms = &i
+	}
+}
+
+// AddedSpawnParseTimeInMs returns the value that was added to the "spawn_parse_time_in_ms" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnParseTimeInMs() (r int64, exists bool) {
+	v := m.addspawn_parse_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnParseTimeInMs clears the value of the "spawn_parse_time_in_ms" field.
+func (m *ActionExecutionMutation) ClearSpawnParseTimeInMs() {
+	m.spawn_parse_time_in_ms = nil
+	m.addspawn_parse_time_in_ms = nil
+	m.clearedFields[actionexecution.FieldSpawnParseTimeInMs] = struct{}{}
+}
+
+// SpawnParseTimeInMsCleared returns if the "spawn_parse_time_in_ms" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnParseTimeInMsCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnParseTimeInMs]
+	return ok
+}
+
+// ResetSpawnParseTimeInMs resets all changes to the "spawn_parse_time_in_ms" field.
+func (m *ActionExecutionMutation) ResetSpawnParseTimeInMs() {
+	m.spawn_parse_time_in_ms = nil
+	m.addspawn_parse_time_in_ms = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnParseTimeInMs)
+}
+
+// SetSpawnNetworkTimeInMs sets the "spawn_network_time_in_ms" field.
+func (m *ActionExecutionMutation) SetSpawnNetworkTimeInMs(i int64) {
+	m.spawn_network_time_in_ms = &i
+	m.addspawn_network_time_in_ms = nil
+}
+
+// SpawnNetworkTimeInMs returns the value of the "spawn_network_time_in_ms" field in the mutation.
+func (m *ActionExecutionMutation) SpawnNetworkTimeInMs() (r int64, exists bool) {
+	v := m.spawn_network_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnNetworkTimeInMs returns the old "spawn_network_time_in_ms" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnNetworkTimeInMs(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnNetworkTimeInMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnNetworkTimeInMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnNetworkTimeInMs: %w", err)
+	}
+	return oldValue.SpawnNetworkTimeInMs, nil
+}
+
+// AddSpawnNetworkTimeInMs adds i to the "spawn_network_time_in_ms" field.
+func (m *ActionExecutionMutation) AddSpawnNetworkTimeInMs(i int64) {
+	if m.addspawn_network_time_in_ms != nil {
+		*m.addspawn_network_time_in_ms += i
+	} else {
+		m.addspawn_network_time_in_ms = &i
+	}
+}
+
+// AddedSpawnNetworkTimeInMs returns the value that was added to the "spawn_network_time_in_ms" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnNetworkTimeInMs() (r int64, exists bool) {
+	v := m.addspawn_network_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnNetworkTimeInMs clears the value of the "spawn_network_time_in_ms" field.
+func (m *ActionExecutionMutation) ClearSpawnNetworkTimeInMs() {
+	m.spawn_network_time_in_ms = nil
+	m.addspawn_network_time_in_ms = nil
+	m.clearedFields[actionexecution.FieldSpawnNetworkTimeInMs] = struct{}{}
+}
+
+// SpawnNetworkTimeInMsCleared returns if the "spawn_network_time_in_ms" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnNetworkTimeInMsCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnNetworkTimeInMs]
+	return ok
+}
+
+// ResetSpawnNetworkTimeInMs resets all changes to the "spawn_network_time_in_ms" field.
+func (m *ActionExecutionMutation) ResetSpawnNetworkTimeInMs() {
+	m.spawn_network_time_in_ms = nil
+	m.addspawn_network_time_in_ms = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnNetworkTimeInMs)
+}
+
+// SetSpawnFetchTimeInMs sets the "spawn_fetch_time_in_ms" field.
+func (m *ActionExecutionMutation) SetSpawnFetchTimeInMs(i int64) {
+	m.spawn_fetch_time_in_ms = &i
+	m.addspawn_fetch_time_in_ms = nil
+}
+
+// SpawnFetchTimeInMs returns the value of the "spawn_fetch_time_in_ms" field in the mutation.
+func (m *ActionExecutionMutation) SpawnFetchTimeInMs() (r int64, exists bool) {
+	v := m.spawn_fetch_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnFetchTimeInMs returns the old "spawn_fetch_time_in_ms" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnFetchTimeInMs(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnFetchTimeInMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnFetchTimeInMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnFetchTimeInMs: %w", err)
+	}
+	return oldValue.SpawnFetchTimeInMs, nil
+}
+
+// AddSpawnFetchTimeInMs adds i to the "spawn_fetch_time_in_ms" field.
+func (m *ActionExecutionMutation) AddSpawnFetchTimeInMs(i int64) {
+	if m.addspawn_fetch_time_in_ms != nil {
+		*m.addspawn_fetch_time_in_ms += i
+	} else {
+		m.addspawn_fetch_time_in_ms = &i
+	}
+}
+
+// AddedSpawnFetchTimeInMs returns the value that was added to the "spawn_fetch_time_in_ms" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnFetchTimeInMs() (r int64, exists bool) {
+	v := m.addspawn_fetch_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnFetchTimeInMs clears the value of the "spawn_fetch_time_in_ms" field.
+func (m *ActionExecutionMutation) ClearSpawnFetchTimeInMs() {
+	m.spawn_fetch_time_in_ms = nil
+	m.addspawn_fetch_time_in_ms = nil
+	m.clearedFields[actionexecution.FieldSpawnFetchTimeInMs] = struct{}{}
+}
+
+// SpawnFetchTimeInMsCleared returns if the "spawn_fetch_time_in_ms" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnFetchTimeInMsCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnFetchTimeInMs]
+	return ok
+}
+
+// ResetSpawnFetchTimeInMs resets all changes to the "spawn_fetch_time_in_ms" field.
+func (m *ActionExecutionMutation) ResetSpawnFetchTimeInMs() {
+	m.spawn_fetch_time_in_ms = nil
+	m.addspawn_fetch_time_in_ms = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnFetchTimeInMs)
+}
+
+// SetSpawnQueueTimeInMs sets the "spawn_queue_time_in_ms" field.
+func (m *ActionExecutionMutation) SetSpawnQueueTimeInMs(i int64) {
+	m.spawn_queue_time_in_ms = &i
+	m.addspawn_queue_time_in_ms = nil
+}
+
+// SpawnQueueTimeInMs returns the value of the "spawn_queue_time_in_ms" field in the mutation.
+func (m *ActionExecutionMutation) SpawnQueueTimeInMs() (r int64, exists bool) {
+	v := m.spawn_queue_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnQueueTimeInMs returns the old "spawn_queue_time_in_ms" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnQueueTimeInMs(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnQueueTimeInMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnQueueTimeInMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnQueueTimeInMs: %w", err)
+	}
+	return oldValue.SpawnQueueTimeInMs, nil
+}
+
+// AddSpawnQueueTimeInMs adds i to the "spawn_queue_time_in_ms" field.
+func (m *ActionExecutionMutation) AddSpawnQueueTimeInMs(i int64) {
+	if m.addspawn_queue_time_in_ms != nil {
+		*m.addspawn_queue_time_in_ms += i
+	} else {
+		m.addspawn_queue_time_in_ms = &i
+	}
+}
+
+// AddedSpawnQueueTimeInMs returns the value that was added to the "spawn_queue_time_in_ms" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnQueueTimeInMs() (r int64, exists bool) {
+	v := m.addspawn_queue_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnQueueTimeInMs clears the value of the "spawn_queue_time_in_ms" field.
+func (m *ActionExecutionMutation) ClearSpawnQueueTimeInMs() {
+	m.spawn_queue_time_in_ms = nil
+	m.addspawn_queue_time_in_ms = nil
+	m.clearedFields[actionexecution.FieldSpawnQueueTimeInMs] = struct{}{}
+}
+
+// SpawnQueueTimeInMsCleared returns if the "spawn_queue_time_in_ms" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnQueueTimeInMsCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnQueueTimeInMs]
+	return ok
+}
+
+// ResetSpawnQueueTimeInMs resets all changes to the "spawn_queue_time_in_ms" field.
+func (m *ActionExecutionMutation) ResetSpawnQueueTimeInMs() {
+	m.spawn_queue_time_in_ms = nil
+	m.addspawn_queue_time_in_ms = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnQueueTimeInMs)
+}
+
+// SetSpawnSetupTimeInMs sets the "spawn_setup_time_in_ms" field.
+func (m *ActionExecutionMutation) SetSpawnSetupTimeInMs(i int64) {
+	m.spawn_setup_time_in_ms = &i
+	m.addspawn_setup_time_in_ms = nil
+}
+
+// SpawnSetupTimeInMs returns the value of the "spawn_setup_time_in_ms" field in the mutation.
+func (m *ActionExecutionMutation) SpawnSetupTimeInMs() (r int64, exists bool) {
+	v := m.spawn_setup_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnSetupTimeInMs returns the old "spawn_setup_time_in_ms" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnSetupTimeInMs(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnSetupTimeInMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnSetupTimeInMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnSetupTimeInMs: %w", err)
+	}
+	return oldValue.SpawnSetupTimeInMs, nil
+}
+
+// AddSpawnSetupTimeInMs adds i to the "spawn_setup_time_in_ms" field.
+func (m *ActionExecutionMutation) AddSpawnSetupTimeInMs(i int64) {
+	if m.addspawn_setup_time_in_ms != nil {
+		*m.addspawn_setup_time_in_ms += i
+	} else {
+		m.addspawn_setup_time_in_ms = &i
+	}
+}
+
+// AddedSpawnSetupTimeInMs returns the value that was added to the "spawn_setup_time_in_ms" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnSetupTimeInMs() (r int64, exists bool) {
+	v := m.addspawn_setup_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnSetupTimeInMs clears the value of the "spawn_setup_time_in_ms" field.
+func (m *ActionExecutionMutation) ClearSpawnSetupTimeInMs() {
+	m.spawn_setup_time_in_ms = nil
+	m.addspawn_setup_time_in_ms = nil
+	m.clearedFields[actionexecution.FieldSpawnSetupTimeInMs] = struct{}{}
+}
+
+// SpawnSetupTimeInMsCleared returns if the "spawn_setup_time_in_ms" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnSetupTimeInMsCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnSetupTimeInMs]
+	return ok
+}
+
+// ResetSpawnSetupTimeInMs resets all changes to the "spawn_setup_time_in_ms" field.
+func (m *ActionExecutionMutation) ResetSpawnSetupTimeInMs() {
+	m.spawn_setup_time_in_ms = nil
+	m.addspawn_setup_time_in_ms = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnSetupTimeInMs)
+}
+
+// SetSpawnUploadTimeInMs sets the "spawn_upload_time_in_ms" field.
+func (m *ActionExecutionMutation) SetSpawnUploadTimeInMs(i int64) {
+	m.spawn_upload_time_in_ms = &i
+	m.addspawn_upload_time_in_ms = nil
+}
+
+// SpawnUploadTimeInMs returns the value of the "spawn_upload_time_in_ms" field in the mutation.
+func (m *ActionExecutionMutation) SpawnUploadTimeInMs() (r int64, exists bool) {
+	v := m.spawn_upload_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnUploadTimeInMs returns the old "spawn_upload_time_in_ms" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnUploadTimeInMs(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnUploadTimeInMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnUploadTimeInMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnUploadTimeInMs: %w", err)
+	}
+	return oldValue.SpawnUploadTimeInMs, nil
+}
+
+// AddSpawnUploadTimeInMs adds i to the "spawn_upload_time_in_ms" field.
+func (m *ActionExecutionMutation) AddSpawnUploadTimeInMs(i int64) {
+	if m.addspawn_upload_time_in_ms != nil {
+		*m.addspawn_upload_time_in_ms += i
+	} else {
+		m.addspawn_upload_time_in_ms = &i
+	}
+}
+
+// AddedSpawnUploadTimeInMs returns the value that was added to the "spawn_upload_time_in_ms" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnUploadTimeInMs() (r int64, exists bool) {
+	v := m.addspawn_upload_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnUploadTimeInMs clears the value of the "spawn_upload_time_in_ms" field.
+func (m *ActionExecutionMutation) ClearSpawnUploadTimeInMs() {
+	m.spawn_upload_time_in_ms = nil
+	m.addspawn_upload_time_in_ms = nil
+	m.clearedFields[actionexecution.FieldSpawnUploadTimeInMs] = struct{}{}
+}
+
+// SpawnUploadTimeInMsCleared returns if the "spawn_upload_time_in_ms" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnUploadTimeInMsCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnUploadTimeInMs]
+	return ok
+}
+
+// ResetSpawnUploadTimeInMs resets all changes to the "spawn_upload_time_in_ms" field.
+func (m *ActionExecutionMutation) ResetSpawnUploadTimeInMs() {
+	m.spawn_upload_time_in_ms = nil
+	m.addspawn_upload_time_in_ms = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnUploadTimeInMs)
+}
+
+// SetSpawnExecutionWallTimeInMs sets the "spawn_execution_wall_time_in_ms" field.
+func (m *ActionExecutionMutation) SetSpawnExecutionWallTimeInMs(i int64) {
+	m.spawn_execution_wall_time_in_ms = &i
+	m.addspawn_execution_wall_time_in_ms = nil
+}
+
+// SpawnExecutionWallTimeInMs returns the value of the "spawn_execution_wall_time_in_ms" field in the mutation.
+func (m *ActionExecutionMutation) SpawnExecutionWallTimeInMs() (r int64, exists bool) {
+	v := m.spawn_execution_wall_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnExecutionWallTimeInMs returns the old "spawn_execution_wall_time_in_ms" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnExecutionWallTimeInMs(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnExecutionWallTimeInMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnExecutionWallTimeInMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnExecutionWallTimeInMs: %w", err)
+	}
+	return oldValue.SpawnExecutionWallTimeInMs, nil
+}
+
+// AddSpawnExecutionWallTimeInMs adds i to the "spawn_execution_wall_time_in_ms" field.
+func (m *ActionExecutionMutation) AddSpawnExecutionWallTimeInMs(i int64) {
+	if m.addspawn_execution_wall_time_in_ms != nil {
+		*m.addspawn_execution_wall_time_in_ms += i
+	} else {
+		m.addspawn_execution_wall_time_in_ms = &i
+	}
+}
+
+// AddedSpawnExecutionWallTimeInMs returns the value that was added to the "spawn_execution_wall_time_in_ms" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnExecutionWallTimeInMs() (r int64, exists bool) {
+	v := m.addspawn_execution_wall_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnExecutionWallTimeInMs clears the value of the "spawn_execution_wall_time_in_ms" field.
+func (m *ActionExecutionMutation) ClearSpawnExecutionWallTimeInMs() {
+	m.spawn_execution_wall_time_in_ms = nil
+	m.addspawn_execution_wall_time_in_ms = nil
+	m.clearedFields[actionexecution.FieldSpawnExecutionWallTimeInMs] = struct{}{}
+}
+
+// SpawnExecutionWallTimeInMsCleared returns if the "spawn_execution_wall_time_in_ms" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnExecutionWallTimeInMsCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnExecutionWallTimeInMs]
+	return ok
+}
+
+// ResetSpawnExecutionWallTimeInMs resets all changes to the "spawn_execution_wall_time_in_ms" field.
+func (m *ActionExecutionMutation) ResetSpawnExecutionWallTimeInMs() {
+	m.spawn_execution_wall_time_in_ms = nil
+	m.addspawn_execution_wall_time_in_ms = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnExecutionWallTimeInMs)
+}
+
+// SetSpawnProcessOutputsTimeInMs sets the "spawn_process_outputs_time_in_ms" field.
+func (m *ActionExecutionMutation) SetSpawnProcessOutputsTimeInMs(i int64) {
+	m.spawn_process_outputs_time_in_ms = &i
+	m.addspawn_process_outputs_time_in_ms = nil
+}
+
+// SpawnProcessOutputsTimeInMs returns the value of the "spawn_process_outputs_time_in_ms" field in the mutation.
+func (m *ActionExecutionMutation) SpawnProcessOutputsTimeInMs() (r int64, exists bool) {
+	v := m.spawn_process_outputs_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnProcessOutputsTimeInMs returns the old "spawn_process_outputs_time_in_ms" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnProcessOutputsTimeInMs(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnProcessOutputsTimeInMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnProcessOutputsTimeInMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnProcessOutputsTimeInMs: %w", err)
+	}
+	return oldValue.SpawnProcessOutputsTimeInMs, nil
+}
+
+// AddSpawnProcessOutputsTimeInMs adds i to the "spawn_process_outputs_time_in_ms" field.
+func (m *ActionExecutionMutation) AddSpawnProcessOutputsTimeInMs(i int64) {
+	if m.addspawn_process_outputs_time_in_ms != nil {
+		*m.addspawn_process_outputs_time_in_ms += i
+	} else {
+		m.addspawn_process_outputs_time_in_ms = &i
+	}
+}
+
+// AddedSpawnProcessOutputsTimeInMs returns the value that was added to the "spawn_process_outputs_time_in_ms" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnProcessOutputsTimeInMs() (r int64, exists bool) {
+	v := m.addspawn_process_outputs_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnProcessOutputsTimeInMs clears the value of the "spawn_process_outputs_time_in_ms" field.
+func (m *ActionExecutionMutation) ClearSpawnProcessOutputsTimeInMs() {
+	m.spawn_process_outputs_time_in_ms = nil
+	m.addspawn_process_outputs_time_in_ms = nil
+	m.clearedFields[actionexecution.FieldSpawnProcessOutputsTimeInMs] = struct{}{}
+}
+
+// SpawnProcessOutputsTimeInMsCleared returns if the "spawn_process_outputs_time_in_ms" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnProcessOutputsTimeInMsCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnProcessOutputsTimeInMs]
+	return ok
+}
+
+// ResetSpawnProcessOutputsTimeInMs resets all changes to the "spawn_process_outputs_time_in_ms" field.
+func (m *ActionExecutionMutation) ResetSpawnProcessOutputsTimeInMs() {
+	m.spawn_process_outputs_time_in_ms = nil
+	m.addspawn_process_outputs_time_in_ms = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnProcessOutputsTimeInMs)
+}
+
+// SetSpawnRetryTimeInMs sets the "spawn_retry_time_in_ms" field.
+func (m *ActionExecutionMutation) SetSpawnRetryTimeInMs(i int64) {
+	m.spawn_retry_time_in_ms = &i
+	m.addspawn_retry_time_in_ms = nil
+}
+
+// SpawnRetryTimeInMs returns the value of the "spawn_retry_time_in_ms" field in the mutation.
+func (m *ActionExecutionMutation) SpawnRetryTimeInMs() (r int64, exists bool) {
+	v := m.spawn_retry_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnRetryTimeInMs returns the old "spawn_retry_time_in_ms" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnRetryTimeInMs(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnRetryTimeInMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnRetryTimeInMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnRetryTimeInMs: %w", err)
+	}
+	return oldValue.SpawnRetryTimeInMs, nil
+}
+
+// AddSpawnRetryTimeInMs adds i to the "spawn_retry_time_in_ms" field.
+func (m *ActionExecutionMutation) AddSpawnRetryTimeInMs(i int64) {
+	if m.addspawn_retry_time_in_ms != nil {
+		*m.addspawn_retry_time_in_ms += i
+	} else {
+		m.addspawn_retry_time_in_ms = &i
+	}
+}
+
+// AddedSpawnRetryTimeInMs returns the value that was added to the "spawn_retry_time_in_ms" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnRetryTimeInMs() (r int64, exists bool) {
+	v := m.addspawn_retry_time_in_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnRetryTimeInMs clears the value of the "spawn_retry_time_in_ms" field.
+func (m *ActionExecutionMutation) ClearSpawnRetryTimeInMs() {
+	m.spawn_retry_time_in_ms = nil
+	m.addspawn_retry_time_in_ms = nil
+	m.clearedFields[actionexecution.FieldSpawnRetryTimeInMs] = struct{}{}
+}
+
+// SpawnRetryTimeInMsCleared returns if the "spawn_retry_time_in_ms" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnRetryTimeInMsCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnRetryTimeInMs]
+	return ok
+}
+
+// ResetSpawnRetryTimeInMs resets all changes to the "spawn_retry_time_in_ms" field.
+func (m *ActionExecutionMutation) ResetSpawnRetryTimeInMs() {
+	m.spawn_retry_time_in_ms = nil
+	m.addspawn_retry_time_in_ms = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnRetryTimeInMs)
+}
+
+// SetSpawnInputBytes sets the "spawn_input_bytes" field.
+func (m *ActionExecutionMutation) SetSpawnInputBytes(i int64) {
+	m.spawn_input_bytes = &i
+	m.addspawn_input_bytes = nil
+}
+
+// SpawnInputBytes returns the value of the "spawn_input_bytes" field in the mutation.
+func (m *ActionExecutionMutation) SpawnInputBytes() (r int64, exists bool) {
+	v := m.spawn_input_bytes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnInputBytes returns the old "spawn_input_bytes" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnInputBytes(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnInputBytes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnInputBytes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnInputBytes: %w", err)
+	}
+	return oldValue.SpawnInputBytes, nil
+}
+
+// AddSpawnInputBytes adds i to the "spawn_input_bytes" field.
+func (m *ActionExecutionMutation) AddSpawnInputBytes(i int64) {
+	if m.addspawn_input_bytes != nil {
+		*m.addspawn_input_bytes += i
+	} else {
+		m.addspawn_input_bytes = &i
+	}
+}
+
+// AddedSpawnInputBytes returns the value that was added to the "spawn_input_bytes" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnInputBytes() (r int64, exists bool) {
+	v := m.addspawn_input_bytes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnInputBytes clears the value of the "spawn_input_bytes" field.
+func (m *ActionExecutionMutation) ClearSpawnInputBytes() {
+	m.spawn_input_bytes = nil
+	m.addspawn_input_bytes = nil
+	m.clearedFields[actionexecution.FieldSpawnInputBytes] = struct{}{}
+}
+
+// SpawnInputBytesCleared returns if the "spawn_input_bytes" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnInputBytesCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnInputBytes]
+	return ok
+}
+
+// ResetSpawnInputBytes resets all changes to the "spawn_input_bytes" field.
+func (m *ActionExecutionMutation) ResetSpawnInputBytes() {
+	m.spawn_input_bytes = nil
+	m.addspawn_input_bytes = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnInputBytes)
+}
+
+// SetSpawnInputFiles sets the "spawn_input_files" field.
+func (m *ActionExecutionMutation) SetSpawnInputFiles(i int64) {
+	m.spawn_input_files = &i
+	m.addspawn_input_files = nil
+}
+
+// SpawnInputFiles returns the value of the "spawn_input_files" field in the mutation.
+func (m *ActionExecutionMutation) SpawnInputFiles() (r int64, exists bool) {
+	v := m.spawn_input_files
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnInputFiles returns the old "spawn_input_files" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnInputFiles(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnInputFiles is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnInputFiles requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnInputFiles: %w", err)
+	}
+	return oldValue.SpawnInputFiles, nil
+}
+
+// AddSpawnInputFiles adds i to the "spawn_input_files" field.
+func (m *ActionExecutionMutation) AddSpawnInputFiles(i int64) {
+	if m.addspawn_input_files != nil {
+		*m.addspawn_input_files += i
+	} else {
+		m.addspawn_input_files = &i
+	}
+}
+
+// AddedSpawnInputFiles returns the value that was added to the "spawn_input_files" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnInputFiles() (r int64, exists bool) {
+	v := m.addspawn_input_files
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnInputFiles clears the value of the "spawn_input_files" field.
+func (m *ActionExecutionMutation) ClearSpawnInputFiles() {
+	m.spawn_input_files = nil
+	m.addspawn_input_files = nil
+	m.clearedFields[actionexecution.FieldSpawnInputFiles] = struct{}{}
+}
+
+// SpawnInputFilesCleared returns if the "spawn_input_files" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnInputFilesCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnInputFiles]
+	return ok
+}
+
+// ResetSpawnInputFiles resets all changes to the "spawn_input_files" field.
+func (m *ActionExecutionMutation) ResetSpawnInputFiles() {
+	m.spawn_input_files = nil
+	m.addspawn_input_files = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnInputFiles)
+}
+
+// SetSpawnMemoryEstimateBytes sets the "spawn_memory_estimate_bytes" field.
+func (m *ActionExecutionMutation) SetSpawnMemoryEstimateBytes(i int64) {
+	m.spawn_memory_estimate_bytes = &i
+	m.addspawn_memory_estimate_bytes = nil
+}
+
+// SpawnMemoryEstimateBytes returns the value of the "spawn_memory_estimate_bytes" field in the mutation.
+func (m *ActionExecutionMutation) SpawnMemoryEstimateBytes() (r int64, exists bool) {
+	v := m.spawn_memory_estimate_bytes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpawnMemoryEstimateBytes returns the old "spawn_memory_estimate_bytes" field's value of the ActionExecution entity.
+// If the ActionExecution object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionExecutionMutation) OldSpawnMemoryEstimateBytes(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpawnMemoryEstimateBytes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpawnMemoryEstimateBytes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpawnMemoryEstimateBytes: %w", err)
+	}
+	return oldValue.SpawnMemoryEstimateBytes, nil
+}
+
+// AddSpawnMemoryEstimateBytes adds i to the "spawn_memory_estimate_bytes" field.
+func (m *ActionExecutionMutation) AddSpawnMemoryEstimateBytes(i int64) {
+	if m.addspawn_memory_estimate_bytes != nil {
+		*m.addspawn_memory_estimate_bytes += i
+	} else {
+		m.addspawn_memory_estimate_bytes = &i
+	}
+}
+
+// AddedSpawnMemoryEstimateBytes returns the value that was added to the "spawn_memory_estimate_bytes" field in this mutation.
+func (m *ActionExecutionMutation) AddedSpawnMemoryEstimateBytes() (r int64, exists bool) {
+	v := m.addspawn_memory_estimate_bytes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpawnMemoryEstimateBytes clears the value of the "spawn_memory_estimate_bytes" field.
+func (m *ActionExecutionMutation) ClearSpawnMemoryEstimateBytes() {
+	m.spawn_memory_estimate_bytes = nil
+	m.addspawn_memory_estimate_bytes = nil
+	m.clearedFields[actionexecution.FieldSpawnMemoryEstimateBytes] = struct{}{}
+}
+
+// SpawnMemoryEstimateBytesCleared returns if the "spawn_memory_estimate_bytes" field was cleared in this mutation.
+func (m *ActionExecutionMutation) SpawnMemoryEstimateBytesCleared() bool {
+	_, ok := m.clearedFields[actionexecution.FieldSpawnMemoryEstimateBytes]
+	return ok
+}
+
+// ResetSpawnMemoryEstimateBytes resets all changes to the "spawn_memory_estimate_bytes" field.
+func (m *ActionExecutionMutation) ResetSpawnMemoryEstimateBytes() {
+	m.spawn_memory_estimate_bytes = nil
+	m.addspawn_memory_estimate_bytes = nil
+	delete(m.clearedFields, actionexecution.FieldSpawnMemoryEstimateBytes)
 }
 
 // SetSuccess sets the "success" field.
@@ -3528,7 +4515,7 @@ func (m *ActionExecutionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ActionExecutionMutation) Fields() []string {
-	fields := make([]string, 0, 18)
+	fields := make([]string, 0, 32)
 	if m.bazel_invocation != nil {
 		fields = append(fields, actionexecution.FieldBazelInvocationID)
 	}
@@ -3558,6 +4545,48 @@ func (m *ActionExecutionMutation) Fields() []string {
 	}
 	if m.cache_hit != nil {
 		fields = append(fields, actionexecution.FieldCacheHit)
+	}
+	if m.execution_platform != nil {
+		fields = append(fields, actionexecution.FieldExecutionPlatform)
+	}
+	if m.spawn_total_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnTotalTimeInMs)
+	}
+	if m.spawn_parse_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnParseTimeInMs)
+	}
+	if m.spawn_network_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnNetworkTimeInMs)
+	}
+	if m.spawn_fetch_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnFetchTimeInMs)
+	}
+	if m.spawn_queue_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnQueueTimeInMs)
+	}
+	if m.spawn_setup_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnSetupTimeInMs)
+	}
+	if m.spawn_upload_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnUploadTimeInMs)
+	}
+	if m.spawn_execution_wall_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnExecutionWallTimeInMs)
+	}
+	if m.spawn_process_outputs_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnProcessOutputsTimeInMs)
+	}
+	if m.spawn_retry_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnRetryTimeInMs)
+	}
+	if m.spawn_input_bytes != nil {
+		fields = append(fields, actionexecution.FieldSpawnInputBytes)
+	}
+	if m.spawn_input_files != nil {
+		fields = append(fields, actionexecution.FieldSpawnInputFiles)
+	}
+	if m.spawn_memory_estimate_bytes != nil {
+		fields = append(fields, actionexecution.FieldSpawnMemoryEstimateBytes)
 	}
 	if m.success != nil {
 		fields = append(fields, actionexecution.FieldSuccess)
@@ -3611,6 +4640,34 @@ func (m *ActionExecutionMutation) Field(name string) (ent.Value, bool) {
 		return m.Runner()
 	case actionexecution.FieldCacheHit:
 		return m.CacheHit()
+	case actionexecution.FieldExecutionPlatform:
+		return m.ExecutionPlatform()
+	case actionexecution.FieldSpawnTotalTimeInMs:
+		return m.SpawnTotalTimeInMs()
+	case actionexecution.FieldSpawnParseTimeInMs:
+		return m.SpawnParseTimeInMs()
+	case actionexecution.FieldSpawnNetworkTimeInMs:
+		return m.SpawnNetworkTimeInMs()
+	case actionexecution.FieldSpawnFetchTimeInMs:
+		return m.SpawnFetchTimeInMs()
+	case actionexecution.FieldSpawnQueueTimeInMs:
+		return m.SpawnQueueTimeInMs()
+	case actionexecution.FieldSpawnSetupTimeInMs:
+		return m.SpawnSetupTimeInMs()
+	case actionexecution.FieldSpawnUploadTimeInMs:
+		return m.SpawnUploadTimeInMs()
+	case actionexecution.FieldSpawnExecutionWallTimeInMs:
+		return m.SpawnExecutionWallTimeInMs()
+	case actionexecution.FieldSpawnProcessOutputsTimeInMs:
+		return m.SpawnProcessOutputsTimeInMs()
+	case actionexecution.FieldSpawnRetryTimeInMs:
+		return m.SpawnRetryTimeInMs()
+	case actionexecution.FieldSpawnInputBytes:
+		return m.SpawnInputBytes()
+	case actionexecution.FieldSpawnInputFiles:
+		return m.SpawnInputFiles()
+	case actionexecution.FieldSpawnMemoryEstimateBytes:
+		return m.SpawnMemoryEstimateBytes()
 	case actionexecution.FieldSuccess:
 		return m.Success()
 	case actionexecution.FieldExitCode:
@@ -3656,6 +4713,34 @@ func (m *ActionExecutionMutation) OldField(ctx context.Context, name string) (en
 		return m.OldRunner(ctx)
 	case actionexecution.FieldCacheHit:
 		return m.OldCacheHit(ctx)
+	case actionexecution.FieldExecutionPlatform:
+		return m.OldExecutionPlatform(ctx)
+	case actionexecution.FieldSpawnTotalTimeInMs:
+		return m.OldSpawnTotalTimeInMs(ctx)
+	case actionexecution.FieldSpawnParseTimeInMs:
+		return m.OldSpawnParseTimeInMs(ctx)
+	case actionexecution.FieldSpawnNetworkTimeInMs:
+		return m.OldSpawnNetworkTimeInMs(ctx)
+	case actionexecution.FieldSpawnFetchTimeInMs:
+		return m.OldSpawnFetchTimeInMs(ctx)
+	case actionexecution.FieldSpawnQueueTimeInMs:
+		return m.OldSpawnQueueTimeInMs(ctx)
+	case actionexecution.FieldSpawnSetupTimeInMs:
+		return m.OldSpawnSetupTimeInMs(ctx)
+	case actionexecution.FieldSpawnUploadTimeInMs:
+		return m.OldSpawnUploadTimeInMs(ctx)
+	case actionexecution.FieldSpawnExecutionWallTimeInMs:
+		return m.OldSpawnExecutionWallTimeInMs(ctx)
+	case actionexecution.FieldSpawnProcessOutputsTimeInMs:
+		return m.OldSpawnProcessOutputsTimeInMs(ctx)
+	case actionexecution.FieldSpawnRetryTimeInMs:
+		return m.OldSpawnRetryTimeInMs(ctx)
+	case actionexecution.FieldSpawnInputBytes:
+		return m.OldSpawnInputBytes(ctx)
+	case actionexecution.FieldSpawnInputFiles:
+		return m.OldSpawnInputFiles(ctx)
+	case actionexecution.FieldSpawnMemoryEstimateBytes:
+		return m.OldSpawnMemoryEstimateBytes(ctx)
 	case actionexecution.FieldSuccess:
 		return m.OldSuccess(ctx)
 	case actionexecution.FieldExitCode:
@@ -3751,6 +4836,104 @@ func (m *ActionExecutionMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCacheHit(v)
 		return nil
+	case actionexecution.FieldExecutionPlatform:
+		v, ok := value.(map[string]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExecutionPlatform(v)
+		return nil
+	case actionexecution.FieldSpawnTotalTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnTotalTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnParseTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnParseTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnNetworkTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnNetworkTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnFetchTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnFetchTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnQueueTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnQueueTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnSetupTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnSetupTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnUploadTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnUploadTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnExecutionWallTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnExecutionWallTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnProcessOutputsTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnProcessOutputsTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnRetryTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnRetryTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnInputBytes:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnInputBytes(v)
+		return nil
+	case actionexecution.FieldSpawnInputFiles:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnInputFiles(v)
+		return nil
+	case actionexecution.FieldSpawnMemoryEstimateBytes:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpawnMemoryEstimateBytes(v)
+		return nil
 	case actionexecution.FieldSuccess:
 		v, ok := value.(bool)
 		if !ok {
@@ -3815,6 +4998,45 @@ func (m *ActionExecutionMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *ActionExecutionMutation) AddedFields() []string {
 	var fields []string
+	if m.addspawn_total_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnTotalTimeInMs)
+	}
+	if m.addspawn_parse_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnParseTimeInMs)
+	}
+	if m.addspawn_network_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnNetworkTimeInMs)
+	}
+	if m.addspawn_fetch_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnFetchTimeInMs)
+	}
+	if m.addspawn_queue_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnQueueTimeInMs)
+	}
+	if m.addspawn_setup_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnSetupTimeInMs)
+	}
+	if m.addspawn_upload_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnUploadTimeInMs)
+	}
+	if m.addspawn_execution_wall_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnExecutionWallTimeInMs)
+	}
+	if m.addspawn_process_outputs_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnProcessOutputsTimeInMs)
+	}
+	if m.addspawn_retry_time_in_ms != nil {
+		fields = append(fields, actionexecution.FieldSpawnRetryTimeInMs)
+	}
+	if m.addspawn_input_bytes != nil {
+		fields = append(fields, actionexecution.FieldSpawnInputBytes)
+	}
+	if m.addspawn_input_files != nil {
+		fields = append(fields, actionexecution.FieldSpawnInputFiles)
+	}
+	if m.addspawn_memory_estimate_bytes != nil {
+		fields = append(fields, actionexecution.FieldSpawnMemoryEstimateBytes)
+	}
 	if m.addexit_code != nil {
 		fields = append(fields, actionexecution.FieldExitCode)
 	}
@@ -3826,6 +5048,32 @@ func (m *ActionExecutionMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *ActionExecutionMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case actionexecution.FieldSpawnTotalTimeInMs:
+		return m.AddedSpawnTotalTimeInMs()
+	case actionexecution.FieldSpawnParseTimeInMs:
+		return m.AddedSpawnParseTimeInMs()
+	case actionexecution.FieldSpawnNetworkTimeInMs:
+		return m.AddedSpawnNetworkTimeInMs()
+	case actionexecution.FieldSpawnFetchTimeInMs:
+		return m.AddedSpawnFetchTimeInMs()
+	case actionexecution.FieldSpawnQueueTimeInMs:
+		return m.AddedSpawnQueueTimeInMs()
+	case actionexecution.FieldSpawnSetupTimeInMs:
+		return m.AddedSpawnSetupTimeInMs()
+	case actionexecution.FieldSpawnUploadTimeInMs:
+		return m.AddedSpawnUploadTimeInMs()
+	case actionexecution.FieldSpawnExecutionWallTimeInMs:
+		return m.AddedSpawnExecutionWallTimeInMs()
+	case actionexecution.FieldSpawnProcessOutputsTimeInMs:
+		return m.AddedSpawnProcessOutputsTimeInMs()
+	case actionexecution.FieldSpawnRetryTimeInMs:
+		return m.AddedSpawnRetryTimeInMs()
+	case actionexecution.FieldSpawnInputBytes:
+		return m.AddedSpawnInputBytes()
+	case actionexecution.FieldSpawnInputFiles:
+		return m.AddedSpawnInputFiles()
+	case actionexecution.FieldSpawnMemoryEstimateBytes:
+		return m.AddedSpawnMemoryEstimateBytes()
 	case actionexecution.FieldExitCode:
 		return m.AddedExitCode()
 	}
@@ -3837,6 +5085,97 @@ func (m *ActionExecutionMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ActionExecutionMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case actionexecution.FieldSpawnTotalTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnTotalTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnParseTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnParseTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnNetworkTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnNetworkTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnFetchTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnFetchTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnQueueTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnQueueTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnSetupTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnSetupTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnUploadTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnUploadTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnExecutionWallTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnExecutionWallTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnProcessOutputsTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnProcessOutputsTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnRetryTimeInMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnRetryTimeInMs(v)
+		return nil
+	case actionexecution.FieldSpawnInputBytes:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnInputBytes(v)
+		return nil
+	case actionexecution.FieldSpawnInputFiles:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnInputFiles(v)
+		return nil
+	case actionexecution.FieldSpawnMemoryEstimateBytes:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpawnMemoryEstimateBytes(v)
+		return nil
 	case actionexecution.FieldExitCode:
 		v, ok := value.(int32)
 		if !ok {
@@ -3875,6 +5214,48 @@ func (m *ActionExecutionMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(actionexecution.FieldCacheHit) {
 		fields = append(fields, actionexecution.FieldCacheHit)
+	}
+	if m.FieldCleared(actionexecution.FieldExecutionPlatform) {
+		fields = append(fields, actionexecution.FieldExecutionPlatform)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnTotalTimeInMs) {
+		fields = append(fields, actionexecution.FieldSpawnTotalTimeInMs)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnParseTimeInMs) {
+		fields = append(fields, actionexecution.FieldSpawnParseTimeInMs)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnNetworkTimeInMs) {
+		fields = append(fields, actionexecution.FieldSpawnNetworkTimeInMs)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnFetchTimeInMs) {
+		fields = append(fields, actionexecution.FieldSpawnFetchTimeInMs)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnQueueTimeInMs) {
+		fields = append(fields, actionexecution.FieldSpawnQueueTimeInMs)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnSetupTimeInMs) {
+		fields = append(fields, actionexecution.FieldSpawnSetupTimeInMs)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnUploadTimeInMs) {
+		fields = append(fields, actionexecution.FieldSpawnUploadTimeInMs)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnExecutionWallTimeInMs) {
+		fields = append(fields, actionexecution.FieldSpawnExecutionWallTimeInMs)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnProcessOutputsTimeInMs) {
+		fields = append(fields, actionexecution.FieldSpawnProcessOutputsTimeInMs)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnRetryTimeInMs) {
+		fields = append(fields, actionexecution.FieldSpawnRetryTimeInMs)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnInputBytes) {
+		fields = append(fields, actionexecution.FieldSpawnInputBytes)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnInputFiles) {
+		fields = append(fields, actionexecution.FieldSpawnInputFiles)
+	}
+	if m.FieldCleared(actionexecution.FieldSpawnMemoryEstimateBytes) {
+		fields = append(fields, actionexecution.FieldSpawnMemoryEstimateBytes)
 	}
 	if m.FieldCleared(actionexecution.FieldSuccess) {
 		fields = append(fields, actionexecution.FieldSuccess)
@@ -3938,6 +5319,48 @@ func (m *ActionExecutionMutation) ClearField(name string) error {
 	case actionexecution.FieldCacheHit:
 		m.ClearCacheHit()
 		return nil
+	case actionexecution.FieldExecutionPlatform:
+		m.ClearExecutionPlatform()
+		return nil
+	case actionexecution.FieldSpawnTotalTimeInMs:
+		m.ClearSpawnTotalTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnParseTimeInMs:
+		m.ClearSpawnParseTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnNetworkTimeInMs:
+		m.ClearSpawnNetworkTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnFetchTimeInMs:
+		m.ClearSpawnFetchTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnQueueTimeInMs:
+		m.ClearSpawnQueueTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnSetupTimeInMs:
+		m.ClearSpawnSetupTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnUploadTimeInMs:
+		m.ClearSpawnUploadTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnExecutionWallTimeInMs:
+		m.ClearSpawnExecutionWallTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnProcessOutputsTimeInMs:
+		m.ClearSpawnProcessOutputsTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnRetryTimeInMs:
+		m.ClearSpawnRetryTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnInputBytes:
+		m.ClearSpawnInputBytes()
+		return nil
+	case actionexecution.FieldSpawnInputFiles:
+		m.ClearSpawnInputFiles()
+		return nil
+	case actionexecution.FieldSpawnMemoryEstimateBytes:
+		m.ClearSpawnMemoryEstimateBytes()
+		return nil
 	case actionexecution.FieldSuccess:
 		m.ClearSuccess()
 		return nil
@@ -3999,6 +5422,48 @@ func (m *ActionExecutionMutation) ResetField(name string) error {
 		return nil
 	case actionexecution.FieldCacheHit:
 		m.ResetCacheHit()
+		return nil
+	case actionexecution.FieldExecutionPlatform:
+		m.ResetExecutionPlatform()
+		return nil
+	case actionexecution.FieldSpawnTotalTimeInMs:
+		m.ResetSpawnTotalTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnParseTimeInMs:
+		m.ResetSpawnParseTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnNetworkTimeInMs:
+		m.ResetSpawnNetworkTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnFetchTimeInMs:
+		m.ResetSpawnFetchTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnQueueTimeInMs:
+		m.ResetSpawnQueueTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnSetupTimeInMs:
+		m.ResetSpawnSetupTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnUploadTimeInMs:
+		m.ResetSpawnUploadTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnExecutionWallTimeInMs:
+		m.ResetSpawnExecutionWallTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnProcessOutputsTimeInMs:
+		m.ResetSpawnProcessOutputsTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnRetryTimeInMs:
+		m.ResetSpawnRetryTimeInMs()
+		return nil
+	case actionexecution.FieldSpawnInputBytes:
+		m.ResetSpawnInputBytes()
+		return nil
+	case actionexecution.FieldSpawnInputFiles:
+		m.ResetSpawnInputFiles()
+		return nil
+	case actionexecution.FieldSpawnMemoryEstimateBytes:
+		m.ResetSpawnMemoryEstimateBytes()
 		return nil
 	case actionexecution.FieldSuccess:
 		m.ResetSuccess()
@@ -7044,6 +8509,17 @@ type BazelInvocationMutation struct {
 	started_at                       *time.Time
 	ended_at                         *time.Time
 	bep_completed                    *bool
+	action_analytics_state           *bazelinvocation.ActionAnalyticsState
+	action_analytics_failure_message *string
+	action_analytics_started_at      *time.Time
+	action_analytics_completed_at    *time.Time
+	action_analytics_result          **actionanalytics.Report
+	execution_log_status             *bazelinvocation.ExecutionLogStatus
+	execution_log_failure_message    *string
+	execution_log_action_count       *int64
+	addexecution_log_action_count    *int64
+	execution_log_matched_actions    *int64
+	addexecution_log_matched_actions *int64
 	username                         *string
 	hostname                         *string
 	num_fetches                      *int64
@@ -7412,6 +8888,435 @@ func (m *BazelInvocationMutation) OldBepCompleted(ctx context.Context) (v bool, 
 // ResetBepCompleted resets all changes to the "bep_completed" field.
 func (m *BazelInvocationMutation) ResetBepCompleted() {
 	m.bep_completed = nil
+}
+
+// SetActionAnalyticsState sets the "action_analytics_state" field.
+func (m *BazelInvocationMutation) SetActionAnalyticsState(bas bazelinvocation.ActionAnalyticsState) {
+	m.action_analytics_state = &bas
+}
+
+// ActionAnalyticsState returns the value of the "action_analytics_state" field in the mutation.
+func (m *BazelInvocationMutation) ActionAnalyticsState() (r bazelinvocation.ActionAnalyticsState, exists bool) {
+	v := m.action_analytics_state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActionAnalyticsState returns the old "action_analytics_state" field's value of the BazelInvocation entity.
+// If the BazelInvocation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BazelInvocationMutation) OldActionAnalyticsState(ctx context.Context) (v bazelinvocation.ActionAnalyticsState, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActionAnalyticsState is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActionAnalyticsState requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActionAnalyticsState: %w", err)
+	}
+	return oldValue.ActionAnalyticsState, nil
+}
+
+// ResetActionAnalyticsState resets all changes to the "action_analytics_state" field.
+func (m *BazelInvocationMutation) ResetActionAnalyticsState() {
+	m.action_analytics_state = nil
+}
+
+// SetActionAnalyticsFailureMessage sets the "action_analytics_failure_message" field.
+func (m *BazelInvocationMutation) SetActionAnalyticsFailureMessage(s string) {
+	m.action_analytics_failure_message = &s
+}
+
+// ActionAnalyticsFailureMessage returns the value of the "action_analytics_failure_message" field in the mutation.
+func (m *BazelInvocationMutation) ActionAnalyticsFailureMessage() (r string, exists bool) {
+	v := m.action_analytics_failure_message
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActionAnalyticsFailureMessage returns the old "action_analytics_failure_message" field's value of the BazelInvocation entity.
+// If the BazelInvocation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BazelInvocationMutation) OldActionAnalyticsFailureMessage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActionAnalyticsFailureMessage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActionAnalyticsFailureMessage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActionAnalyticsFailureMessage: %w", err)
+	}
+	return oldValue.ActionAnalyticsFailureMessage, nil
+}
+
+// ClearActionAnalyticsFailureMessage clears the value of the "action_analytics_failure_message" field.
+func (m *BazelInvocationMutation) ClearActionAnalyticsFailureMessage() {
+	m.action_analytics_failure_message = nil
+	m.clearedFields[bazelinvocation.FieldActionAnalyticsFailureMessage] = struct{}{}
+}
+
+// ActionAnalyticsFailureMessageCleared returns if the "action_analytics_failure_message" field was cleared in this mutation.
+func (m *BazelInvocationMutation) ActionAnalyticsFailureMessageCleared() bool {
+	_, ok := m.clearedFields[bazelinvocation.FieldActionAnalyticsFailureMessage]
+	return ok
+}
+
+// ResetActionAnalyticsFailureMessage resets all changes to the "action_analytics_failure_message" field.
+func (m *BazelInvocationMutation) ResetActionAnalyticsFailureMessage() {
+	m.action_analytics_failure_message = nil
+	delete(m.clearedFields, bazelinvocation.FieldActionAnalyticsFailureMessage)
+}
+
+// SetActionAnalyticsStartedAt sets the "action_analytics_started_at" field.
+func (m *BazelInvocationMutation) SetActionAnalyticsStartedAt(t time.Time) {
+	m.action_analytics_started_at = &t
+}
+
+// ActionAnalyticsStartedAt returns the value of the "action_analytics_started_at" field in the mutation.
+func (m *BazelInvocationMutation) ActionAnalyticsStartedAt() (r time.Time, exists bool) {
+	v := m.action_analytics_started_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActionAnalyticsStartedAt returns the old "action_analytics_started_at" field's value of the BazelInvocation entity.
+// If the BazelInvocation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BazelInvocationMutation) OldActionAnalyticsStartedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActionAnalyticsStartedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActionAnalyticsStartedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActionAnalyticsStartedAt: %w", err)
+	}
+	return oldValue.ActionAnalyticsStartedAt, nil
+}
+
+// ClearActionAnalyticsStartedAt clears the value of the "action_analytics_started_at" field.
+func (m *BazelInvocationMutation) ClearActionAnalyticsStartedAt() {
+	m.action_analytics_started_at = nil
+	m.clearedFields[bazelinvocation.FieldActionAnalyticsStartedAt] = struct{}{}
+}
+
+// ActionAnalyticsStartedAtCleared returns if the "action_analytics_started_at" field was cleared in this mutation.
+func (m *BazelInvocationMutation) ActionAnalyticsStartedAtCleared() bool {
+	_, ok := m.clearedFields[bazelinvocation.FieldActionAnalyticsStartedAt]
+	return ok
+}
+
+// ResetActionAnalyticsStartedAt resets all changes to the "action_analytics_started_at" field.
+func (m *BazelInvocationMutation) ResetActionAnalyticsStartedAt() {
+	m.action_analytics_started_at = nil
+	delete(m.clearedFields, bazelinvocation.FieldActionAnalyticsStartedAt)
+}
+
+// SetActionAnalyticsCompletedAt sets the "action_analytics_completed_at" field.
+func (m *BazelInvocationMutation) SetActionAnalyticsCompletedAt(t time.Time) {
+	m.action_analytics_completed_at = &t
+}
+
+// ActionAnalyticsCompletedAt returns the value of the "action_analytics_completed_at" field in the mutation.
+func (m *BazelInvocationMutation) ActionAnalyticsCompletedAt() (r time.Time, exists bool) {
+	v := m.action_analytics_completed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActionAnalyticsCompletedAt returns the old "action_analytics_completed_at" field's value of the BazelInvocation entity.
+// If the BazelInvocation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BazelInvocationMutation) OldActionAnalyticsCompletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActionAnalyticsCompletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActionAnalyticsCompletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActionAnalyticsCompletedAt: %w", err)
+	}
+	return oldValue.ActionAnalyticsCompletedAt, nil
+}
+
+// ClearActionAnalyticsCompletedAt clears the value of the "action_analytics_completed_at" field.
+func (m *BazelInvocationMutation) ClearActionAnalyticsCompletedAt() {
+	m.action_analytics_completed_at = nil
+	m.clearedFields[bazelinvocation.FieldActionAnalyticsCompletedAt] = struct{}{}
+}
+
+// ActionAnalyticsCompletedAtCleared returns if the "action_analytics_completed_at" field was cleared in this mutation.
+func (m *BazelInvocationMutation) ActionAnalyticsCompletedAtCleared() bool {
+	_, ok := m.clearedFields[bazelinvocation.FieldActionAnalyticsCompletedAt]
+	return ok
+}
+
+// ResetActionAnalyticsCompletedAt resets all changes to the "action_analytics_completed_at" field.
+func (m *BazelInvocationMutation) ResetActionAnalyticsCompletedAt() {
+	m.action_analytics_completed_at = nil
+	delete(m.clearedFields, bazelinvocation.FieldActionAnalyticsCompletedAt)
+}
+
+// SetActionAnalyticsResult sets the "action_analytics_result" field.
+func (m *BazelInvocationMutation) SetActionAnalyticsResult(a *actionanalytics.Report) {
+	m.action_analytics_result = &a
+}
+
+// ActionAnalyticsResult returns the value of the "action_analytics_result" field in the mutation.
+func (m *BazelInvocationMutation) ActionAnalyticsResult() (r *actionanalytics.Report, exists bool) {
+	v := m.action_analytics_result
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActionAnalyticsResult returns the old "action_analytics_result" field's value of the BazelInvocation entity.
+// If the BazelInvocation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BazelInvocationMutation) OldActionAnalyticsResult(ctx context.Context) (v *actionanalytics.Report, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActionAnalyticsResult is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActionAnalyticsResult requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActionAnalyticsResult: %w", err)
+	}
+	return oldValue.ActionAnalyticsResult, nil
+}
+
+// ClearActionAnalyticsResult clears the value of the "action_analytics_result" field.
+func (m *BazelInvocationMutation) ClearActionAnalyticsResult() {
+	m.action_analytics_result = nil
+	m.clearedFields[bazelinvocation.FieldActionAnalyticsResult] = struct{}{}
+}
+
+// ActionAnalyticsResultCleared returns if the "action_analytics_result" field was cleared in this mutation.
+func (m *BazelInvocationMutation) ActionAnalyticsResultCleared() bool {
+	_, ok := m.clearedFields[bazelinvocation.FieldActionAnalyticsResult]
+	return ok
+}
+
+// ResetActionAnalyticsResult resets all changes to the "action_analytics_result" field.
+func (m *BazelInvocationMutation) ResetActionAnalyticsResult() {
+	m.action_analytics_result = nil
+	delete(m.clearedFields, bazelinvocation.FieldActionAnalyticsResult)
+}
+
+// SetExecutionLogStatus sets the "execution_log_status" field.
+func (m *BazelInvocationMutation) SetExecutionLogStatus(bls bazelinvocation.ExecutionLogStatus) {
+	m.execution_log_status = &bls
+}
+
+// ExecutionLogStatus returns the value of the "execution_log_status" field in the mutation.
+func (m *BazelInvocationMutation) ExecutionLogStatus() (r bazelinvocation.ExecutionLogStatus, exists bool) {
+	v := m.execution_log_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExecutionLogStatus returns the old "execution_log_status" field's value of the BazelInvocation entity.
+// If the BazelInvocation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BazelInvocationMutation) OldExecutionLogStatus(ctx context.Context) (v bazelinvocation.ExecutionLogStatus, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExecutionLogStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExecutionLogStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExecutionLogStatus: %w", err)
+	}
+	return oldValue.ExecutionLogStatus, nil
+}
+
+// ResetExecutionLogStatus resets all changes to the "execution_log_status" field.
+func (m *BazelInvocationMutation) ResetExecutionLogStatus() {
+	m.execution_log_status = nil
+}
+
+// SetExecutionLogFailureMessage sets the "execution_log_failure_message" field.
+func (m *BazelInvocationMutation) SetExecutionLogFailureMessage(s string) {
+	m.execution_log_failure_message = &s
+}
+
+// ExecutionLogFailureMessage returns the value of the "execution_log_failure_message" field in the mutation.
+func (m *BazelInvocationMutation) ExecutionLogFailureMessage() (r string, exists bool) {
+	v := m.execution_log_failure_message
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExecutionLogFailureMessage returns the old "execution_log_failure_message" field's value of the BazelInvocation entity.
+// If the BazelInvocation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BazelInvocationMutation) OldExecutionLogFailureMessage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExecutionLogFailureMessage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExecutionLogFailureMessage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExecutionLogFailureMessage: %w", err)
+	}
+	return oldValue.ExecutionLogFailureMessage, nil
+}
+
+// ClearExecutionLogFailureMessage clears the value of the "execution_log_failure_message" field.
+func (m *BazelInvocationMutation) ClearExecutionLogFailureMessage() {
+	m.execution_log_failure_message = nil
+	m.clearedFields[bazelinvocation.FieldExecutionLogFailureMessage] = struct{}{}
+}
+
+// ExecutionLogFailureMessageCleared returns if the "execution_log_failure_message" field was cleared in this mutation.
+func (m *BazelInvocationMutation) ExecutionLogFailureMessageCleared() bool {
+	_, ok := m.clearedFields[bazelinvocation.FieldExecutionLogFailureMessage]
+	return ok
+}
+
+// ResetExecutionLogFailureMessage resets all changes to the "execution_log_failure_message" field.
+func (m *BazelInvocationMutation) ResetExecutionLogFailureMessage() {
+	m.execution_log_failure_message = nil
+	delete(m.clearedFields, bazelinvocation.FieldExecutionLogFailureMessage)
+}
+
+// SetExecutionLogActionCount sets the "execution_log_action_count" field.
+func (m *BazelInvocationMutation) SetExecutionLogActionCount(i int64) {
+	m.execution_log_action_count = &i
+	m.addexecution_log_action_count = nil
+}
+
+// ExecutionLogActionCount returns the value of the "execution_log_action_count" field in the mutation.
+func (m *BazelInvocationMutation) ExecutionLogActionCount() (r int64, exists bool) {
+	v := m.execution_log_action_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExecutionLogActionCount returns the old "execution_log_action_count" field's value of the BazelInvocation entity.
+// If the BazelInvocation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BazelInvocationMutation) OldExecutionLogActionCount(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExecutionLogActionCount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExecutionLogActionCount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExecutionLogActionCount: %w", err)
+	}
+	return oldValue.ExecutionLogActionCount, nil
+}
+
+// AddExecutionLogActionCount adds i to the "execution_log_action_count" field.
+func (m *BazelInvocationMutation) AddExecutionLogActionCount(i int64) {
+	if m.addexecution_log_action_count != nil {
+		*m.addexecution_log_action_count += i
+	} else {
+		m.addexecution_log_action_count = &i
+	}
+}
+
+// AddedExecutionLogActionCount returns the value that was added to the "execution_log_action_count" field in this mutation.
+func (m *BazelInvocationMutation) AddedExecutionLogActionCount() (r int64, exists bool) {
+	v := m.addexecution_log_action_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetExecutionLogActionCount resets all changes to the "execution_log_action_count" field.
+func (m *BazelInvocationMutation) ResetExecutionLogActionCount() {
+	m.execution_log_action_count = nil
+	m.addexecution_log_action_count = nil
+}
+
+// SetExecutionLogMatchedActions sets the "execution_log_matched_actions" field.
+func (m *BazelInvocationMutation) SetExecutionLogMatchedActions(i int64) {
+	m.execution_log_matched_actions = &i
+	m.addexecution_log_matched_actions = nil
+}
+
+// ExecutionLogMatchedActions returns the value of the "execution_log_matched_actions" field in the mutation.
+func (m *BazelInvocationMutation) ExecutionLogMatchedActions() (r int64, exists bool) {
+	v := m.execution_log_matched_actions
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExecutionLogMatchedActions returns the old "execution_log_matched_actions" field's value of the BazelInvocation entity.
+// If the BazelInvocation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BazelInvocationMutation) OldExecutionLogMatchedActions(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExecutionLogMatchedActions is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExecutionLogMatchedActions requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExecutionLogMatchedActions: %w", err)
+	}
+	return oldValue.ExecutionLogMatchedActions, nil
+}
+
+// AddExecutionLogMatchedActions adds i to the "execution_log_matched_actions" field.
+func (m *BazelInvocationMutation) AddExecutionLogMatchedActions(i int64) {
+	if m.addexecution_log_matched_actions != nil {
+		*m.addexecution_log_matched_actions += i
+	} else {
+		m.addexecution_log_matched_actions = &i
+	}
+}
+
+// AddedExecutionLogMatchedActions returns the value that was added to the "execution_log_matched_actions" field in this mutation.
+func (m *BazelInvocationMutation) AddedExecutionLogMatchedActions() (r int64, exists bool) {
+	v := m.addexecution_log_matched_actions
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetExecutionLogMatchedActions resets all changes to the "execution_log_matched_actions" field.
+func (m *BazelInvocationMutation) ResetExecutionLogMatchedActions() {
+	m.execution_log_matched_actions = nil
+	m.addexecution_log_matched_actions = nil
 }
 
 // SetUsername sets the "username" field.
@@ -8866,7 +10771,7 @@ func (m *BazelInvocationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BazelInvocationMutation) Fields() []string {
-	fields := make([]string, 0, 20)
+	fields := make([]string, 0, 29)
 	if m.invocation_id != nil {
 		fields = append(fields, bazelinvocation.FieldInvocationID)
 	}
@@ -8881,6 +10786,33 @@ func (m *BazelInvocationMutation) Fields() []string {
 	}
 	if m.bep_completed != nil {
 		fields = append(fields, bazelinvocation.FieldBepCompleted)
+	}
+	if m.action_analytics_state != nil {
+		fields = append(fields, bazelinvocation.FieldActionAnalyticsState)
+	}
+	if m.action_analytics_failure_message != nil {
+		fields = append(fields, bazelinvocation.FieldActionAnalyticsFailureMessage)
+	}
+	if m.action_analytics_started_at != nil {
+		fields = append(fields, bazelinvocation.FieldActionAnalyticsStartedAt)
+	}
+	if m.action_analytics_completed_at != nil {
+		fields = append(fields, bazelinvocation.FieldActionAnalyticsCompletedAt)
+	}
+	if m.action_analytics_result != nil {
+		fields = append(fields, bazelinvocation.FieldActionAnalyticsResult)
+	}
+	if m.execution_log_status != nil {
+		fields = append(fields, bazelinvocation.FieldExecutionLogStatus)
+	}
+	if m.execution_log_failure_message != nil {
+		fields = append(fields, bazelinvocation.FieldExecutionLogFailureMessage)
+	}
+	if m.execution_log_action_count != nil {
+		fields = append(fields, bazelinvocation.FieldExecutionLogActionCount)
+	}
+	if m.execution_log_matched_actions != nil {
+		fields = append(fields, bazelinvocation.FieldExecutionLogMatchedActions)
 	}
 	if m.username != nil {
 		fields = append(fields, bazelinvocation.FieldUsername)
@@ -8945,6 +10877,24 @@ func (m *BazelInvocationMutation) Field(name string) (ent.Value, bool) {
 		return m.EndedAt()
 	case bazelinvocation.FieldBepCompleted:
 		return m.BepCompleted()
+	case bazelinvocation.FieldActionAnalyticsState:
+		return m.ActionAnalyticsState()
+	case bazelinvocation.FieldActionAnalyticsFailureMessage:
+		return m.ActionAnalyticsFailureMessage()
+	case bazelinvocation.FieldActionAnalyticsStartedAt:
+		return m.ActionAnalyticsStartedAt()
+	case bazelinvocation.FieldActionAnalyticsCompletedAt:
+		return m.ActionAnalyticsCompletedAt()
+	case bazelinvocation.FieldActionAnalyticsResult:
+		return m.ActionAnalyticsResult()
+	case bazelinvocation.FieldExecutionLogStatus:
+		return m.ExecutionLogStatus()
+	case bazelinvocation.FieldExecutionLogFailureMessage:
+		return m.ExecutionLogFailureMessage()
+	case bazelinvocation.FieldExecutionLogActionCount:
+		return m.ExecutionLogActionCount()
+	case bazelinvocation.FieldExecutionLogMatchedActions:
+		return m.ExecutionLogMatchedActions()
 	case bazelinvocation.FieldUsername:
 		return m.Username()
 	case bazelinvocation.FieldHostname:
@@ -8994,6 +10944,24 @@ func (m *BazelInvocationMutation) OldField(ctx context.Context, name string) (en
 		return m.OldEndedAt(ctx)
 	case bazelinvocation.FieldBepCompleted:
 		return m.OldBepCompleted(ctx)
+	case bazelinvocation.FieldActionAnalyticsState:
+		return m.OldActionAnalyticsState(ctx)
+	case bazelinvocation.FieldActionAnalyticsFailureMessage:
+		return m.OldActionAnalyticsFailureMessage(ctx)
+	case bazelinvocation.FieldActionAnalyticsStartedAt:
+		return m.OldActionAnalyticsStartedAt(ctx)
+	case bazelinvocation.FieldActionAnalyticsCompletedAt:
+		return m.OldActionAnalyticsCompletedAt(ctx)
+	case bazelinvocation.FieldActionAnalyticsResult:
+		return m.OldActionAnalyticsResult(ctx)
+	case bazelinvocation.FieldExecutionLogStatus:
+		return m.OldExecutionLogStatus(ctx)
+	case bazelinvocation.FieldExecutionLogFailureMessage:
+		return m.OldExecutionLogFailureMessage(ctx)
+	case bazelinvocation.FieldExecutionLogActionCount:
+		return m.OldExecutionLogActionCount(ctx)
+	case bazelinvocation.FieldExecutionLogMatchedActions:
+		return m.OldExecutionLogMatchedActions(ctx)
 	case bazelinvocation.FieldUsername:
 		return m.OldUsername(ctx)
 	case bazelinvocation.FieldHostname:
@@ -9067,6 +11035,69 @@ func (m *BazelInvocationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBepCompleted(v)
+		return nil
+	case bazelinvocation.FieldActionAnalyticsState:
+		v, ok := value.(bazelinvocation.ActionAnalyticsState)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActionAnalyticsState(v)
+		return nil
+	case bazelinvocation.FieldActionAnalyticsFailureMessage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActionAnalyticsFailureMessage(v)
+		return nil
+	case bazelinvocation.FieldActionAnalyticsStartedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActionAnalyticsStartedAt(v)
+		return nil
+	case bazelinvocation.FieldActionAnalyticsCompletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActionAnalyticsCompletedAt(v)
+		return nil
+	case bazelinvocation.FieldActionAnalyticsResult:
+		v, ok := value.(*actionanalytics.Report)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActionAnalyticsResult(v)
+		return nil
+	case bazelinvocation.FieldExecutionLogStatus:
+		v, ok := value.(bazelinvocation.ExecutionLogStatus)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExecutionLogStatus(v)
+		return nil
+	case bazelinvocation.FieldExecutionLogFailureMessage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExecutionLogFailureMessage(v)
+		return nil
+	case bazelinvocation.FieldExecutionLogActionCount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExecutionLogActionCount(v)
+		return nil
+	case bazelinvocation.FieldExecutionLogMatchedActions:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExecutionLogMatchedActions(v)
 		return nil
 	case bazelinvocation.FieldUsername:
 		v, ok := value.(string)
@@ -9181,6 +11212,12 @@ func (m *BazelInvocationMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *BazelInvocationMutation) AddedFields() []string {
 	var fields []string
+	if m.addexecution_log_action_count != nil {
+		fields = append(fields, bazelinvocation.FieldExecutionLogActionCount)
+	}
+	if m.addexecution_log_matched_actions != nil {
+		fields = append(fields, bazelinvocation.FieldExecutionLogMatchedActions)
+	}
 	if m.addnum_fetches != nil {
 		fields = append(fields, bazelinvocation.FieldNumFetches)
 	}
@@ -9195,6 +11232,10 @@ func (m *BazelInvocationMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *BazelInvocationMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case bazelinvocation.FieldExecutionLogActionCount:
+		return m.AddedExecutionLogActionCount()
+	case bazelinvocation.FieldExecutionLogMatchedActions:
+		return m.AddedExecutionLogMatchedActions()
 	case bazelinvocation.FieldNumFetches:
 		return m.AddedNumFetches()
 	case bazelinvocation.FieldExitCodeCode:
@@ -9208,6 +11249,20 @@ func (m *BazelInvocationMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *BazelInvocationMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case bazelinvocation.FieldExecutionLogActionCount:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddExecutionLogActionCount(v)
+		return nil
+	case bazelinvocation.FieldExecutionLogMatchedActions:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddExecutionLogMatchedActions(v)
+		return nil
 	case bazelinvocation.FieldNumFetches:
 		v, ok := value.(int64)
 		if !ok {
@@ -9235,6 +11290,21 @@ func (m *BazelInvocationMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(bazelinvocation.FieldEndedAt) {
 		fields = append(fields, bazelinvocation.FieldEndedAt)
+	}
+	if m.FieldCleared(bazelinvocation.FieldActionAnalyticsFailureMessage) {
+		fields = append(fields, bazelinvocation.FieldActionAnalyticsFailureMessage)
+	}
+	if m.FieldCleared(bazelinvocation.FieldActionAnalyticsStartedAt) {
+		fields = append(fields, bazelinvocation.FieldActionAnalyticsStartedAt)
+	}
+	if m.FieldCleared(bazelinvocation.FieldActionAnalyticsCompletedAt) {
+		fields = append(fields, bazelinvocation.FieldActionAnalyticsCompletedAt)
+	}
+	if m.FieldCleared(bazelinvocation.FieldActionAnalyticsResult) {
+		fields = append(fields, bazelinvocation.FieldActionAnalyticsResult)
+	}
+	if m.FieldCleared(bazelinvocation.FieldExecutionLogFailureMessage) {
+		fields = append(fields, bazelinvocation.FieldExecutionLogFailureMessage)
 	}
 	if m.FieldCleared(bazelinvocation.FieldUsername) {
 		fields = append(fields, bazelinvocation.FieldUsername)
@@ -9288,6 +11358,21 @@ func (m *BazelInvocationMutation) ClearField(name string) error {
 		return nil
 	case bazelinvocation.FieldEndedAt:
 		m.ClearEndedAt()
+		return nil
+	case bazelinvocation.FieldActionAnalyticsFailureMessage:
+		m.ClearActionAnalyticsFailureMessage()
+		return nil
+	case bazelinvocation.FieldActionAnalyticsStartedAt:
+		m.ClearActionAnalyticsStartedAt()
+		return nil
+	case bazelinvocation.FieldActionAnalyticsCompletedAt:
+		m.ClearActionAnalyticsCompletedAt()
+		return nil
+	case bazelinvocation.FieldActionAnalyticsResult:
+		m.ClearActionAnalyticsResult()
+		return nil
+	case bazelinvocation.FieldExecutionLogFailureMessage:
+		m.ClearExecutionLogFailureMessage()
 		return nil
 	case bazelinvocation.FieldUsername:
 		m.ClearUsername()
@@ -9344,6 +11429,33 @@ func (m *BazelInvocationMutation) ResetField(name string) error {
 		return nil
 	case bazelinvocation.FieldBepCompleted:
 		m.ResetBepCompleted()
+		return nil
+	case bazelinvocation.FieldActionAnalyticsState:
+		m.ResetActionAnalyticsState()
+		return nil
+	case bazelinvocation.FieldActionAnalyticsFailureMessage:
+		m.ResetActionAnalyticsFailureMessage()
+		return nil
+	case bazelinvocation.FieldActionAnalyticsStartedAt:
+		m.ResetActionAnalyticsStartedAt()
+		return nil
+	case bazelinvocation.FieldActionAnalyticsCompletedAt:
+		m.ResetActionAnalyticsCompletedAt()
+		return nil
+	case bazelinvocation.FieldActionAnalyticsResult:
+		m.ResetActionAnalyticsResult()
+		return nil
+	case bazelinvocation.FieldExecutionLogStatus:
+		m.ResetExecutionLogStatus()
+		return nil
+	case bazelinvocation.FieldExecutionLogFailureMessage:
+		m.ResetExecutionLogFailureMessage()
+		return nil
+	case bazelinvocation.FieldExecutionLogActionCount:
+		m.ResetExecutionLogActionCount()
+		return nil
+	case bazelinvocation.FieldExecutionLogMatchedActions:
+		m.ResetExecutionLogMatchedActions()
 		return nil
 	case bazelinvocation.FieldUsername:
 		m.ResetUsername()

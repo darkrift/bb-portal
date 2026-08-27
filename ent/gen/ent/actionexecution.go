@@ -42,6 +42,34 @@ type ActionExecution struct {
 	Runner string `json:"runner,omitempty"`
 	// Whether Bazel's compact execution log reported a disk or remote cache hit
 	CacheHit *bool `json:"cache_hit,omitempty"`
+	// Execution-platform properties reported by Bazel's compact execution log
+	ExecutionPlatform map[string]string `json:"execution_platform,omitempty"`
+	// Total wall time spent running the spawn, measured locally by Bazel
+	SpawnTotalTimeInMs *int64 `json:"spawn_total_time_in_ms,omitempty"`
+	// Time spent converting the spawn into a network request
+	SpawnParseTimeInMs *int64 `json:"spawn_parse_time_in_ms,omitempty"`
+	// Time spent communicating over the network
+	SpawnNetworkTimeInMs *int64 `json:"spawn_network_time_in_ms,omitempty"`
+	// Time spent fetching remote outputs
+	SpawnFetchTimeInMs *int64 `json:"spawn_fetch_time_in_ms,omitempty"`
+	// Time spent waiting in queues
+	SpawnQueueTimeInMs *int64 `json:"spawn_queue_time_in_ms,omitempty"`
+	// Time spent setting up the spawn execution environment
+	SpawnSetupTimeInMs *int64 `json:"spawn_setup_time_in_ms,omitempty"`
+	// Time spent uploading outputs to a remote store
+	SpawnUploadTimeInMs *int64 `json:"spawn_upload_time_in_ms,omitempty"`
+	// Time spent running the subprocess
+	SpawnExecutionWallTimeInMs *int64 `json:"spawn_execution_wall_time_in_ms,omitempty"`
+	// Time spent by the execution framework processing outputs
+	SpawnProcessOutputsTimeInMs *int64 `json:"spawn_process_outputs_time_in_ms,omitempty"`
+	// Time spent in previous failed attempts, excluding queue time
+	SpawnRetryTimeInMs *int64 `json:"spawn_retry_time_in_ms,omitempty"`
+	// Total input size reported by Bazel; absent when unavailable
+	SpawnInputBytes *int64 `json:"spawn_input_bytes,omitempty"`
+	// Total input file count reported by Bazel; absent when unavailable
+	SpawnInputFiles *int64 `json:"spawn_input_files,omitempty"`
+	// Estimated memory use reported by Bazel; absent when unavailable
+	SpawnMemoryEstimateBytes *int64 `json:"spawn_memory_estimate_bytes,omitempty"`
 	// Success holds the value of the "success" field.
 	Success bool `json:"success,omitempty"`
 	// ExitCode holds the value of the "exit_code" field.
@@ -156,11 +184,11 @@ func (*ActionExecution) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case actionexecution.FieldCommandLine:
+		case actionexecution.FieldExecutionPlatform, actionexecution.FieldCommandLine:
 			values[i] = new([]byte)
 		case actionexecution.FieldCacheHit, actionexecution.FieldSuccess:
 			values[i] = new(sql.NullBool)
-		case actionexecution.FieldID, actionexecution.FieldBazelInvocationID, actionexecution.FieldConfigurationID, actionexecution.FieldActionDigestID, actionexecution.FieldPrimaryOutputFileID, actionexecution.FieldStdoutFileID, actionexecution.FieldStderrFileID, actionexecution.FieldExitCode:
+		case actionexecution.FieldID, actionexecution.FieldBazelInvocationID, actionexecution.FieldConfigurationID, actionexecution.FieldActionDigestID, actionexecution.FieldPrimaryOutputFileID, actionexecution.FieldStdoutFileID, actionexecution.FieldStderrFileID, actionexecution.FieldSpawnTotalTimeInMs, actionexecution.FieldSpawnParseTimeInMs, actionexecution.FieldSpawnNetworkTimeInMs, actionexecution.FieldSpawnFetchTimeInMs, actionexecution.FieldSpawnQueueTimeInMs, actionexecution.FieldSpawnSetupTimeInMs, actionexecution.FieldSpawnUploadTimeInMs, actionexecution.FieldSpawnExecutionWallTimeInMs, actionexecution.FieldSpawnProcessOutputsTimeInMs, actionexecution.FieldSpawnRetryTimeInMs, actionexecution.FieldSpawnInputBytes, actionexecution.FieldSpawnInputFiles, actionexecution.FieldSpawnMemoryEstimateBytes, actionexecution.FieldExitCode:
 			values[i] = new(sql.NullInt64)
 		case actionexecution.FieldLabel, actionexecution.FieldType, actionexecution.FieldRunner, actionexecution.FieldFailureCode, actionexecution.FieldFailureMessage, actionexecution.FieldPrimaryOutput:
 			values[i] = new(sql.NullString)
@@ -247,6 +275,105 @@ func (_m *ActionExecution) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.CacheHit = new(bool)
 				*_m.CacheHit = value.Bool
+			}
+		case actionexecution.FieldExecutionPlatform:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field execution_platform", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.ExecutionPlatform); err != nil {
+					return fmt.Errorf("unmarshal field execution_platform: %w", err)
+				}
+			}
+		case actionexecution.FieldSpawnTotalTimeInMs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_total_time_in_ms", values[i])
+			} else if value.Valid {
+				_m.SpawnTotalTimeInMs = new(int64)
+				*_m.SpawnTotalTimeInMs = value.Int64
+			}
+		case actionexecution.FieldSpawnParseTimeInMs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_parse_time_in_ms", values[i])
+			} else if value.Valid {
+				_m.SpawnParseTimeInMs = new(int64)
+				*_m.SpawnParseTimeInMs = value.Int64
+			}
+		case actionexecution.FieldSpawnNetworkTimeInMs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_network_time_in_ms", values[i])
+			} else if value.Valid {
+				_m.SpawnNetworkTimeInMs = new(int64)
+				*_m.SpawnNetworkTimeInMs = value.Int64
+			}
+		case actionexecution.FieldSpawnFetchTimeInMs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_fetch_time_in_ms", values[i])
+			} else if value.Valid {
+				_m.SpawnFetchTimeInMs = new(int64)
+				*_m.SpawnFetchTimeInMs = value.Int64
+			}
+		case actionexecution.FieldSpawnQueueTimeInMs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_queue_time_in_ms", values[i])
+			} else if value.Valid {
+				_m.SpawnQueueTimeInMs = new(int64)
+				*_m.SpawnQueueTimeInMs = value.Int64
+			}
+		case actionexecution.FieldSpawnSetupTimeInMs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_setup_time_in_ms", values[i])
+			} else if value.Valid {
+				_m.SpawnSetupTimeInMs = new(int64)
+				*_m.SpawnSetupTimeInMs = value.Int64
+			}
+		case actionexecution.FieldSpawnUploadTimeInMs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_upload_time_in_ms", values[i])
+			} else if value.Valid {
+				_m.SpawnUploadTimeInMs = new(int64)
+				*_m.SpawnUploadTimeInMs = value.Int64
+			}
+		case actionexecution.FieldSpawnExecutionWallTimeInMs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_execution_wall_time_in_ms", values[i])
+			} else if value.Valid {
+				_m.SpawnExecutionWallTimeInMs = new(int64)
+				*_m.SpawnExecutionWallTimeInMs = value.Int64
+			}
+		case actionexecution.FieldSpawnProcessOutputsTimeInMs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_process_outputs_time_in_ms", values[i])
+			} else if value.Valid {
+				_m.SpawnProcessOutputsTimeInMs = new(int64)
+				*_m.SpawnProcessOutputsTimeInMs = value.Int64
+			}
+		case actionexecution.FieldSpawnRetryTimeInMs:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_retry_time_in_ms", values[i])
+			} else if value.Valid {
+				_m.SpawnRetryTimeInMs = new(int64)
+				*_m.SpawnRetryTimeInMs = value.Int64
+			}
+		case actionexecution.FieldSpawnInputBytes:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_input_bytes", values[i])
+			} else if value.Valid {
+				_m.SpawnInputBytes = new(int64)
+				*_m.SpawnInputBytes = value.Int64
+			}
+		case actionexecution.FieldSpawnInputFiles:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_input_files", values[i])
+			} else if value.Valid {
+				_m.SpawnInputFiles = new(int64)
+				*_m.SpawnInputFiles = value.Int64
+			}
+		case actionexecution.FieldSpawnMemoryEstimateBytes:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field spawn_memory_estimate_bytes", values[i])
+			} else if value.Valid {
+				_m.SpawnMemoryEstimateBytes = new(int64)
+				*_m.SpawnMemoryEstimateBytes = value.Int64
 			}
 		case actionexecution.FieldSuccess:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -393,6 +520,74 @@ func (_m *ActionExecution) String() string {
 	builder.WriteString(", ")
 	if v := _m.CacheHit; v != nil {
 		builder.WriteString("cache_hit=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("execution_platform=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ExecutionPlatform))
+	builder.WriteString(", ")
+	if v := _m.SpawnTotalTimeInMs; v != nil {
+		builder.WriteString("spawn_total_time_in_ms=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnParseTimeInMs; v != nil {
+		builder.WriteString("spawn_parse_time_in_ms=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnNetworkTimeInMs; v != nil {
+		builder.WriteString("spawn_network_time_in_ms=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnFetchTimeInMs; v != nil {
+		builder.WriteString("spawn_fetch_time_in_ms=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnQueueTimeInMs; v != nil {
+		builder.WriteString("spawn_queue_time_in_ms=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnSetupTimeInMs; v != nil {
+		builder.WriteString("spawn_setup_time_in_ms=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnUploadTimeInMs; v != nil {
+		builder.WriteString("spawn_upload_time_in_ms=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnExecutionWallTimeInMs; v != nil {
+		builder.WriteString("spawn_execution_wall_time_in_ms=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnProcessOutputsTimeInMs; v != nil {
+		builder.WriteString("spawn_process_outputs_time_in_ms=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnRetryTimeInMs; v != nil {
+		builder.WriteString("spawn_retry_time_in_ms=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnInputBytes; v != nil {
+		builder.WriteString("spawn_input_bytes=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnInputFiles; v != nil {
+		builder.WriteString("spawn_input_files=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpawnMemoryEstimateBytes; v != nil {
+		builder.WriteString("spawn_memory_estimate_bytes=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

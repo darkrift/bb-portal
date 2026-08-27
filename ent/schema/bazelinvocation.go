@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"github.com/buildbarn/bb-portal/pkg/invocation"
+	"github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics"
 	"github.com/google/uuid"
 )
 
@@ -34,6 +35,53 @@ func (BazelInvocation) Fields() []ent.Field {
 
 		// Build Event Protocol completed successfuly.
 		field.Bool("bep_completed").Default(false),
+
+		field.Enum("action_analytics_state").
+			Comment("Lifecycle state of asynchronous action analytics processing").
+			Values(
+				string(actionanalytics.StatePending),
+				string(actionanalytics.StateProcessing),
+				string(actionanalytics.StateCompleted),
+				string(actionanalytics.StateFailed),
+			).
+			Default(string(actionanalytics.StatePending)).
+			Annotations(entgql.Skip()),
+		field.String("action_analytics_failure_message").
+			Optional().
+			Annotations(entgql.Skip()),
+		field.Time("action_analytics_started_at").
+			Optional().
+			Nillable().
+			Annotations(entgql.Skip()),
+		field.Time("action_analytics_completed_at").
+			Optional().
+			Nillable().
+			Annotations(entgql.Skip()),
+		field.JSON("action_analytics_result", &actionanalytics.Report{}).
+			Optional().
+			Annotations(entgql.Skip()),
+
+		field.Enum("execution_log_status").
+			Comment("Whether the compact execution log was provided and processed").
+			Values(
+				string(actionanalytics.ExecutionLogNotProvided),
+				string(actionanalytics.ExecutionLogProcessed),
+				string(actionanalytics.ExecutionLogFailed),
+			).
+			Default(string(actionanalytics.ExecutionLogNotProvided)).
+			Annotations(entgql.Skip()),
+		field.String("execution_log_failure_message").
+			Optional().
+			Annotations(entgql.Skip()),
+		field.Int64("execution_log_action_count").
+			Comment("Number of published actions eligible for compact execution-log correlation").
+			Default(0).
+			NonNegative().
+			Annotations(entgql.Skip()),
+		field.Int64("execution_log_matched_actions").
+			Default(0).
+			NonNegative().
+			Annotations(entgql.Skip()),
 
 		// Username of the user who launched the invocation if provided.
 		field.String("username").Optional().Annotations(entgql.OrderField("USERNAME")),
@@ -180,6 +228,7 @@ func (BazelInvocation) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("started_at"),
 		index.Fields("ended_at"),
+		index.Fields("action_analytics_state", "bep_completed", "ended_at"),
 		index.Edges("build"),
 		index.Edges("instance_name"),
 		index.Edges("authenticated_user"),

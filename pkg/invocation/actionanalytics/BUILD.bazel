@@ -1,0 +1,18 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "actionanalytics",
+    srcs = [
+        "analyze.go",
+        "model.go",
+    ],
+    importpath = "github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics",
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "actionanalytics_test",
+    srcs = ["analyze_test.go"],
+    embed = [":actionanalytics"],
+    deps = ["@com_github_stretchr_testify//require"],
+)

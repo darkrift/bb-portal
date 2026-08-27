@@ -25,6 +25,100 @@ type ActionTimingMetrics {
   timedCacheHitActions: Int!
 }
 
+enum ActionAnalyticsState {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ExecutionLogStatus {
+  NOT_PROVIDED
+  PROCESSED
+  FAILED
+}
+
+type ActionAnalytics {
+  state: ActionAnalyticsState!
+  failureMessage: String
+  startedAt: Time
+  completedAt: Time
+  executionLogStatus: ExecutionLogStatus!
+  executionLogFailureMessage: String
+  executionLogActionCount: Int!
+  executionLogMatchedActions: Int!
+  report: ActionAnalyticsReport
+}
+
+type ActionAnalyticsReport {
+  totalActions: Int!
+  timedActions: Int!
+  peakConcurrentActions: Int!
+  averageConcurrency: Float!
+  observedActionDuration: DurationStatistics!
+  longestObservedActions: [ActionStatistics!]!
+  concurrency: [ConcurrencyPoint!]!
+  spawnMetricsActions: Int!
+  remoteExecutionActions: Int!
+  remoteQueueTime: DurationStatistics!
+  remoteExecutionWallTime: DurationStatistics!
+  queueToExecutionRatio: Float!
+  longestQueueWaits: [ActionStatistics!]!
+  slowestExecutions: [ActionStatistics!]!
+  phaseStatistics: [NamedDurationStatistics!]!
+  remoteMnemonicStatistics: [GroupedActionStatistics!]!
+  remotePlatformStatistics: [GroupedActionStatistics!]!
+}
+
+type DurationStatistics {
+  sampleCount: Int!
+  totalInMs: Int!
+  minimumInMs: Int!
+  p50InMs: Int!
+  p90InMs: Int!
+  p95InMs: Int!
+  p99InMs: Int!
+  maximumInMs: Int!
+}
+
+type NamedDurationStatistics {
+  name: String!
+  statistics: DurationStatistics!
+}
+
+type GroupedActionStatistics {
+  name: String!
+  actionCount: Int!
+  queueTime: DurationStatistics!
+  executionWallTime: DurationStatistics!
+}
+
+type PlatformProperty {
+  name: String!
+  value: String!
+}
+
+type ActionStatistics {
+  actionExecutionID: Int!
+  label: String!
+  mnemonic: String!
+  runner: String!
+  platform: [PlatformProperty!]!
+  observedDurationInMs: Int
+  totalTimeInMs: Int
+  queueTimeInMs: Int
+  executionWallTimeInMs: Int
+  inputBytes: Int
+  inputFiles: Int
+  memoryEstimateBytes: Int
+}
+
+type ConcurrencyPoint {
+  elapsedTimeInMs: Int!
+  concurrentActions: Int!
+}
+
 extend type BazelInvocation {
   actionTimingMetrics: ActionTimingMetrics! @goField(forceResolver: true)
+  actionAnalytics: ActionAnalytics! @goField(forceResolver: true)
 }

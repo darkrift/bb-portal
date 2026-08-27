@@ -81,6 +81,36 @@ func BepCompleted(v bool) predicate.BazelInvocation {
 	return predicate.BazelInvocation(sql.FieldEQ(FieldBepCompleted, v))
 }
 
+// ActionAnalyticsFailureMessage applies equality check predicate on the "action_analytics_failure_message" field. It's identical to ActionAnalyticsFailureMessageEQ.
+func ActionAnalyticsFailureMessage(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsStartedAt applies equality check predicate on the "action_analytics_started_at" field. It's identical to ActionAnalyticsStartedAtEQ.
+func ActionAnalyticsStartedAt(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldActionAnalyticsStartedAt, v))
+}
+
+// ActionAnalyticsCompletedAt applies equality check predicate on the "action_analytics_completed_at" field. It's identical to ActionAnalyticsCompletedAtEQ.
+func ActionAnalyticsCompletedAt(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldActionAnalyticsCompletedAt, v))
+}
+
+// ExecutionLogFailureMessage applies equality check predicate on the "execution_log_failure_message" field. It's identical to ExecutionLogFailureMessageEQ.
+func ExecutionLogFailureMessage(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogActionCount applies equality check predicate on the "execution_log_action_count" field. It's identical to ExecutionLogActionCountEQ.
+func ExecutionLogActionCount(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldExecutionLogActionCount, v))
+}
+
+// ExecutionLogMatchedActions applies equality check predicate on the "execution_log_matched_actions" field. It's identical to ExecutionLogMatchedActionsEQ.
+func ExecutionLogMatchedActions(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldExecutionLogMatchedActions, v))
+}
+
 // Username applies equality check predicate on the "username" field. It's identical to UsernameEQ.
 func Username(v string) predicate.BazelInvocation {
 	return predicate.BazelInvocation(sql.FieldEQ(FieldUsername, v))
@@ -324,6 +354,386 @@ func BepCompletedEQ(v bool) predicate.BazelInvocation {
 // BepCompletedNEQ applies the NEQ predicate on the "bep_completed" field.
 func BepCompletedNEQ(v bool) predicate.BazelInvocation {
 	return predicate.BazelInvocation(sql.FieldNEQ(FieldBepCompleted, v))
+}
+
+// ActionAnalyticsStateEQ applies the EQ predicate on the "action_analytics_state" field.
+func ActionAnalyticsStateEQ(v ActionAnalyticsState) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldActionAnalyticsState, v))
+}
+
+// ActionAnalyticsStateNEQ applies the NEQ predicate on the "action_analytics_state" field.
+func ActionAnalyticsStateNEQ(v ActionAnalyticsState) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNEQ(FieldActionAnalyticsState, v))
+}
+
+// ActionAnalyticsStateIn applies the In predicate on the "action_analytics_state" field.
+func ActionAnalyticsStateIn(vs ...ActionAnalyticsState) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIn(FieldActionAnalyticsState, vs...))
+}
+
+// ActionAnalyticsStateNotIn applies the NotIn predicate on the "action_analytics_state" field.
+func ActionAnalyticsStateNotIn(vs ...ActionAnalyticsState) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotIn(FieldActionAnalyticsState, vs...))
+}
+
+// ActionAnalyticsFailureMessageEQ applies the EQ predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageEQ(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsFailureMessageNEQ applies the NEQ predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageNEQ(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNEQ(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsFailureMessageIn applies the In predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageIn(vs ...string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIn(FieldActionAnalyticsFailureMessage, vs...))
+}
+
+// ActionAnalyticsFailureMessageNotIn applies the NotIn predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageNotIn(vs ...string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotIn(FieldActionAnalyticsFailureMessage, vs...))
+}
+
+// ActionAnalyticsFailureMessageGT applies the GT predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageGT(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGT(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsFailureMessageGTE applies the GTE predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageGTE(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGTE(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsFailureMessageLT applies the LT predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageLT(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLT(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsFailureMessageLTE applies the LTE predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageLTE(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLTE(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsFailureMessageContains applies the Contains predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageContains(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldContains(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsFailureMessageHasPrefix applies the HasPrefix predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageHasPrefix(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldHasPrefix(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsFailureMessageHasSuffix applies the HasSuffix predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageHasSuffix(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldHasSuffix(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsFailureMessageIsNil applies the IsNil predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageIsNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIsNull(FieldActionAnalyticsFailureMessage))
+}
+
+// ActionAnalyticsFailureMessageNotNil applies the NotNil predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageNotNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotNull(FieldActionAnalyticsFailureMessage))
+}
+
+// ActionAnalyticsFailureMessageEqualFold applies the EqualFold predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageEqualFold(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEqualFold(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsFailureMessageContainsFold applies the ContainsFold predicate on the "action_analytics_failure_message" field.
+func ActionAnalyticsFailureMessageContainsFold(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldContainsFold(FieldActionAnalyticsFailureMessage, v))
+}
+
+// ActionAnalyticsStartedAtEQ applies the EQ predicate on the "action_analytics_started_at" field.
+func ActionAnalyticsStartedAtEQ(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldActionAnalyticsStartedAt, v))
+}
+
+// ActionAnalyticsStartedAtNEQ applies the NEQ predicate on the "action_analytics_started_at" field.
+func ActionAnalyticsStartedAtNEQ(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNEQ(FieldActionAnalyticsStartedAt, v))
+}
+
+// ActionAnalyticsStartedAtIn applies the In predicate on the "action_analytics_started_at" field.
+func ActionAnalyticsStartedAtIn(vs ...time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIn(FieldActionAnalyticsStartedAt, vs...))
+}
+
+// ActionAnalyticsStartedAtNotIn applies the NotIn predicate on the "action_analytics_started_at" field.
+func ActionAnalyticsStartedAtNotIn(vs ...time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotIn(FieldActionAnalyticsStartedAt, vs...))
+}
+
+// ActionAnalyticsStartedAtGT applies the GT predicate on the "action_analytics_started_at" field.
+func ActionAnalyticsStartedAtGT(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGT(FieldActionAnalyticsStartedAt, v))
+}
+
+// ActionAnalyticsStartedAtGTE applies the GTE predicate on the "action_analytics_started_at" field.
+func ActionAnalyticsStartedAtGTE(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGTE(FieldActionAnalyticsStartedAt, v))
+}
+
+// ActionAnalyticsStartedAtLT applies the LT predicate on the "action_analytics_started_at" field.
+func ActionAnalyticsStartedAtLT(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLT(FieldActionAnalyticsStartedAt, v))
+}
+
+// ActionAnalyticsStartedAtLTE applies the LTE predicate on the "action_analytics_started_at" field.
+func ActionAnalyticsStartedAtLTE(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLTE(FieldActionAnalyticsStartedAt, v))
+}
+
+// ActionAnalyticsStartedAtIsNil applies the IsNil predicate on the "action_analytics_started_at" field.
+func ActionAnalyticsStartedAtIsNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIsNull(FieldActionAnalyticsStartedAt))
+}
+
+// ActionAnalyticsStartedAtNotNil applies the NotNil predicate on the "action_analytics_started_at" field.
+func ActionAnalyticsStartedAtNotNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotNull(FieldActionAnalyticsStartedAt))
+}
+
+// ActionAnalyticsCompletedAtEQ applies the EQ predicate on the "action_analytics_completed_at" field.
+func ActionAnalyticsCompletedAtEQ(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldActionAnalyticsCompletedAt, v))
+}
+
+// ActionAnalyticsCompletedAtNEQ applies the NEQ predicate on the "action_analytics_completed_at" field.
+func ActionAnalyticsCompletedAtNEQ(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNEQ(FieldActionAnalyticsCompletedAt, v))
+}
+
+// ActionAnalyticsCompletedAtIn applies the In predicate on the "action_analytics_completed_at" field.
+func ActionAnalyticsCompletedAtIn(vs ...time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIn(FieldActionAnalyticsCompletedAt, vs...))
+}
+
+// ActionAnalyticsCompletedAtNotIn applies the NotIn predicate on the "action_analytics_completed_at" field.
+func ActionAnalyticsCompletedAtNotIn(vs ...time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotIn(FieldActionAnalyticsCompletedAt, vs...))
+}
+
+// ActionAnalyticsCompletedAtGT applies the GT predicate on the "action_analytics_completed_at" field.
+func ActionAnalyticsCompletedAtGT(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGT(FieldActionAnalyticsCompletedAt, v))
+}
+
+// ActionAnalyticsCompletedAtGTE applies the GTE predicate on the "action_analytics_completed_at" field.
+func ActionAnalyticsCompletedAtGTE(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGTE(FieldActionAnalyticsCompletedAt, v))
+}
+
+// ActionAnalyticsCompletedAtLT applies the LT predicate on the "action_analytics_completed_at" field.
+func ActionAnalyticsCompletedAtLT(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLT(FieldActionAnalyticsCompletedAt, v))
+}
+
+// ActionAnalyticsCompletedAtLTE applies the LTE predicate on the "action_analytics_completed_at" field.
+func ActionAnalyticsCompletedAtLTE(v time.Time) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLTE(FieldActionAnalyticsCompletedAt, v))
+}
+
+// ActionAnalyticsCompletedAtIsNil applies the IsNil predicate on the "action_analytics_completed_at" field.
+func ActionAnalyticsCompletedAtIsNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIsNull(FieldActionAnalyticsCompletedAt))
+}
+
+// ActionAnalyticsCompletedAtNotNil applies the NotNil predicate on the "action_analytics_completed_at" field.
+func ActionAnalyticsCompletedAtNotNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotNull(FieldActionAnalyticsCompletedAt))
+}
+
+// ActionAnalyticsResultIsNil applies the IsNil predicate on the "action_analytics_result" field.
+func ActionAnalyticsResultIsNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIsNull(FieldActionAnalyticsResult))
+}
+
+// ActionAnalyticsResultNotNil applies the NotNil predicate on the "action_analytics_result" field.
+func ActionAnalyticsResultNotNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotNull(FieldActionAnalyticsResult))
+}
+
+// ExecutionLogStatusEQ applies the EQ predicate on the "execution_log_status" field.
+func ExecutionLogStatusEQ(v ExecutionLogStatus) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldExecutionLogStatus, v))
+}
+
+// ExecutionLogStatusNEQ applies the NEQ predicate on the "execution_log_status" field.
+func ExecutionLogStatusNEQ(v ExecutionLogStatus) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNEQ(FieldExecutionLogStatus, v))
+}
+
+// ExecutionLogStatusIn applies the In predicate on the "execution_log_status" field.
+func ExecutionLogStatusIn(vs ...ExecutionLogStatus) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIn(FieldExecutionLogStatus, vs...))
+}
+
+// ExecutionLogStatusNotIn applies the NotIn predicate on the "execution_log_status" field.
+func ExecutionLogStatusNotIn(vs ...ExecutionLogStatus) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotIn(FieldExecutionLogStatus, vs...))
+}
+
+// ExecutionLogFailureMessageEQ applies the EQ predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageEQ(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogFailureMessageNEQ applies the NEQ predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageNEQ(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNEQ(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogFailureMessageIn applies the In predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageIn(vs ...string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIn(FieldExecutionLogFailureMessage, vs...))
+}
+
+// ExecutionLogFailureMessageNotIn applies the NotIn predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageNotIn(vs ...string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotIn(FieldExecutionLogFailureMessage, vs...))
+}
+
+// ExecutionLogFailureMessageGT applies the GT predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageGT(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGT(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogFailureMessageGTE applies the GTE predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageGTE(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGTE(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogFailureMessageLT applies the LT predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageLT(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLT(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogFailureMessageLTE applies the LTE predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageLTE(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLTE(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogFailureMessageContains applies the Contains predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageContains(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldContains(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogFailureMessageHasPrefix applies the HasPrefix predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageHasPrefix(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldHasPrefix(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogFailureMessageHasSuffix applies the HasSuffix predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageHasSuffix(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldHasSuffix(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogFailureMessageIsNil applies the IsNil predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageIsNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIsNull(FieldExecutionLogFailureMessage))
+}
+
+// ExecutionLogFailureMessageNotNil applies the NotNil predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageNotNil() predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotNull(FieldExecutionLogFailureMessage))
+}
+
+// ExecutionLogFailureMessageEqualFold applies the EqualFold predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageEqualFold(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEqualFold(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogFailureMessageContainsFold applies the ContainsFold predicate on the "execution_log_failure_message" field.
+func ExecutionLogFailureMessageContainsFold(v string) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldContainsFold(FieldExecutionLogFailureMessage, v))
+}
+
+// ExecutionLogActionCountEQ applies the EQ predicate on the "execution_log_action_count" field.
+func ExecutionLogActionCountEQ(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldExecutionLogActionCount, v))
+}
+
+// ExecutionLogActionCountNEQ applies the NEQ predicate on the "execution_log_action_count" field.
+func ExecutionLogActionCountNEQ(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNEQ(FieldExecutionLogActionCount, v))
+}
+
+// ExecutionLogActionCountIn applies the In predicate on the "execution_log_action_count" field.
+func ExecutionLogActionCountIn(vs ...int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIn(FieldExecutionLogActionCount, vs...))
+}
+
+// ExecutionLogActionCountNotIn applies the NotIn predicate on the "execution_log_action_count" field.
+func ExecutionLogActionCountNotIn(vs ...int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotIn(FieldExecutionLogActionCount, vs...))
+}
+
+// ExecutionLogActionCountGT applies the GT predicate on the "execution_log_action_count" field.
+func ExecutionLogActionCountGT(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGT(FieldExecutionLogActionCount, v))
+}
+
+// ExecutionLogActionCountGTE applies the GTE predicate on the "execution_log_action_count" field.
+func ExecutionLogActionCountGTE(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGTE(FieldExecutionLogActionCount, v))
+}
+
+// ExecutionLogActionCountLT applies the LT predicate on the "execution_log_action_count" field.
+func ExecutionLogActionCountLT(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLT(FieldExecutionLogActionCount, v))
+}
+
+// ExecutionLogActionCountLTE applies the LTE predicate on the "execution_log_action_count" field.
+func ExecutionLogActionCountLTE(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLTE(FieldExecutionLogActionCount, v))
+}
+
+// ExecutionLogMatchedActionsEQ applies the EQ predicate on the "execution_log_matched_actions" field.
+func ExecutionLogMatchedActionsEQ(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldEQ(FieldExecutionLogMatchedActions, v))
+}
+
+// ExecutionLogMatchedActionsNEQ applies the NEQ predicate on the "execution_log_matched_actions" field.
+func ExecutionLogMatchedActionsNEQ(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNEQ(FieldExecutionLogMatchedActions, v))
+}
+
+// ExecutionLogMatchedActionsIn applies the In predicate on the "execution_log_matched_actions" field.
+func ExecutionLogMatchedActionsIn(vs ...int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldIn(FieldExecutionLogMatchedActions, vs...))
+}
+
+// ExecutionLogMatchedActionsNotIn applies the NotIn predicate on the "execution_log_matched_actions" field.
+func ExecutionLogMatchedActionsNotIn(vs ...int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldNotIn(FieldExecutionLogMatchedActions, vs...))
+}
+
+// ExecutionLogMatchedActionsGT applies the GT predicate on the "execution_log_matched_actions" field.
+func ExecutionLogMatchedActionsGT(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGT(FieldExecutionLogMatchedActions, v))
+}
+
+// ExecutionLogMatchedActionsGTE applies the GTE predicate on the "execution_log_matched_actions" field.
+func ExecutionLogMatchedActionsGTE(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldGTE(FieldExecutionLogMatchedActions, v))
+}
+
+// ExecutionLogMatchedActionsLT applies the LT predicate on the "execution_log_matched_actions" field.
+func ExecutionLogMatchedActionsLT(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLT(FieldExecutionLogMatchedActions, v))
+}
+
+// ExecutionLogMatchedActionsLTE applies the LTE predicate on the "execution_log_matched_actions" field.
+func ExecutionLogMatchedActionsLTE(v int64) predicate.BazelInvocation {
+	return predicate.BazelInvocation(sql.FieldLTE(FieldExecutionLogMatchedActions, v))
 }
 
 // UsernameEQ applies the EQ predicate on the "username" field.

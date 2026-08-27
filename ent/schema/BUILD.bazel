@@ -59,6 +59,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/invocation",
+        "//pkg/invocation/actionanalytics",
         "@com_github_google_uuid//:uuid",
         "@io_entgo_contrib//entgql",
         "@io_entgo_ent//:ent",

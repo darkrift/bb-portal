@@ -1,0 +1,37 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "actionanalyticsservice",
+    srcs = ["action_analytics_service.go"],
+    importpath = "github.com/buildbarn/bb-portal/internal/database/actionanalyticsservice",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//ent/gen/ent",
+        "//ent/gen/ent/actionexecution",
+        "//ent/gen/ent/bazelinvocation",
+        "//internal/database",
+        "//internal/database/dbauthservice",
+        "//pkg/invocation/actionanalytics",
+        "@com_github_buildbarn_bb_storage//pkg/clock",
+        "@com_github_buildbarn_bb_storage//pkg/program",
+        "@com_github_buildbarn_bb_storage//pkg/util",
+        "@io_opentelemetry_go_otel//codes",
+        "@io_opentelemetry_go_otel_trace//:trace",
+    ],
+)
+
+go_test(
+    name = "actionanalyticsservice_test",
+    srcs = ["action_analytics_service_test.go"],
+    deps = [
+        ":actionanalyticsservice",
+        "//ent/gen/ent/runtime",
+        "//internal/database/dbauthservice",
+        "//internal/database/embedded",
+        "//pkg/invocation/actionanalytics",
+        "//test/testutils",
+        "@com_github_buildbarn_bb_storage//pkg/clock",
+        "@com_github_stretchr_testify//require",
+        "@io_opentelemetry_go_otel_trace//noop",
+    ],
+)

@@ -73,3 +73,33 @@ models:
   ActionTimingMetrics:
     model:
       - github.com/buildbarn/bb-portal/internal/database/sqlc.GetActionTimingMetricsRow
+  ActionAnalyticsState:
+    model:
+      - github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics.State
+  ExecutionLogStatus:
+    model:
+      - github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics.ExecutionLogStatus
+  ActionAnalytics:
+    model:
+      - github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics.Analytics
+  ActionAnalyticsReport:
+    model:
+      - github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics.Report
+  DurationStatistics:
+    model:
+      - github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics.DurationStatistics
+  NamedDurationStatistics:
+    model:
+      - github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics.NamedDurationStatistics
+  GroupedActionStatistics:
+    model:
+      - github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics.GroupedActionStatistics
+  PlatformProperty:
+    model:
+      - github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics.PlatformProperty
+  ActionStatistics:
+    model:
+      - github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics.ActionStatistics
+  ConcurrencyPoint:
+    model:
+      - github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics.ConcurrencyPoint

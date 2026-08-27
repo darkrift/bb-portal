@@ -3,6 +3,10 @@
 package bazelinvocation
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -23,6 +27,24 @@ const (
 	FieldEndedAt = "ended_at"
 	// FieldBepCompleted holds the string denoting the bep_completed field in the database.
 	FieldBepCompleted = "bep_completed"
+	// FieldActionAnalyticsState holds the string denoting the action_analytics_state field in the database.
+	FieldActionAnalyticsState = "action_analytics_state"
+	// FieldActionAnalyticsFailureMessage holds the string denoting the action_analytics_failure_message field in the database.
+	FieldActionAnalyticsFailureMessage = "action_analytics_failure_message"
+	// FieldActionAnalyticsStartedAt holds the string denoting the action_analytics_started_at field in the database.
+	FieldActionAnalyticsStartedAt = "action_analytics_started_at"
+	// FieldActionAnalyticsCompletedAt holds the string denoting the action_analytics_completed_at field in the database.
+	FieldActionAnalyticsCompletedAt = "action_analytics_completed_at"
+	// FieldActionAnalyticsResult holds the string denoting the action_analytics_result field in the database.
+	FieldActionAnalyticsResult = "action_analytics_result"
+	// FieldExecutionLogStatus holds the string denoting the execution_log_status field in the database.
+	FieldExecutionLogStatus = "execution_log_status"
+	// FieldExecutionLogFailureMessage holds the string denoting the execution_log_failure_message field in the database.
+	FieldExecutionLogFailureMessage = "execution_log_failure_message"
+	// FieldExecutionLogActionCount holds the string denoting the execution_log_action_count field in the database.
+	FieldExecutionLogActionCount = "execution_log_action_count"
+	// FieldExecutionLogMatchedActions holds the string denoting the execution_log_matched_actions field in the database.
+	FieldExecutionLogMatchedActions = "execution_log_matched_actions"
 	// FieldUsername holds the string denoting the username field in the database.
 	FieldUsername = "username"
 	// FieldHostname holds the string denoting the hostname field in the database.
@@ -200,6 +222,15 @@ var Columns = []string{
 	FieldStartedAt,
 	FieldEndedAt,
 	FieldBepCompleted,
+	FieldActionAnalyticsState,
+	FieldActionAnalyticsFailureMessage,
+	FieldActionAnalyticsStartedAt,
+	FieldActionAnalyticsCompletedAt,
+	FieldActionAnalyticsResult,
+	FieldExecutionLogStatus,
+	FieldExecutionLogFailureMessage,
+	FieldExecutionLogActionCount,
+	FieldExecutionLogMatchedActions,
 	FieldUsername,
 	FieldHostname,
 	FieldNumFetches,
@@ -250,6 +281,14 @@ var (
 	Policy ent.Policy
 	// DefaultBepCompleted holds the default value on creation for the "bep_completed" field.
 	DefaultBepCompleted bool
+	// DefaultExecutionLogActionCount holds the default value on creation for the "execution_log_action_count" field.
+	DefaultExecutionLogActionCount int64
+	// ExecutionLogActionCountValidator is a validator for the "execution_log_action_count" field. It is called by the builders before save.
+	ExecutionLogActionCountValidator func(int64) error
+	// DefaultExecutionLogMatchedActions holds the default value on creation for the "execution_log_matched_actions" field.
+	DefaultExecutionLogMatchedActions int64
+	// ExecutionLogMatchedActionsValidator is a validator for the "execution_log_matched_actions" field. It is called by the builders before save.
+	ExecutionLogMatchedActionsValidator func(int64) error
 	// DefaultProcessedEventStarted holds the default value on creation for the "processed_event_started" field.
 	DefaultProcessedEventStarted bool
 	// DefaultProcessedEventBuildMetadata holds the default value on creation for the "processed_event_build_metadata" field.
@@ -259,6 +298,61 @@ var (
 	// DefaultProcessedEventWorkspaceStatus holds the default value on creation for the "processed_event_workspace_status" field.
 	DefaultProcessedEventWorkspaceStatus bool
 )
+
+// ActionAnalyticsState defines the type for the "action_analytics_state" enum field.
+type ActionAnalyticsState string
+
+// ActionAnalyticsStatePENDING is the default value of the ActionAnalyticsState enum.
+const DefaultActionAnalyticsState = ActionAnalyticsStatePENDING
+
+// ActionAnalyticsState values.
+const (
+	ActionAnalyticsStatePENDING    ActionAnalyticsState = "PENDING"
+	ActionAnalyticsStatePROCESSING ActionAnalyticsState = "PROCESSING"
+	ActionAnalyticsStateCOMPLETED  ActionAnalyticsState = "COMPLETED"
+	ActionAnalyticsStateFAILED     ActionAnalyticsState = "FAILED"
+)
+
+func (aas ActionAnalyticsState) String() string {
+	return string(aas)
+}
+
+// ActionAnalyticsStateValidator is a validator for the "action_analytics_state" field enum values. It is called by the builders before save.
+func ActionAnalyticsStateValidator(aas ActionAnalyticsState) error {
+	switch aas {
+	case ActionAnalyticsStatePENDING, ActionAnalyticsStatePROCESSING, ActionAnalyticsStateCOMPLETED, ActionAnalyticsStateFAILED:
+		return nil
+	default:
+		return fmt.Errorf("bazelinvocation: invalid enum value for action_analytics_state field: %q", aas)
+	}
+}
+
+// ExecutionLogStatus defines the type for the "execution_log_status" enum field.
+type ExecutionLogStatus string
+
+// ExecutionLogStatusNOT_PROVIDED is the default value of the ExecutionLogStatus enum.
+const DefaultExecutionLogStatus = ExecutionLogStatusNOT_PROVIDED
+
+// ExecutionLogStatus values.
+const (
+	ExecutionLogStatusNOT_PROVIDED ExecutionLogStatus = "NOT_PROVIDED"
+	ExecutionLogStatusPROCESSED    ExecutionLogStatus = "PROCESSED"
+	ExecutionLogStatusFAILED       ExecutionLogStatus = "FAILED"
+)
+
+func (els ExecutionLogStatus) String() string {
+	return string(els)
+}
+
+// ExecutionLogStatusValidator is a validator for the "execution_log_status" field enum values. It is called by the builders before save.
+func ExecutionLogStatusValidator(els ExecutionLogStatus) error {
+	switch els {
+	case ExecutionLogStatusNOT_PROVIDED, ExecutionLogStatusPROCESSED, ExecutionLogStatusFAILED:
+		return nil
+	default:
+		return fmt.Errorf("bazelinvocation: invalid enum value for execution_log_status field: %q", els)
+	}
+}
 
 // OrderOption defines the ordering options for the BazelInvocation queries.
 type OrderOption func(*sql.Selector)
@@ -291,6 +385,46 @@ func ByEndedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByBepCompleted orders the results by the bep_completed field.
 func ByBepCompleted(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldBepCompleted, opts...).ToFunc()
+}
+
+// ByActionAnalyticsState orders the results by the action_analytics_state field.
+func ByActionAnalyticsState(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActionAnalyticsState, opts...).ToFunc()
+}
+
+// ByActionAnalyticsFailureMessage orders the results by the action_analytics_failure_message field.
+func ByActionAnalyticsFailureMessage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActionAnalyticsFailureMessage, opts...).ToFunc()
+}
+
+// ByActionAnalyticsStartedAt orders the results by the action_analytics_started_at field.
+func ByActionAnalyticsStartedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActionAnalyticsStartedAt, opts...).ToFunc()
+}
+
+// ByActionAnalyticsCompletedAt orders the results by the action_analytics_completed_at field.
+func ByActionAnalyticsCompletedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActionAnalyticsCompletedAt, opts...).ToFunc()
+}
+
+// ByExecutionLogStatus orders the results by the execution_log_status field.
+func ByExecutionLogStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExecutionLogStatus, opts...).ToFunc()
+}
+
+// ByExecutionLogFailureMessage orders the results by the execution_log_failure_message field.
+func ByExecutionLogFailureMessage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExecutionLogFailureMessage, opts...).ToFunc()
+}
+
+// ByExecutionLogActionCount orders the results by the execution_log_action_count field.
+func ByExecutionLogActionCount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExecutionLogActionCount, opts...).ToFunc()
+}
+
+// ByExecutionLogMatchedActions orders the results by the execution_log_matched_actions field.
+func ByExecutionLogMatchedActions(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExecutionLogMatchedActions, opts...).ToFunc()
 }
 
 // ByUsername orders the results by the username field.
@@ -612,4 +746,40 @@ func newSourceControlStep() *sqlgraph.Step {
 		sqlgraph.To(SourceControlInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SourceControlTable, SourceControlColumn),
 	)
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e ActionAnalyticsState) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *ActionAnalyticsState) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = ActionAnalyticsState(str)
+	if err := ActionAnalyticsStateValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid ActionAnalyticsState", str)
+	}
+	return nil
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e ExecutionLogStatus) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *ExecutionLogStatus) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = ExecutionLogStatus(str)
+	if err := ExecutionLogStatusValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid ExecutionLogStatus", str)
+	}
+	return nil
 }

@@ -18,6 +18,7 @@ import (
 	"github.com/buildbarn/bb-portal/ent/gen/ent/testsummary"
 	"github.com/buildbarn/bb-portal/internal/database/sqlc"
 	"github.com/buildbarn/bb-portal/internal/graphql/helpers"
+	"github.com/buildbarn/bb-portal/pkg/invocation/actionanalytics"
 	"github.com/buildbarn/bb-storage/pkg/util"
 	"github.com/google/uuid"
 )
@@ -29,6 +30,21 @@ func (r *bazelInvocationResolver) ActionTimingMetrics(ctx context.Context, obj *
 		return nil, util.StatusWrap(err, "Failed to query action timing metrics")
 	}
 	return &metrics, nil
+}
+
+// ActionAnalytics is the resolver for the actionAnalytics field.
+func (r *bazelInvocationResolver) ActionAnalytics(ctx context.Context, obj *ent.BazelInvocation) (*actionanalytics.Analytics, error) {
+	return &actionanalytics.Analytics{
+		State:                      actionanalytics.State(obj.ActionAnalyticsState),
+		FailureMessage:             optionalString(obj.ActionAnalyticsFailureMessage),
+		StartedAt:                  obj.ActionAnalyticsStartedAt,
+		CompletedAt:                obj.ActionAnalyticsCompletedAt,
+		ExecutionLogStatus:         actionanalytics.ExecutionLogStatus(obj.ExecutionLogStatus),
+		ExecutionLogFailureMessage: optionalString(obj.ExecutionLogFailureMessage),
+		ExecutionLogActionCount:    obj.ExecutionLogActionCount,
+		ExecutionLogMatchedActions: obj.ExecutionLogMatchedActions,
+		Report:                     obj.ActionAnalyticsResult,
+	}, nil
 }
 
 // TimeSinceLastConnectionMillis is the resolver for the timeSinceLastConnectionMillis field.
