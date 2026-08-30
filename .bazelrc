@@ -8,11 +8,15 @@ common --@rules_go//go/config:pure
 common:enable_reload --@rules_itest//:enable_per_service_reload
 build:enable_reload --//pkg/frontend:embed_frontend=False
 
-# Send a local Bazel invocation to //test/itest:bb_portal.
-build:bb_portal_itest --bes_backend=grpc://127.0.0.1:18082
+# Send a local Bazel invocation through nbes, which fans the BES stream out to
+# both Conduit and //test/itest:bb_portal.
+build:bb_portal_itest --bes_backend=grpc://127.0.0.1:18084
 build:bb_portal_itest --bes_results_url=http://127.0.0.1:18081/bazel-invocations/
 build:bb_portal_itest --bes_upload_mode=wait_for_upload_complete
 build:bb_portal_itest --build_event_publish_all_actions
+# Conduit discovers this path in the BES OptionsParsed event and live-tails it
+# through the matching bind mount in the integration-test Compose stack.
+build:bb_portal_itest --execution_log_compact_file=/tmp/bb-portal-itest-execution-log.compact
 
 # Execute actions on the local Buildbarn worker started by
 # //test/itest:bb_portal. The Linux execution platform makes toolchain

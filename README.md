@@ -65,7 +65,7 @@ For an isolated PostgreSQL, independently reloadable Vite frontend and Go
 backend, and a local Buildbarn remote-execution cluster, run:
 
 ```
-~/.local/bin/ibazel run --config=enable_reload //test/itest:bb_portal
+ibazel run --config=enable_reload //test/itest:bb_portal
 ```
 
 Then execute a smoke action on the local worker and publish its invocation to
@@ -75,8 +75,10 @@ the portal from another terminal:
 bazel build --config=local_rbe --config=bb_portal_itest --noremote_accept_cached //test/itest:rbe_smoke
 ```
 
-The UI is available at <http://127.0.0.1:18081>, and Jaeger is available at
-<http://127.0.0.1:16686>. See
+The [iBazel (bazel-watcher)](https://github.com/bazelbuild/bazel-watcher)
+command gives any Bazel target hot-reload behavior similar to a JavaScript
+development server. The UI is available at <http://127.0.0.1:18081>, and
+Jaeger is available at <http://127.0.0.1:16686>. See
 [`test/itest/README.md`](test/itest/README.md) for the ports and complete
 workflow.
 

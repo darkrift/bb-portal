@@ -1,0 +1,11 @@
+server:
+  listen: 0.0.0.0:9000
+
+# nbes fans each incoming BES stream out concurrently. Conduit is declared
+# first for readability; both blocking backends must acknowledge the stream
+# before Bazel receives success.
+bes_backends:
+  - name: conduit
+    endpoint: grpc://conduit:8080
+  - name: bb-portal
+    endpoint: grpc://host.docker.internal:18082

@@ -69,6 +69,39 @@ services:
       volume-initializer:
         condition: service_completed_successfully
 
+  conduit:
+    image: bb-portal-itest/bazel-conduit:2cdfc1e
+    command:
+      - --serve
+      - --listen-addr=0.0.0.0
+      - --port=8080
+      - --export=otlp
+      - --otlp-endpoint=http://jaeger:4317
+    ports:
+      - 18083:8080
+    volumes:
+      # Bazel writes the compact execution log to an absolute /tmp path. Bind
+      # the same host path into Conduit so it can live-tail that file.
+      - type: bind
+        source: /tmp
+        target: /tmp
+        read_only: true
+    depends_on:
+      jaeger:
+        condition: service_started
+
+  nbes:
+    image: ghcr.io/kormide/nbes@sha256:034fcf0e532a0b4886778ff4e744c2e3df63cca88eb16f515c42bca2f0be319c
+    ports:
+      - 18084:9000
+    volumes:
+      - ./config/nbes.yaml:/config.yaml:ro
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      conduit:
+        condition: service_started
+
   frontend:
     image: ghcr.io/buildbarn/bb-storage@sha256:36201141f924865ddbea1bc518c4f98dd0dbb744181ef34f9f5e864d3dcf43f8
     command: [/config/frontend.jsonnet]

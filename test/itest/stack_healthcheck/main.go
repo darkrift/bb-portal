@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"time"
@@ -29,8 +30,8 @@ func main() {
 }
 
 func run() error {
-	if len(os.Args) != 5 {
-		return fmt.Errorf("usage: stack_healthcheck POSTGRESQL_CONNECTION_STRING CAS_ADDRESS SCHEDULER_ADDRESS JAEGER_URL")
+	if len(os.Args) != 7 {
+		return fmt.Errorf("usage: stack_healthcheck POSTGRESQL_CONNECTION_STRING CAS_ADDRESS SCHEDULER_ADDRESS JAEGER_URL CONDUIT_ADDRESS NBES_ADDRESS")
 	}
 	if err := checkPostgres(os.Args[1]); err != nil {
 		return err
@@ -41,7 +42,21 @@ func run() error {
 	if err := checkWorker(os.Args[3]); err != nil {
 		return err
 	}
-	return checkJaeger(os.Args[4])
+	if err := checkJaeger(os.Args[4]); err != nil {
+		return err
+	}
+	if err := checkTCP("Conduit", os.Args[5]); err != nil {
+		return err
+	}
+	return checkTCP("nbes", os.Args[6])
+}
+
+func checkTCP(name, address string) error {
+	connection, err := net.DialTimeout("tcp", address, requestTimeout)
+	if err != nil {
+		return fmt.Errorf("%s is not ready: %w", name, err)
+	}
+	return connection.Close()
 }
 
 func checkPostgres(connectionString string) error {
